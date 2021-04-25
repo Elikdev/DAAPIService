@@ -3,7 +3,19 @@
 Drinkol App API Service
 
 ## Build image
-`docker build --pull --rm -f "Dockerfile" -t daapiservice:latest "."`
+`docker-compose build`
 
 ## Run container 
-`docker run --rm -d  -p 8080:8080/tcp daapiservice:latest`
+`docker-compose up -d`
+
+## Tail logs
+`docker logs -f <container_id>`
+
+## Access container
+`docker exec -it <container_id> /bin/bash`
+
+## Run with prod config
+`docker-compose -f docker-compose.yml -f docker-compose.prod.yml up`
+
+## Down
+`docker-compose down`
