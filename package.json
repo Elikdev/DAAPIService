@@ -1,0 +1,14 @@
+{
+  "name": "DAAPIService",
+  "version": "0.1.0",
+  "description": "Node.js on Docker",
+  "author": "Ruhao Xia <1994ep@gmail.com>",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.16.1",
+    "sequelize": "^6.6.2"
+  }
+}
