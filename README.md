@@ -1,6 +1,14 @@
 # DAAPIService
 
-Drinkol App API Service
+NodeJS + Express + TypeScript + TypeORM + Docker + Postgres API Service 
+
+### Reference
+
+https://medium.com/@rcuni8/create-expressjs-server-with-typeorm-and-postgres-using-docker-and-docker-compose-66f1ebc9d94b
+
+https://nodejs.org/en/docs/guides/nodejs-docker-webapp/#create-the-node-js-app
+
+https://typeorm.io/#/
 
 ## Install packages and run
 `npm install`
