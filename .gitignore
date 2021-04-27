@@ -1,4 +1,7 @@
-node_modules
-.DS_Store
-.docker
-build
+.idea/
+.vscode/
+node_modules/
+build/
+tmp/
+temp/
+pgdata

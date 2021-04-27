@@ -2,6 +2,11 @@
 
 Drinkol App API Service
 
+## Install packages and run
+`npm install`
+`npm run build`
+`npm run dev`
+
 ## Build image
 `docker-compose build`
 

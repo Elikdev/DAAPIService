@@ -8,12 +8,10 @@ WORKDIR /home/node/app
 # where available (npm@5+)
 COPY package*.json ./
 
-RUN npm install
-RUN npm run lint-and-fix
-# If you are building your code for production
-# RUN npm ci --only=production
+RUN npm config set registry https://registry.npm.taobao.org
 
-# Bundle app source
+RUN npm install
+
 COPY . .
 
 FROM base as production
@@ -21,3 +19,5 @@ FROM base as production
 ENV NODE_PATH=./build
 
 RUN npm run build
+
+RUN npm ci --only=production
