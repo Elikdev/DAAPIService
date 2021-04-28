@@ -32,3 +32,7 @@ https://typeorm.io/#/
 
 ## Down
 `docker-compose down`
+
+## type-orm-model-generator
+1. npm i -g typeorm-model-generator
+2. run npx typeorm-model-generator -h localhost -d da_devo -p 5432 -u postgres -x password -e postgres -o entities --noConfig true --ce pascal --cp camel
