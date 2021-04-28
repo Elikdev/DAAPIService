@@ -6,7 +6,7 @@ export const DBConfig:ConnectionOptions = {
   "port": 5432,
   "username": "postgres",
   "password": "password",
-  "database": "drinkol",
+  "database": "da_devo",
   "synchronize": true,
   "logging": false,
   "entities": [

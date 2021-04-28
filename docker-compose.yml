@@ -11,7 +11,7 @@ services:
       PGPORT: 5432
       POSTGRES_USER: 'postgres'
       POSTGRES_PASSWORD: 'password'
-      POSTGRES_DB: 'drinkol'
+      POSTGRES_DB: 'da_devo'
       # POSTGRES_HOST_AUTH_METHOD: 'trust'
   tsnodedocker:
     restart: always
