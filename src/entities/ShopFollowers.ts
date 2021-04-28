@@ -1,9 +1,9 @@
-import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 import { Shops } from "./Shops";
 
 @Entity("shop_followers", { schema: "public" })
 export class ShopFollowers {
-  @Column("integer", { name: "follower_id", nullable: true })
+  @PrimaryColumn("integer", { name: "follower_id" })
   followerId: number | null;
 
   @ManyToOne(() => Shops, (shops) => shops.shopFollowers)

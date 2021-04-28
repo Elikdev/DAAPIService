@@ -9,7 +9,9 @@
       "lint-and-fix": "eslint . --ext .ts --fix",
       "start": "ts-node src/index.ts",
       "build": "tsc -p .",
-      "dev": "nodemon src/index.ts"
+      "dev": "nodemon src/index.ts",
+      "typeorm:cli": "ts-node ./node_modules/typeorm/cli -f ormconfig.json"
+
    },
    "dependencies": {
       "express": "^4.16.1",

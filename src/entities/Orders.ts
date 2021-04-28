@@ -13,8 +13,8 @@ import { Users } from "./Users";
 @Index("orders_pkey", ["id"], { unique: true })
 @Entity("orders", { schema: "public" })
 export class Orders {
-  @Column("integer", { primary: true, name: "id" })
-  id: number;
+  @Column("uuid", { primary: true, name: "id" })
+  id: string;
 
   @Column("integer", { name: "buyer_id", unique: true })
   buyerId: number;
@@ -22,7 +22,7 @@ export class Orders {
   @Column("integer", { name: "seller_shop_id", nullable: true })
   sellerShopId: number | null;
 
-  @Column("double precision", { name: "amount", nullable: true, precision: 53 })
+  @Column("double precision", { name: "amount", nullable: true })
   amount: number | null;
 
   @Column("json", { name: "items", nullable: true })

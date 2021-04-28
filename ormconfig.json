@@ -1,27 +1,23 @@
 {
    "type": "postgres",
-   "host": "postgresdb",
+   "host": "localhost",
    "port": 5432,
    "username": "postgres",
    "password": "password",
    "database": "da_devo",
    "synchronize": true,
    "logging": false,
-   "entities": [
-      "src/entity/**/*.ts"
-   ],
-   "migrations": [
-      "src/migration/**/*.ts"
-   ],
+   "entities": ["src/entities/**/*.ts"],
+   "migrations": ["src/migration/**/*.ts"],
    "subscribers": [
       "src/subscriber/**/*.ts"
    ],
    "cli": {
-      "entitiesDir": "src/entity",
+      "entitiesDir": "src/entities",
       "migrationsDir": "src/migration",
       "subscribersDir": "src/subscriber"
    },
    "autoReconnect": true,
    "reconnectTries": 10,
    "reconnectInterval": 2000
-}
+}       

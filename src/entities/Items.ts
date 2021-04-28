@@ -5,23 +5,24 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
+  PrimaryColumn
 } from "typeorm";
+import { ItemComments } from "./ItemComments";
+import { ItemLikes } from "./ItemLikes";
+import { ItemSaves } from "./ItemSaves";
 import { Orders } from "./Orders";
 import { Shops } from "./Shops";
-import { ItmeComments } from "./ItmeComments";
-import { ItmeLikes } from "./ItmeLikes";
-import { ItmeSaves } from "./ItmeSaves";
 
 @Index("items_pkey", ["id"], { unique: true })
 @Entity("items", { schema: "public" })
 export class Items {
-  @Column("integer", { primary: true, name: "id" })
+  @PrimaryColumn("integer", { primary: true, name: "id" })
   id: number;
 
   @Column("character varying", { name: "name", nullable: true })
   name: string | null;
 
-  @Column("double precision", { name: "price", nullable: true, precision: 53 })
+  @Column("double precision", { name: "price", nullable: true})
   price: number | null;
 
   @Column("character varying", { name: "condition", nullable: true })
@@ -42,6 +43,15 @@ export class Items {
   @Column("timestamp without time zone", { name: "created_at", nullable: true })
   createdAt: Date | null;
 
+  @OneToMany(() => ItemComments, (itemComments) => itemComments.item)
+  itemComments: ItemComments[];
+
+  @OneToMany(() => ItemLikes, (itemLikes) => itemLikes.item)
+  itemLikes: ItemLikes[];
+
+  @OneToMany(() => ItemSaves, (itemSaves) => itemSaves.item)
+  itemSaves: ItemSaves[];
+
   @ManyToOne(() => Orders, (orders) => orders.items2)
   @JoinColumn([{ name: "order_id", referencedColumnName: "id" }])
   order: Orders;
@@ -49,13 +59,4 @@ export class Items {
   @ManyToOne(() => Shops, (shops) => shops.items)
   @JoinColumn([{ name: "shop_id", referencedColumnName: "id" }])
   shop: Shops;
-
-  @OneToMany(() => ItmeComments, (itmeComments) => itmeComments.item)
-  itmeComments: ItmeComments[];
-
-  @OneToMany(() => ItmeLikes, (itmeLikes) => itmeLikes.item)
-  itmeLikes: ItmeLikes[];
-
-  @OneToMany(() => ItmeSaves, (itmeSaves) => itmeSaves.item)
-  itmeSaves: ItmeSaves[];
 }

@@ -10,7 +10,7 @@ export const DBConfig:ConnectionOptions = {
   "synchronize": true,
   "logging": false,
   "entities": [
-    "src/entity/**/*.ts"
+    "src/entities/**/*.ts"
   ],
   "migrations": [
     "src/migration/**/*.ts"
@@ -19,8 +19,11 @@ export const DBConfig:ConnectionOptions = {
     "src/subscriber/**/*.ts"
   ],
   "cli": {
-    "entitiesDir": "src/entity",
+    "entitiesDir": "src/entities",
     "migrationsDir": "src/migration",
     "subscribersDir": "src/subscriber"
   }
 };
+
+
+

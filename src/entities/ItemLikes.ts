@@ -1,10 +1,10 @@
-import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 import { Items } from "./Items";
 
-@Entity("itme_likes", { schema: "public" })
-export class ItmeLikes {
-  @Column("integer", { name: "id", nullable: true })
-  id: number | null;
+@Entity("item_likes", { schema: "public" })
+export class ItemLikes {
+  @PrimaryColumn("uuid", { name: "id" })
+  id: string | null;
 
   @Column("integer", { name: "liked_by", nullable: true })
   likedBy: number | null;
@@ -12,7 +12,7 @@ export class ItmeLikes {
   @Column("timestamp without time zone", { name: "created_at", nullable: true })
   createdAt: Date | null;
 
-  @ManyToOne(() => Items, (items) => items.itmeLikes)
+  @ManyToOne(() => Items, (items) => items.itemLikes)
   @JoinColumn([{ name: "item_id", referencedColumnName: "id" }])
   item: Items;
 }

@@ -41,6 +41,9 @@ export class Users {
   @Column("character varying", { name: "district", nullable: true })
   district: string | null;
 
+  @Column("character varying", { name: "city", nullable: true })
+  city: string | null;
+
   @Column("character varying", { name: "shop_id", nullable: true })
   shopId: string | null;
 
@@ -49,9 +52,6 @@ export class Users {
 
   @Column("timestamp without time zone", { name: "created_at", nullable: true })
   createdAt: Date | null;
-
-  @Column("character varying", { name: "city", nullable: true })
-  city: string | null;
 
   @OneToMany(() => Orders, (orders) => orders.seller)
   orders: Orders[];

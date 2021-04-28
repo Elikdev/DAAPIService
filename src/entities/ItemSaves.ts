@@ -1,10 +1,10 @@
-import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 import { Items } from "./Items";
 
-@Entity("itme_saves", { schema: "public" })
-export class ItmeSaves {
-  @Column("integer", { name: "id", nullable: true })
-  id: number | null;
+@Entity("item_saves", { schema: "public" })
+export class ItemSaves {
+  @PrimaryColumn("uuid", { name: "id" })
+  id: string | null;
 
   @Column("integer", { name: "saved_by", nullable: true })
   savedBy: number | null;
@@ -12,7 +12,7 @@ export class ItmeSaves {
   @Column("timestamp without time zone", { name: "created_at", nullable: true })
   createdAt: Date | null;
 
-  @ManyToOne(() => Items, (items) => items.itmeSaves)
+  @ManyToOne(() => Items, (items) => items.itemSaves)
   @JoinColumn([{ name: "item_id", referencedColumnName: "id" }])
   item: Items;
 }
