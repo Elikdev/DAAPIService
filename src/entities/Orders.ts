@@ -27,7 +27,7 @@ export class Orders {
   amount: number | null;
 
   @Column("json", {nullable: true })
-  items: object | null;
+  itemsJson: object | null;
 
   @Column("character varying", {nullable: true })
   trackingNum: string | null;
@@ -42,7 +42,7 @@ export class Orders {
   createdAt: string | null;
 
   @OneToMany(() => Items, (items) => items.order)
-  items2: Items[];
+  orderItems: Items[];
 
   @ManyToOne(() => Users, (users) => users.orders)
   @JoinColumn([{referencedColumnName: "id" }])

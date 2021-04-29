@@ -52,7 +52,7 @@ export class Items {
   @OneToMany(() => ItemSaves, (itemSaves) => itemSaves.item)
   itemSaves: ItemSaves[];
 
-  @ManyToOne(() => Orders, (orders) => orders.items2)
+  @ManyToOne(() => Orders, (orders) => orders.orderItems)
   @JoinColumn([{referencedColumnName: "id" }])
   order: Orders;
 
