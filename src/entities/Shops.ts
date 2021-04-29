@@ -14,28 +14,28 @@ import { Users } from "./Users";
 @Index("shops_pkey", ["id"], { unique: true })
 @Entity("shops", { schema: "public" })
 export class Shops {
-  @PrimaryGeneratedColumn({ type: "integer", name: "id" })
-  id: number;
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
 
-  @Column("character varying", { name: "name", nullable: true })
+  @Column("character varying", {nullable: true })
   name: string | null;
 
-  @Column("character varying", { name: "introduction", nullable: true })
+  @Column("character varying", {nullable: true })
   introduction: string | null;
 
-  @Column("character varying", { name: "location", nullable: true })
+  @Column("character varying", {nullable: true })
   location: string | null;
 
-  @Column("character varying", { name: "review_star", nullable: true })
+  @Column("character varying", {nullable: true })
   reviewStar: string | null;
 
-  @Column("character varying", { name: "logo_url", nullable: true })
+  @Column("character varying", {nullable: true })
   logoUrl: string | null;
 
-  @Column("timestamp without time zone", { name: "created_at", nullable: true })
+  @Column("timestamp without time zone", {nullable: true })
   createdAt: Date | null;
 
-  @Column("character varying", { name: "comission_rate", nullable: true })
+  @Column("character varying", {nullable: true })
   comissionRate: string | null;
 
   @OneToMany(() => Items, (items) => items.shop)
@@ -45,6 +45,6 @@ export class Shops {
   shopFollowers: ShopFollowers[];
 
   @ManyToOne(() => Users, (users) => users.shops)
-  @JoinColumn([{ name: "owner_id", referencedColumnName: "id" }])
+  @JoinColumn([{referencedColumnName: "id" }])
   owner: Users;
 }

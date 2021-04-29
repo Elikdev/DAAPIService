@@ -11,46 +11,46 @@ import { Shops } from "./Shops";
 @Index("users_pkey", ["id"], { unique: true })
 @Entity("users", { schema: "public" })
 export class Users {
-  @PrimaryGeneratedColumn({ type: "integer", name: "id" })
-  id: number;
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
 
-  @Column("character varying", { name: "open_id", nullable: true })
+  @Column("character varying", {nullable: true })
   openId: string | null;
 
-  @Column("character varying", { name: "full_name", nullable: true })
+  @Column("character varying", {nullable: true })
   fullName: string | null;
 
-  @Column("character varying", { name: "avatar", nullable: true })
+  @Column("character varying", {nullable: true })
   avatar: string | null;
 
-  @Column("character varying", { name: "phone", nullable: true })
+  @Column("character varying", {nullable: true })
   phone: string | null;
 
-  @Column("character varying", { name: "email", nullable: true })
+  @Column("character varying", {nullable: true })
   email: string | null;
 
-  @Column("character varying", { name: "country", nullable: true })
+  @Column("character varying", {nullable: true })
   country: string | null;
 
-  @Column("character varying", { name: "zip_code", nullable: true })
+  @Column("character varying", {nullable: true })
   zipCode: string | null;
 
-  @Column("character varying", { name: "province", nullable: true })
+  @Column("character varying", {nullable: true })
   province: string | null;
 
-  @Column("character varying", { name: "district", nullable: true })
+  @Column("character varying", {nullable: true })
   district: string | null;
 
-  @Column("character varying", { name: "city", nullable: true })
+  @Column("character varying", {nullable: true })
   city: string | null;
 
-  @Column("character varying", { name: "shop_id", nullable: true })
+  @Column("character varying", {nullable: true })
   shopId: string | null;
 
-  @Column("character varying", { name: "role", nullable: true })
+  @Column("character varying", {nullable: true })
   role: string | null;
 
-  @Column("timestamp without time zone", { name: "created_at", nullable: true })
+  @Column("timestamp without time zone", {nullable: true })
   createdAt: Date | null;
 
   @OneToMany(() => Orders, (orders) => orders.seller)

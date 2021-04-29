@@ -5,6 +5,7 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
+  PrimaryGeneratedColumn
 } from "typeorm";
 import { Items } from "./Items";
 import { Users } from "./Users";
@@ -13,37 +14,37 @@ import { Users } from "./Users";
 @Index("orders_pkey", ["id"], { unique: true })
 @Entity("orders", { schema: "public" })
 export class Orders {
-  @Column("uuid", { primary: true, name: "id" })
+  @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @Column("integer", { name: "buyer_id", unique: true })
+  @Column("integer", {unique: true })
   buyerId: number;
 
-  @Column("integer", { name: "seller_shop_id", nullable: true })
+  @Column("integer", {nullable: true })
   sellerShopId: number | null;
 
-  @Column("double precision", { name: "amount", nullable: true })
+  @Column("double precision", {nullable: true })
   amount: number | null;
 
-  @Column("json", { name: "items", nullable: true })
+  @Column("json", {nullable: true })
   items: object | null;
 
-  @Column("character varying", { name: "tracking_num", nullable: true })
+  @Column("character varying", {nullable: true })
   trackingNum: string | null;
 
-  @Column("character varying", { name: "status", nullable: true })
+  @Column("character varying", {nullable: true })
   status: string | null;
 
-  @Column("timestamp without time zone", { name: "updated_at", nullable: true })
+  @Column("timestamp without time zone", {nullable: true })
   updatedAt: Date | null;
 
-  @Column("character varying", { name: "created_at", nullable: true })
+  @Column("character varying", {nullable: true })
   createdAt: string | null;
 
   @OneToMany(() => Items, (items) => items.order)
   items2: Items[];
 
   @ManyToOne(() => Users, (users) => users.orders)
-  @JoinColumn([{ name: "seller_id", referencedColumnName: "id" }])
+  @JoinColumn([{referencedColumnName: "id" }])
   seller: Users;
 }

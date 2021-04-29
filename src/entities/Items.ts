@@ -5,7 +5,7 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
-  PrimaryColumn
+  PrimaryGeneratedColumn
 } from "typeorm";
 import { ItemComments } from "./ItemComments";
 import { ItemLikes } from "./ItemLikes";
@@ -16,31 +16,31 @@ import { Shops } from "./Shops";
 @Index("items_pkey", ["id"], { unique: true })
 @Entity("items", { schema: "public" })
 export class Items {
-  @PrimaryColumn("integer", { primary: true, name: "id" })
-  id: number;
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
 
-  @Column("character varying", { name: "name", nullable: true })
+  @Column("character varying", {nullable: true })
   name: string | null;
 
-  @Column("double precision", { name: "price", nullable: true})
+  @Column("double precision", {nullable: true})
   price: number | null;
 
-  @Column("character varying", { name: "condition", nullable: true })
+  @Column("character varying", {nullable: true })
   condition: string | null;
 
-  @Column("character varying", { name: "color", nullable: true })
+  @Column("character varying", {nullable: true })
   color: string | null;
 
-  @Column("character varying", { name: "size", nullable: true })
+  @Column("character varying", {nullable: true })
   size: string | null;
 
-  @Column("character varying", { name: "description", nullable: true })
+  @Column("character varying", {nullable: true })
   description: string | null;
 
-  @Column("character varying", { name: "status", nullable: true })
+  @Column("character varying", {nullable: true })
   status: string | null;
 
-  @Column("timestamp without time zone", { name: "created_at", nullable: true })
+  @Column("timestamp without time zone", {nullable: true })
   createdAt: Date | null;
 
   @OneToMany(() => ItemComments, (itemComments) => itemComments.item)
@@ -53,10 +53,10 @@ export class Items {
   itemSaves: ItemSaves[];
 
   @ManyToOne(() => Orders, (orders) => orders.items2)
-  @JoinColumn([{ name: "order_id", referencedColumnName: "id" }])
+  @JoinColumn([{referencedColumnName: "id" }])
   order: Orders;
 
   @ManyToOne(() => Shops, (shops) => shops.items)
-  @JoinColumn([{ name: "shop_id", referencedColumnName: "id" }])
+  @JoinColumn([{referencedColumnName: "id" }])
   shop: Shops;
 }
