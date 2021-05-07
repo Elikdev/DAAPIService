@@ -34,6 +34,12 @@ export class Items {
   @Column("character varying", {nullable: true })
   size: string | null;
 
+  @Column("json", {nullable: true })
+  imageUrls: object | null;
+
+  @Column("character varying", {nullable: true })
+  factoryDate: string | null;
+
   @Column("character varying", {nullable: true })
   description: string | null;
 
