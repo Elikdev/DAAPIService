@@ -1,12 +1,11 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Shops } from "./Shops";
 
-@Entity("shop_followers", { schema: "public" })
+@Entity("shop_followers")
 export class ShopFollowers {
   @PrimaryGeneratedColumn("uuid")
   followerId: string;
 
-  @ManyToOne(() => Shops, (shops) => shops.shopFollowers)
-  @JoinColumn([{referencedColumnName: "id" }])
+  @ManyToOne(() => Shops)
   shop: Shops;
 }

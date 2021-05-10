@@ -2,19 +2,14 @@ import {
   Column,
   Entity,
   Index,
-  JoinColumn,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn
 } from "typeorm";
-import { ItemComments } from "./ItemComments";
-import { ItemLikes } from "./ItemLikes";
-import { ItemSaves } from "./ItemSaves";
 import { Orders } from "./Orders";
 import { Shops } from "./Shops";
 
 @Index("items_pkey", ["id"], { unique: true })
-@Entity("items", { schema: "public" })
+@Entity("items")
 export class Items {
   @PrimaryGeneratedColumn("uuid")
   id: string;
@@ -49,20 +44,9 @@ export class Items {
   @Column("timestamp without time zone", {nullable: true })
   createdAt: Date | null;
 
-  @OneToMany(() => ItemComments, (itemComments) => itemComments.item)
-  itemComments: ItemComments[];
-
-  @OneToMany(() => ItemLikes, (itemLikes) => itemLikes.item)
-  itemLikes: ItemLikes[];
-
-  @OneToMany(() => ItemSaves, (itemSaves) => itemSaves.item)
-  itemSaves: ItemSaves[];
-
-  @ManyToOne(() => Orders, (orders) => orders.orderItems)
-  @JoinColumn([{referencedColumnName: "id" }])
+  @ManyToOne(() => Orders)
   order: Orders;
 
-  @ManyToOne(() => Shops, (shops) => shops.items)
-  @JoinColumn([{referencedColumnName: "id" }])
+  @ManyToOne(() => Shops)
   shop: Shops;
 }

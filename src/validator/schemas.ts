@@ -1,14 +1,7 @@
 import Joi from "joi";
 
-export const exampleSchema = Joi.object().keys({
-  title: Joi.string().required(),
-  engTitle: Joi.string(),
-  description: Joi.string(),
-  manufacter: Joi.string(),
-  origin: Joi.string(),
-  retailPrice: Joi.number(),
-  category: Joi.string(),
-  abv: Joi.number(),
-  volume: Joi.number(),
-  descriptors: Joi.string(),
+export const signUpSchema = Joi.object().keys({
+  username: Joi.string().required(),
+  mobile: Joi.string().pattern(/^[0-9]+$/).required(), 
+  mobilePrefix: Joi.string().max(5).required()
 });

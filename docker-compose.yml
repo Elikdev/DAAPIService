@@ -1,22 +1,9 @@
 version: '3.7'
 
 services:
-  postgresdb:
-    image: postgres:10-alpine
-    volumes:
-      - ./pgdata:/var/lib/postgresql/data
-    ports:
-      - '5432:5432'
-    environment:
-      PGPORT: 5432
-      POSTGRES_USER: 'postgres'
-      POSTGRES_PASSWORD: 'password'
-      POSTGRES_DB: 'da_devo'
-      # POSTGRES_HOST_AUTH_METHOD: 'trust'
   tsnodedocker:
     restart: always
     build:
-      network: host
       context: .
       dockerfile: Dockerfile
       target: base
@@ -28,12 +15,13 @@ services:
       - '4000'
     ports:
       - '4000:4000'
-    # command: npm run dev
     command: >
       bash -c "/home/node/app/bin/run-web.sh"
     environment:
       APP_ENV: development
-      # DATABASE_URL: 'postgresdb://postgres:5432/drinkol'
-    depends_on:
-      - postgresdb
+    networks:
+      - daapi
   
+networks:
+  daapi:
+    driver: bridge
