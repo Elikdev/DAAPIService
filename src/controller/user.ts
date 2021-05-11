@@ -13,12 +13,11 @@ export class UserController {
   @HandleError("signUp")
   static async signUp(req: Request, res: Response): Promise<void> {
     // TODO: add complete logic
-    const userId = req.body.userId;
-    // TODO: validate
     const userData = req.body.data;
     const validator = new RequestValidator(signUpSchema);
     validator.validate(userData);
-
+    
+    const userId = req.body.userId;
     const userRepo = getRepository(Users);
     const user = await userRepo.findOne({id: userId});
     if (user) {
