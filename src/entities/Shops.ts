@@ -12,7 +12,7 @@ import { ShopFollowers } from "./ShopFollowers";
 import { Users } from "./Users";
 
 @Index("shops_pkey", ["id"], { unique: true })
-@Entity("shops", { schema: "public" })
+@Entity("shops")
 export class Shops {
   @PrimaryGeneratedColumn("uuid")
   id: string;

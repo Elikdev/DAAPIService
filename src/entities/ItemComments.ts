@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Items } from "./Items";
 
-@Entity("item_comments", { schema: "public" })
+@Entity("item_comments")
 export class ItemComments {
   @PrimaryGeneratedColumn("uuid")
   id: string | null;
@@ -15,7 +15,6 @@ export class ItemComments {
   @Column("timestamp without time zone", {nullable: true })
   createdAt: Date | null;
 
-  @ManyToOne(() => Items, (items) => items.itemComments)
-  @JoinColumn([{referencedColumnName: "id" }])
+  @ManyToOne(() => Items)
   item: Items;
 }

@@ -2,6 +2,8 @@ import {
   Column,
   Entity,
   Index,
+  JoinTable,
+  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
@@ -9,22 +11,28 @@ import { Orders } from "./Orders";
 import { Shops } from "./Shops";
 
 @Index("users_pkey", ["id"], { unique: true })
-@Entity("users", { schema: "public" })
+@Entity("users")
 export class Users {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn("increment")
   id: string;
 
   @Column("character varying", {nullable: true })
-  openId: string | null;
+  openId: string;
+
+  @Column()
+  username: string
+
+  @Column("character varying", {nullable: false })
+  mobilePrefix: string;
+
+  @Column("character varying", {nullable: false })
+  mobile: string;
 
   @Column("character varying", {nullable: true })
   fullName: string | null;
 
   @Column("character varying", {nullable: true })
   avatar: string | null;
-
-  @Column("character varying", {nullable: true })
-  phone: string | null;
 
   @Column("character varying", {nullable: true })
   email: string | null;
@@ -56,6 +64,7 @@ export class Users {
   @OneToMany(() => Orders, (orders) => orders.seller)
   orders: Orders[];
 
-  @OneToMany(() => Shops, (shops) => shops.owner)
+  @ManyToMany(() => Shops)
+  @JoinTable()
   shops: Shops[];
 }
