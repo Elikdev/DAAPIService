@@ -1,29 +1,31 @@
 import {
+  BaseEntity,
   Column,
+  CreateDateColumn,
   Entity,
   Index,
-  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from "typeorm";
 import { Items } from "./Items";
 import { Users } from "./Users";
 
 @Index("shops_pkey", ["id"], { unique: true })
 @Entity("shops")
-export class Shops {
+export class Shops extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @Column("character varying", {nullable: true })
+  @Column("character varying", {nullable: false })
   name: string | null;
 
   @Column("character varying", {nullable: true })
   introduction: string | null;
 
-  @Column("character varying", {nullable: true })
-  location: string | null;
+  // @OneToOne(() => Addresses)
+  // location: Addresses;
 
   @Column("character varying", {nullable: true })
   reviewStar: string | null;
@@ -31,16 +33,18 @@ export class Shops {
   @Column("character varying", {nullable: true })
   logoUrl: string | null;
 
-  @Column("timestamp without time zone", {nullable: true })
-  createdAt: Date | null;
-
   @Column("character varying", {nullable: true })
   comissionRate: string | null;
 
-  @OneToMany(() => Items, (items) => items.shop)
+  @OneToMany(() => Items, (items) => items.shop, { cascade: true })
   items: Items[];
 
   @ManyToOne(() => Users, (users) => users.shops)
-  @JoinColumn([{referencedColumnName: "id" }])
   owner: Users;
+
+  @CreateDateColumn({type: "timestamp"})
+  createdAt: string;
+
+  @UpdateDateColumn({type: "timestamp"})
+  updatedAt: string;
 }

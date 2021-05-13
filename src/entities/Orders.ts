@@ -1,4 +1,5 @@
 import {
+  BaseEntity,
   Column,
   Entity,
   Index,
@@ -13,7 +14,7 @@ import { Users } from "./Users";
 @Index("orders_buyer_id_key", ["buyerId"], { unique: true })
 @Index("orders_pkey", ["id"], { unique: true })
 @Entity("orders")
-export class Orders {
+export class Orders extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 

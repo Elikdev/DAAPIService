@@ -1,16 +1,19 @@
 import {
+  BaseEntity,
   Column,
+  CreateDateColumn,
   Entity,
   Index,
   ManyToOne,
-  PrimaryGeneratedColumn
+  PrimaryGeneratedColumn,
+  UpdateDateColumn
 } from "typeorm";
 import { Orders } from "./Orders";
 import { Shops } from "./Shops";
 
 @Index("items_pkey", ["id"], { unique: true })
 @Entity("items")
-export class Items {
+export class Items extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
@@ -41,8 +44,11 @@ export class Items {
   @Column("character varying", {nullable: true })
   status: string | null;
 
-  @Column("timestamp without time zone", {nullable: true })
-  createdAt: Date | null;
+  @CreateDateColumn({type: "timestamp"})
+  createdAt: string;
+
+  @UpdateDateColumn({type: "timestamp"})
+  updatedAt: string;
 
   @ManyToOne(() => Orders)
   order: Orders;

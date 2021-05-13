@@ -5,7 +5,6 @@ import { getOpenId } from "../auth/openId";
 import { HandleError } from "../decorator/errorDecorator";
 import { Users } from "../entities/Users";
 import { AuthError } from "../error/authError";
-import { BadRequestError } from "../error/badRequestError";
 import { ResourceNotFoundError } from "../error/notfoundError";
 import { logger } from "../logging/logger";
 import { RequestValidator } from "../validator/requestValidator";

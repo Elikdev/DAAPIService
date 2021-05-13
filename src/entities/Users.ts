@@ -1,9 +1,9 @@
 import {
+  BaseEntity,
   Column,
   Entity,
   Index,
   JoinColumn,
-  ManyToMany,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -14,7 +14,7 @@ import { Addresses } from "./Addresses";
 
 @Index("users_pkey", ["id"], { unique: true })
 @Entity("users")
-export class Users {
+export class Users extends BaseEntity {
   @PrimaryGeneratedColumn("increment")
   id: number;
 
@@ -42,7 +42,8 @@ export class Users {
   @OneToMany(() => Orders, (orders) => orders.seller)
   orders: Orders[];
 
-  @OneToMany(() => Shops, (shops) => shops.owner)
+  @OneToMany(() => Shops, (shops) => shops.owner, { cascade: true })
+  @JoinColumn()
   shops: Shops[];
 
   @OneToMany(() => Addresses, addresses => addresses.user)

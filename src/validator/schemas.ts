@@ -14,10 +14,8 @@ export const createItemSchema = Joi.object().keys({
   color: Joi.string().optional(),
   size: Joi.string().required(),
   imageUrls: Joi.string().required(),
-  factoryDate: Joi.string().required(),
+  factoryDate: Joi.string(),
   description: Joi.string().required(),
-  status: Joi.string().required(),
-  shopId: Joi.string().required()
 });
 
 export const updateItemSchema = Joi.object().keys({
@@ -53,3 +51,10 @@ export const updateAddressSchema = Joi.object().keys({
   isDefault: Joi.boolean().optional(),
   isDefaultBeforeUpdate: Joi.boolean().optional()
 }).min(1);
+
+export const createShopSchema = Joi.object().keys({
+  name: Joi.string().max(20).required(),
+  introduction: Joi.string(),
+  location: Joi.string().uuid(),
+  logoUrl: Joi.string(),
+});
