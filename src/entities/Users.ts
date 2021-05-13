@@ -1,12 +1,14 @@
 import {
   BaseEntity,
   Column,
+  CreateDateColumn,
   Entity,
   Index,
   JoinColumn,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from "typeorm";
 import { Orders } from "./Orders";
 import { Shops } from "./Shops";
@@ -36,9 +38,6 @@ export class Users extends BaseEntity {
   @Column("character varying", {nullable: true })
   role: string | null;
 
-  @Column("timestamp without time zone", {nullable: true })
-  createdAt: Date | null;
-
   @OneToMany(() => Orders, (orders) => orders.seller)
   orders: Orders[];
 
@@ -52,4 +51,10 @@ export class Users extends BaseEntity {
   @OneToOne(() => Addresses, {nullable: true })
   @JoinColumn()
   defaultAddress: Addresses | null;
+
+  @CreateDateColumn({type: "timestamp"})
+  createdAt: string;
+
+  @UpdateDateColumn({type: "timestamp"})
+  updatedAt: string;
 }

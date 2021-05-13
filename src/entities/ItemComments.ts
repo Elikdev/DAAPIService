@@ -1,4 +1,4 @@
-import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Items } from "./Items";
 
 @Entity("item_comments")
@@ -12,8 +12,11 @@ export class ItemComments extends BaseEntity {
   @Column("character varying", {nullable: true })
   content: string | null;
 
-  @Column("timestamp without time zone", {nullable: true })
-  createdAt: Date | null;
+  @CreateDateColumn({type: "timestamp"})
+  createdAt: string;
+
+  @UpdateDateColumn({type: "timestamp"})
+  updatedAt: string;
 
   @ManyToOne(() => Items)
   item: Items;

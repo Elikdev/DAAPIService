@@ -1,4 +1,5 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Shops } from "./Shops";
 import { Users } from "./Users";
 
 @Entity("addresses")
@@ -27,9 +28,15 @@ export class Addresses {
   @ManyToOne(() => Users, user => user.addresses)
   user: Users;
 
+  @OneToOne(() => Shops)
+  shop: Shops
+
   @Column("boolean", {default: true })
   isActive: boolean;
 
-  @Column("timestamp without time zone", {nullable: true })
-  createdAt: Date | null;
+  @CreateDateColumn({type: "timestamp"})
+  createdAt: string;
+
+  @UpdateDateColumn({type: "timestamp"})
+  updatedAt: string;
 }

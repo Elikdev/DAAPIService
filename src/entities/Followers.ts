@@ -1,4 +1,4 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity("followers")
 export class Followers extends BaseEntity {
@@ -11,6 +11,9 @@ export class Followers extends BaseEntity {
   @Column("integer", {nullable: true })
   followeeId: number | null;
 
-  @Column("timestamp without time zone", {nullable: true })
-  createdAt: Date | null;
+  @CreateDateColumn({type: "timestamp"})
+  createdAt: string;
+
+  @UpdateDateColumn({type: "timestamp"})
+  updatedAt: string;
 }

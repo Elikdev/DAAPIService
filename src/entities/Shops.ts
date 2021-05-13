@@ -4,11 +4,14 @@ import {
   CreateDateColumn,
   Entity,
   Index,
+  JoinColumn,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
+import { Addresses } from "./Addresses";
 import { Items } from "./Items";
 import { Users } from "./Users";
 
@@ -24,8 +27,9 @@ export class Shops extends BaseEntity {
   @Column("character varying", {nullable: true })
   introduction: string | null;
 
-  // @OneToOne(() => Addresses)
-  // location: Addresses;
+  @OneToOne(() => Addresses)
+  @JoinColumn()
+  address: Addresses;
 
   @Column("character varying", {nullable: true })
   reviewStar: string | null;

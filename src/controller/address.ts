@@ -26,7 +26,7 @@ export class AddressController {
 
     const isDefault = addressData.isDefault;
     if (isDefault) {
-       await userRepo.update(userId, {defaultAddress: result});                   
+      await userRepo.update(userId, {defaultAddress: result});                   
     }
 
     res.send({
@@ -53,12 +53,12 @@ export class AddressController {
     }
 
     const result = await addressRepo.createQueryBuilder()
-                       .update(Addresses, addressData)
-                       .where('id = :id', { id: addressId })
-                       .returning('*')
-                       .updateEntity(true)
-                       .execute()
-                       .then(response => response.raw[0]);
+      .update(Addresses, addressData)
+      .where("id = :id", { id: addressId })
+      .returning("*")
+      .updateEntity(true)
+      .execute()
+      .then(response => response.raw[0]);
 
     if (isDefault !== isDefaultBeforeUpdate) {
       const userId = req.body.userId;
@@ -87,13 +87,13 @@ export class AddressController {
     }
 
     const result = await addressRepo.createQueryBuilder()
-                       .update(Addresses, {isActive: false})
-                       .where('id = :id', { id: addressId })
-                       .returning('*')
-                       .updateEntity(true)
-                       .execute()
-                       .then(response => response.raw[0]);
-    logger.info("Address deleted.")
+      .update(Addresses, {isActive: false})
+      .where("id = :id", { id: addressId })
+      .returning("*")
+      .updateEntity(true)
+      .execute()
+      .then(response => response.raw[0]);
+    logger.info("Address deleted.");
     res.send({
       data: result
     });
@@ -104,18 +104,18 @@ export class AddressController {
     const userId = req.body.userId;
     const isDefault = req.query.defaultAddress === "true";
     const user = await getRepository(Users)
-                     .createQueryBuilder("user")
-                     .leftJoinAndSelect("user.addresses", "address", "address.isActive = :isActive", {isActive: true})
-                     .leftJoinAndSelect("user.defaultAddress", "defaultAddress", "defaultAddress.isActive = :isActive", {isActive: true})
-                     .where("user.id = :id", { id: userId })
-                     .getOne();
+      .createQueryBuilder("user")
+      .leftJoinAndSelect("user.addresses", "address", "address.isActive = :isActive", {isActive: true})
+      .leftJoinAndSelect("user.defaultAddress", "defaultAddress", "defaultAddress.isActive = :isActive", {isActive: true})
+      .where("user.id = :id", { id: userId })
+      .getOne();
                     
-   if (!user) {
+    if (!user) {
       throw new ResourceNotFoundError("User is not found.");
-   }              
+    }              
 
-   const result = isDefault? user.defaultAddress : user.addresses;
-   res.send({
+    const result = isDefault? user.defaultAddress : user.addresses;
+    res.send({
       data: result
     });
   }  
