@@ -1,8 +1,8 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Items } from "./Items";
 
 @Entity("item_comments")
-export class ItemComments {
+export class ItemComments extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string | null;
 

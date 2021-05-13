@@ -1,8 +1,8 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Items } from "./Items";
 
 @Entity("item_saves")
-export class ItemSaves {
+export class ItemSaves extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string | null;
 
