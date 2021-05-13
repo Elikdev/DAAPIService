@@ -24,7 +24,7 @@ export class BuyerAddresses {
   @Column("character varying", {nullable: false })
   mobile: string;
 
-  @ManyToOne(() => Users, (users) => users.buyer_addresses, {eager: true})
+  @ManyToOne(() => Users, (users) => users.buyer_addresses)
   buyer: Users;
 
   @Column("timestamp without time zone", {nullable: true })
