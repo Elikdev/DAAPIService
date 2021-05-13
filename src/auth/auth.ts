@@ -8,7 +8,6 @@ const TEST_CUSTOMER_ID = 1;
 
 export const authMiddleWare = (req: Request, res: Response, next: NextFunction): void => {
   const authorization = req.headers.authorization;
-
   try {
     if (!authorization) {
       logger.error("Authorization token is not present.");

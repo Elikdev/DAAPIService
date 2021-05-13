@@ -5,7 +5,6 @@ import { Items } from "../entities/Items";
 import { ItemLikes } from "../entities/ItemLikes";
 import { ResourceNotFoundError } from "../error/notfoundError";
 import { logger } from "../logging/logger";
-import { RequestValidator } from "../validator/requestValidator";
 
 export class ItemLikeController {
 
@@ -26,7 +25,6 @@ export class ItemLikeController {
       logger.warning("ItemLike already exists.");
     }
     //TODO: Update item meta data
-    
     const newItemLike = new ItemLikes();
     newItemLike.likedBy = userId;
     newItemLike.item = item;
