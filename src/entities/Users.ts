@@ -2,13 +2,15 @@ import {
   Column,
   Entity,
   Index,
-  JoinTable,
+  JoinColumn,
   ManyToMany,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { Orders } from "./Orders";
 import { Shops } from "./Shops";
+import { BuyerAddresses } from "./BuyerAddresses";
 
 @Index("users_pkey", ["id"], { unique: true })
 @Entity("users")
@@ -64,7 +66,13 @@ export class Users {
   @OneToMany(() => Orders, (orders) => orders.seller)
   orders: Orders[];
 
-  @ManyToMany(() => Shops)
-  @JoinTable()
+  @OneToMany(() => Shops, (shops) => shops.owner)
   shops: Shops[];
+
+  @OneToMany(() => BuyerAddresses, (buyeraddresses) => buyeraddresses.buyer)
+  buyer_addresses: BuyerAddresses[];
+
+  @OneToOne(() => BuyerAddresses, {nullable: true })
+  @JoinColumn()
+  default_buyer_address: BuyerAddresses;
 }

@@ -5,6 +5,8 @@ import { ItemController } from "./controller/item";
 import { ItemLikeController } from "./controller/item_like";
 import { ItemSaveController } from "./controller/item_save";
 import { FollowerController } from "./controller/follower";
+import { BuyerAddressController } from "./controller/buyer_address";
+
 
 export const v1router = Router();
 
@@ -23,3 +25,8 @@ v1router.get("/items/:id", ItemController.getItem);
 
 // PATCH
 v1router.patch("/items/:id", ItemController.updateItem);
+v1router.post("/buyer_addresses", BuyerAddressController.createBuyerAddress);
+
+v1router.get("/buyer_addresses/:id", BuyerAddressController.getBuyerAddressById);
+
+v1router.patch("/buyer_addresses/:id", BuyerAddressController.updateBuyerAddress);
