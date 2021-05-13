@@ -8,7 +8,6 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { Items } from "./Items";
-import { ShopFollowers } from "./ShopFollowers";
 import { Users } from "./Users";
 
 @Index("shops_pkey", ["id"], { unique: true })
@@ -40,9 +39,6 @@ export class Shops {
 
   @OneToMany(() => Items, (items) => items.shop)
   items: Items[];
-
-  @OneToMany(() => ShopFollowers, (shopFollowers) => shopFollowers.shop)
-  shopFollowers: ShopFollowers[];
 
   @ManyToOne(() => Users, (users) => users.shops)
   @JoinColumn([{referencedColumnName: "id" }])

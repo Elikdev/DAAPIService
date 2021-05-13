@@ -14,7 +14,7 @@ import { Shops } from "./Shops";
 @Entity("users")
 export class Users {
   @PrimaryGeneratedColumn("increment")
-  id: string;
+  id: number;
 
   @Column("character varying", {nullable: true })
   openId: string;
