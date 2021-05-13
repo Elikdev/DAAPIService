@@ -7,7 +7,6 @@ import { ItemSaveController } from "./controller/item_save";
 import { FollowerController } from "./controller/follower";
 import { BuyerAddressController } from "./controller/buyer_address";
 
-
 export const v1router = Router();
 
 // Do auth filtering
