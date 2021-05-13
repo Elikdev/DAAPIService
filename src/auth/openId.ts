@@ -1,14 +1,12 @@
 import axios from "axios";
-import { open } from "inspector";
 import qs from "qs";
 import { DependencyError } from "../error/dependencyError";
 import { logger } from "../logging/logger";
 
 export const getOpenId = async (wxCode: string): Promise<void> => {
-
   const params =  {
-    appid: "wx67b7282a545f17a7",
-    secret: "79d374a78aff6162bf8d92206cdc0747",
+    appid: process.env.WX_APP_ID,
+    secret: process.env.WX_APP_SECRET,
     js_code: wxCode,
     grant_type: "authorization_code"
   };

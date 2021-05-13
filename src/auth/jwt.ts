@@ -10,8 +10,8 @@ const getAppPath = () => {
   }
 };
 
-const privateKEY = fs.readFileSync(getAppPath() + "/private.key", "utf8");
-const publicKEY = fs.readFileSync(getAppPath() + "/public.key", "utf8");
+const privateKEY = fs.readFileSync(getAppPath() + "/../private.key", "utf8");
+const publicKEY = fs.readFileSync(getAppPath() + "/../public.key", "utf8");
 
 export class JwtHelper {
 
