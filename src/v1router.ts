@@ -5,6 +5,7 @@ import { ItemController } from "./controller/item";
 import { ItemLikeController } from "./controller/itemLike";
 import { ItemSaveController } from "./controller/itemSave";
 import { FollowerController } from "./controller/follower";
+import { AddressController } from "./controller/address";
 
 export const v1router = Router();
 
@@ -18,10 +19,15 @@ v1router.post("/items", ItemController.createItem);
 v1router.post("/items/:id/like", ItemLikeController.createItemLike);
 v1router.post("/items/:id/save", ItemSaveController.createItemSave);
 v1router.post("/followers/:id/follow", FollowerController.createFollow);
+v1router.post("/addresses", AddressController.createAddress);
 
 // GET
 v1router.get("/items/:id", ItemController.getItem);
+v1router.get("/addresses", AddressController.getAddresses);
 
 // PATCH
 v1router.patch("/items/:id", ItemController.updateItem);
+v1router.patch("/addresses/:id", AddressController.updateAddress);
 
+// DELETE
+v1router.delete("/addresses/:id", AddressController.deleteAddress);

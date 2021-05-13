@@ -31,4 +31,25 @@ export const updateItemSchema = Joi.object().keys({
   description: Joi.string().optional(),
   status: Joi.string().optional(),
   orderId: Joi.string().optional()
+});
+
+export const createAddressSchema = Joi.object().keys({
+  fullName: Joi.string().required(),
+  province: Joi.string().required(),
+  city: Joi.string().required(),
+  district: Joi.string().required(),
+  street: Joi.string().required(),
+  mobile: Joi.string().pattern(/^[0-9]+$/).required(), 
+  isDefault: Joi.boolean().optional()
+});
+
+export const updateAddressSchema = Joi.object().keys({
+  fullName: Joi.string().optional(),
+  province: Joi.string().optional(),
+  city: Joi.string().optional(),
+  district: Joi.string().optional(),
+  street: Joi.string().optional(),
+  mobile: Joi.string().pattern(/^[0-9]+$/).optional(),
+  isDefault: Joi.boolean().optional(),
+  isDefaultBeforeUpdate: Joi.boolean().optional()
 }).min(1);

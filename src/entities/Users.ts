@@ -2,13 +2,15 @@ import {
   Column,
   Entity,
   Index,
-  JoinTable,
+  JoinColumn,
   ManyToMany,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { Orders } from "./Orders";
 import { Shops } from "./Shops";
+import { Addresses } from "./Addresses";
 
 @Index("users_pkey", ["id"], { unique: true })
 @Entity("users")
@@ -29,30 +31,6 @@ export class Users {
   mobile: string;
 
   @Column("character varying", {nullable: true })
-  fullName: string | null;
-
-  @Column("character varying", {nullable: true })
-  avatar: string | null;
-
-  @Column("character varying", {nullable: true })
-  email: string | null;
-
-  @Column("character varying", {nullable: true })
-  country: string | null;
-
-  @Column("character varying", {nullable: true })
-  zipCode: string | null;
-
-  @Column("character varying", {nullable: true })
-  province: string | null;
-
-  @Column("character varying", {nullable: true })
-  district: string | null;
-
-  @Column("character varying", {nullable: true })
-  city: string | null;
-
-  @Column("character varying", {nullable: true })
   shopId: string | null;
 
   @Column("character varying", {nullable: true })
@@ -64,7 +42,13 @@ export class Users {
   @OneToMany(() => Orders, (orders) => orders.seller)
   orders: Orders[];
 
-  @ManyToMany(() => Shops)
-  @JoinTable()
+  @OneToMany(() => Shops, (shops) => shops.owner)
   shops: Shops[];
+
+  @OneToMany(() => Addresses, addresses => addresses.user)
+  addresses: Addresses[];
+
+  @OneToOne(() => Addresses, {nullable: true })
+  @JoinColumn()
+  defaultAddress: Addresses | null;
 }
