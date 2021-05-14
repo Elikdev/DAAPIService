@@ -5,11 +5,14 @@ import {
   Entity,
   Index,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn
 } from "typeorm";
 import { Orders } from "./Orders";
 import { Shops } from "./Shops";
+import { ItemSaves } from "./ItemSaves";
+import { ItemLikes } from "./ItemLikes";
 
 @Index("items_pkey", ["id"], { unique: true })
 @Entity("items")
@@ -55,4 +58,16 @@ export class Items extends BaseEntity {
 
   @ManyToOne(() => Shops)
   shop: Shops;
+
+  @OneToMany(() => ItemSaves, (itemSaves) => itemSaves.item, { cascade: true })
+  itemSaves: ItemSaves[];
+
+  @OneToMany(() => ItemLikes, (itemLikes) => itemLikes.item, { cascade: true })
+  itemLikes: ItemLikes[];
+
+  @Column({default: 0})
+  itemSavesCount: number;
+
+  @Column({default: 0})
+  itemLikesCount: number;
 }
