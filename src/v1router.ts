@@ -36,3 +36,4 @@ v1router.post("/shops", ShopController.createShop);
 v1router.get("/shops", ShopController.getShops);
 v1router.get("/shops/:id/items", ShopController.getShopItems);
 v1router.post("/shops/:id/items", ItemController.createItem);
+v1router.patch("/shops/:id", ShopController.updateShop);

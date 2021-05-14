@@ -33,9 +33,6 @@ export class Users extends BaseEntity {
   mobile: string;
 
   @Column("character varying", {nullable: true })
-  shopId: string | null;
-
-  @Column("character varying", {nullable: true })
   role: string | null;
 
   @OneToMany(() => Orders, (orders) => orders.seller)
@@ -45,7 +42,7 @@ export class Users extends BaseEntity {
   @JoinColumn()
   shops: Shops[];
 
-  @OneToMany(() => Addresses, addresses => addresses.user)
+  @OneToMany(() => Addresses, addresses => addresses.user, { cascade: true })
   addresses: Addresses[];
 
   @OneToOne(() => Addresses, {nullable: true })
