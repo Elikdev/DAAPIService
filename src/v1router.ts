@@ -23,6 +23,7 @@ v1router.post("/addresses", AddressController.createAddress);
 
 // GET
 v1router.get("/items/:id", ItemController.getItem);
+v1router.get("/items", ItemController.getItems);
 v1router.get("/addresses", AddressController.getAddresses);
 
 // PATCH

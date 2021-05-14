@@ -11,6 +11,12 @@ import {
 import { Orders } from "./Orders";
 import { Shops } from "./Shops";
 
+export enum ListingStatus {
+  NEW = "new",
+  SOLD = "sold",
+  DELISTED = "delisted",
+}
+
 @Index("items_pkey", ["id"], { unique: true })
 @Entity("items")
 export class Items extends BaseEntity {
@@ -20,8 +26,8 @@ export class Items extends BaseEntity {
   @Column("character varying", {nullable: true })
   name: string | null;
 
-  @Column("double precision", {nullable: true})
-  price: number | null;
+  @Column("double precision", {nullable: false})
+  price: number;
 
   @Column("character varying", {nullable: true })
   condition: string | null;
@@ -35,20 +41,50 @@ export class Items extends BaseEntity {
   @Column("json", {nullable: true })
   imageUrls: object | null;
 
-  @Column("character varying", {nullable: true })
-  factoryDate: string | null;
+  @Column({
+    nullable: true
+  })
+  year: string;
 
   @Column("character varying", {nullable: true })
   description: string | null;
 
-  @Column("character varying", {nullable: true })
-  status: string | null;
+  @Column({
+    type: "enum",
+    enum: ListingStatus,
+    default: ListingStatus.NEW
+  })
+  status: string;
+
+  @Column({
+    nullable: true,
+    length: 50,
+  })
+  brand: string;
+
+  @Column({
+    nullable: true,
+    length: 50,
+  })
+  origin: string
+
+  @Column({
+    nullable: true,
+    length: 50,
+  })
+  category: string;
+
+  @Column({
+    nullable: true,
+    length: 50,
+  })
+  subcategory: string;
 
   @CreateDateColumn({type: "timestamp"})
-  createdAt: string;
+  createdtime: string;
 
   @UpdateDateColumn({type: "timestamp"})
-  updatedAt: string;
+  updatedtime: string;
 
   @ManyToOne(() => Orders)
   order: Orders;
