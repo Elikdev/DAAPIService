@@ -3,6 +3,7 @@ import { getRepository } from "typeorm";
 import { HandleError } from "../decorator/errorDecorator";
 import { Items } from "../entities/Items";
 import { Shops } from "../entities/Shops";
+import { Users } from "../entities/Users";
 import { ResourceNotFoundError } from "../error/notfoundError";
 import { logger } from "../logging/logger";
 import { RequestValidator } from "../validator/requestValidator";
@@ -12,11 +13,13 @@ export class ItemController {
 
   @HandleError("createItem")
   static async createItem(req: Request, res: Response): Promise<void> {
+    const userId = req.body.userId;
     const itemData = req.body.data;
     const shopId = req.params.id;
     const validator = new RequestValidator(createItemSchema);
     validator.validate(itemData);
-    const shop = await Shops.findOne({id: shopId});
+    const user = await Users.findOne({id: userId});
+    const shop = await Shops.findOne({id: shopId, owner: user});
     if (!shop) {
       throw new ResourceNotFoundError("Shop not found.");
     }

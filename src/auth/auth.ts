@@ -16,9 +16,7 @@ export const authMiddleWare = (req: Request, res: Response, next: NextFunction):
     const authToken = authorization.split(" ")[1];
     const decodedToken = JwtHelper.verify(authToken);
     req.body.userId = decodedToken.customerId;
-    
-    logger.info("Wechat auth token verified.");
-    logger.debug("CID is :", decodedToken.customerId);
+    logger.debug("Wechat auth token verified. Customer Id is :" + decodedToken.customerId);
     return next();
     
   } catch (err) {
