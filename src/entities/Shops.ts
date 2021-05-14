@@ -3,7 +3,6 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  Index,
   JoinColumn,
   ManyToOne,
   OneToMany,
@@ -15,14 +14,13 @@ import { Addresses } from "./Addresses";
 import { Items } from "./Items";
 import { Users } from "./Users";
 
-@Index("shops_pkey", ["id"], { unique: true })
 @Entity("shops")
 export class Shops extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @Column("character varying", {nullable: false })
-  name: string | null;
+  @Column()
+  name: string;
 
   @Column("character varying", {nullable: true })
   introduction: string | null;
@@ -31,14 +29,14 @@ export class Shops extends BaseEntity {
   @JoinColumn()
   address: Addresses;
 
-  @Column("character varying", {nullable: true })
-  reviewStar: string | null;
+  @Column("float", {default: 0.0 })
+  avgRating: number;
 
   @Column("character varying", {nullable: true })
-  logoUrl: string | null;
+  logoUrl: string;
 
-  @Column("character varying", {nullable: true })
-  comissionRate: string | null;
+  @Column("float", { default: 0.0})
+  commissionRate: number;
 
   @OneToMany(() => Items, (items) => items.shop, { cascade: true })
   items: Items[];
