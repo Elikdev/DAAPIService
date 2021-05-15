@@ -19,6 +19,7 @@ v1router.use(authMiddleWare);
 v1router.post("/items/:id/like", ItemLikeController.createItemLike);
 v1router.post("/items/:id/save", ItemSaveController.createItemSave);
 v1router.get("/items/:id", ItemController.getItem);
+v1router.get("/items", ItemController.getItems);
 v1router.patch("/items/:id", ItemController.updateItem);
 
 v1router.post("/users/:id/follow", UserRelationController.createFollow);
