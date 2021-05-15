@@ -89,10 +89,10 @@ export class Items extends BaseEntity {
   @UpdateDateColumn({type: "timestamp"})
   updatedtime: string;
 
-  @ManyToOne(() => Orders)
+  @ManyToOne(() => Orders, orders => orders.orderItems)
   order: Orders;
 
-  @ManyToOne(() => Shops)
+  @ManyToOne(() => Shops, shops => shops.items)
   shop: Shops;
 
   @OneToMany(() => ItemSaves, (itemSaves) => itemSaves.item, { cascade: true })

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { getRepository } from "typeorm";
 import { HandleError } from "../decorator/errorDecorator";
-import { Items } from "../entities/Items";
+import { Items, ListingStatus } from "../entities/Items";
 import { Shops } from "../entities/Shops";
 import { Users } from "../entities/Users";
 import { ResourceNotFoundError } from "../error/notfoundError";
@@ -21,7 +21,8 @@ export class ItemController {
     const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
 
     logger.debug("OrderBy: " + JSON.stringify(orderBy));
-    const result = await itemRepo.createQueryBuilder()
+    const result = await itemRepo.createQueryBuilder("items")
+      .where("items.status = :new", { new: ListingStatus.NEW })
       .orderBy(orderBy)
       .skip(skipSize)
       .take(pageSize)
