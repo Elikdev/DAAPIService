@@ -9,8 +9,8 @@ import { RequestValidator } from "../validator/requestValidator";
 
 export class UserRelationController {
 
-  @HandleError("createFollow")
-  static async createFollow(req: Request, res: Response, next: NextFunction): Promise<void> {
+  @HandleError("follow")
+  static async follow(req: Request, res: Response, next: NextFunction): Promise<void> {
     const followerId = req.body.userId;
     const followeeId = parseInt(req.params.id);
 
@@ -28,8 +28,8 @@ export class UserRelationController {
     const userRelationRepo = getRepository(UserRelations);
     const userRelationEntry = await userRelationRepo.findOne({ follower: follower, followee: followee });
     if (userRelationEntry) {
-      logger.info("UserRelationEntry already exists.");
       res.send({
+        message: "UserRelationEntry already exists.",
         data: userRelationEntry
       });
       return next();
@@ -45,6 +45,39 @@ export class UserRelationController {
       data: result
     });
   }
+
+  @HandleError("unfollow")
+  static async unfollow(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const followerId = req.body.userId;
+    const followeeId = parseInt(req.params.id);
+
+    const userRepo = getRepository(Users);
+    const follower = await userRepo.findOne({id: followerId});
+    if (!follower) {
+      throw new ResourceNotFoundError("Follower is not found.");
+    }
+
+    const followee = await userRepo.findOne({id: followeeId});
+    if (!followee) {
+      throw new ResourceNotFoundError("Followee is not found.");
+    }
+
+    const userRelationRepo = getRepository(UserRelations);
+    const userRelationEntry = await userRelationRepo.findOne({ follower: follower, followee: followee });
+    if (!userRelationEntry) {
+      res.send({
+        message: "UserRelationEntry does not exist."
+      });
+      return next();
+    }
+
+    const result = await userRelationRepo.remove(userRelationEntry);
+    res.send({
+      message: "UserRelationEntry deleted.",
+      data: result
+    });
+  }
+
 
   @HandleError("getUserFollowings")
   static async getUserFollowings(req: Request, res: Response): Promise<void> {

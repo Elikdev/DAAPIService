@@ -1,4 +1,4 @@
-import { AfterInsert, BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn, ManyToOne, JoinTable } from "typeorm";
+import { AfterInsert, AfterRemove, BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn, ManyToOne, JoinTable } from "typeorm";
 import { Users } from "./Users";
 
 @Entity("user_relation")
@@ -6,10 +6,10 @@ export class UserRelations extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string | null;
 
-  @ManyToOne(type => Users, user => user.followings)
+  @ManyToOne(type => Users, user => user.followings, {eager: true})
   follower: Users;
 
-  @ManyToOne(type => Users, user => user.followers)
+  @ManyToOne(type => Users, user => user.followers, {eager: true})
   followee: Users;
 
   @CreateDateColumn({type: "timestamp"})
@@ -19,7 +19,7 @@ export class UserRelations extends BaseEntity {
   updatedAt: string;
 
   @AfterInsert()
-  async updateFollowersAndFollowingsCount() {
+  async afterInsertOperations() {
     await Users.createQueryBuilder().update(Users)
       .set({followingsCount: this.follower.followingsCount + 1})
       .where("id = :id", { id: this.follower.id })
@@ -29,5 +29,18 @@ export class UserRelations extends BaseEntity {
       .set({followersCount: this.followee.followersCount + 1})
       .where("id = :id", { id: this.followee.id })
       .execute();
+  }
+
+  @AfterRemove()
+  async afterRemoveOperations() {
+    await Users.createQueryBuilder().update(Users)
+      .set({followingsCount: this.follower.followingsCount - 1})
+      .where("id = :id", { id: this.follower.id })
+      .execute();
+
+    await Users.createQueryBuilder().update(Users)
+      .set({followersCount: this.followee.followersCount - 1})
+      .where("id = :id", { id: this.followee.id })
+      .execute();    
   }
 }

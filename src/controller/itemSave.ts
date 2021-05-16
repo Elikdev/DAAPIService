@@ -10,8 +10,8 @@ import { RequestValidator } from "../validator/requestValidator";
 
 export class ItemSaveController {
 
-  @HandleError("createItemSave")
-  static async createItemSave(req: Request, res: Response, next: NextFunction): Promise<void> {
+  @HandleError("saveItem")
+  static async saveItem(req: Request, res: Response, next: NextFunction): Promise<void> {
     const userId = req.body.userId;
     const itemId = req.params.id;
 
@@ -42,6 +42,37 @@ export class ItemSaveController {
     const result = await itemSaveRepo.save(newItemSave);
     logger.info("ItemSave created.");
     res.send({
+      data: result
+    });
+  }
+
+  @HandleError("unsaveItem")
+  static async unsaveItem(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const userId = req.body.userId;
+    const itemId = req.params.id;
+
+    const item = await getRepository(Items).findOne({id: itemId});
+    if (!item) {
+      throw new ResourceNotFoundError("Item not found.");
+    }
+
+    const user = await getRepository(Users).findOne({id: userId});
+    if (!user) {
+      throw new ResourceNotFoundError("User is not found.");
+    }
+
+    const itemSaveRepo = getRepository(ItemSaves);
+    const itemSave = await itemSaveRepo.findOne({user: user, item: item});
+    if (!itemSave) {
+      res.send({
+        message: "ItemSaveEntry does not exist."
+      });
+      return next();
+    }
+
+    const result = await itemSaveRepo.remove(itemSave);
+    res.send({
+      message: "ItemSave deleted.",
       data: result
     });
   }

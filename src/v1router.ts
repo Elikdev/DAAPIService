@@ -16,13 +16,16 @@ v1router.post("/signin", UserController.signIn);
 // Do auth filtering
 v1router.use(authMiddleWare);
 
-v1router.post("/items/:id/like", ItemLikeController.createItemLike);
-v1router.post("/items/:id/save", ItemSaveController.createItemSave);
+v1router.post("/items/:id/like", ItemLikeController.likeItem);
+v1router.post("/items/:id/save", ItemSaveController.saveItem);
+v1router.post("/items/:id/unlike", ItemLikeController.unlikeItem);
+v1router.post("/items/:id/unsave", ItemSaveController.unsaveItem);
 v1router.get("/items/:id", ItemController.getItem);
 v1router.get("/items", ItemController.getItems);
 v1router.patch("/items/:id", ItemController.updateItem);
 
-v1router.post("/users/:id/follow", UserRelationController.createFollow);
+v1router.post("/users/:id/follow", UserRelationController.follow);
+v1router.post("/users/:id/unfollow", UserRelationController.unfollow);
 v1router.get("/users/:id/savedItems", ItemSaveController.getUserSavedItems);
 v1router.get("/users/:id/likedItems", ItemLikeController.getUserLikedItems);
 v1router.get("/users/:id/followers", UserRelationController.getUserFollowers);
