@@ -21,11 +21,19 @@ export class ItemController {
     const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
 
     logger.debug("OrderBy: " + JSON.stringify(orderBy));
-    const result = await itemRepo.createQueryBuilder("items")
-      .where("items.status = :new", { new: ListingStatus.NEW })
+    const itemIds = await itemRepo.createQueryBuilder("item")
+      .select("item.id")
+      .where("item.status = :new", { new: ListingStatus.NEW })
       .orderBy(orderBy)
       .skip(skipSize)
       .take(pageSize)
+      .getMany();
+
+    // two query since one query with join will generate invalid query
+    const inputIds = itemIds.map(item => item.id);
+    const result = await itemRepo.createQueryBuilder("item")
+      .where("item.id IN (:...ids)", { ids: inputIds })
+      .leftJoinAndSelect("item.shop", "shops")
       .getMany();
 
     res.send({
@@ -49,7 +57,6 @@ export class ItemController {
     const itemRepo = getRepository(Items);
     itemData.shop = shop;
     const savedItem = await itemRepo.save(itemData);
-
     res.send({
       data: savedItem
     });

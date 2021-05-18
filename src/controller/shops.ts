@@ -7,8 +7,9 @@ import { BadRequestError } from "../error/badRequestError";
 import { RequestValidator } from "../validator/requestValidator";
 import { createShopSchema, updateShopSchema } from "../validator/schemas";
 import { ResourceNotFoundError } from "../error/notfoundError";
+import { ListingStatus } from "../entities/Items";
 
-const MAX_OWNED_SHOPS = 3;
+const MAX_OWNED_SHOPS = 1;
 
 export class ShopController {
   @HandleError("createShop")
@@ -82,6 +83,7 @@ export class ShopController {
       .createQueryBuilder("shops")
       .leftJoinAndSelect("shops.items", "items")
       .where("shops.id = :id", { id: shopId })
+      .andWhere("items.status = :new", { new: ListingStatus.NEW })
       .getOne();
 
     res.send({

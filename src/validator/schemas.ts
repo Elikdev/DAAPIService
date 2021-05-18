@@ -1,4 +1,5 @@
 import Joi from "joi";
+import { ItemCondition } from "../entities/Items";
 
 export const signUpSchema = Joi.object().keys({
   username: Joi.string().required(),
@@ -10,25 +11,27 @@ export const signUpSchema = Joi.object().keys({
 export const createItemSchema = Joi.object().keys({
   name: Joi.string().required(),
   price: Joi.number().required(),
-  condition: Joi.string().required(),
+  condition: Joi.number().required().valid(...Object.values(ItemCondition)),
   color: Joi.string().optional(),
   size: Joi.string().required(),
   imageUrls: Joi.string().required(),
   factoryDate: Joi.string(),
   description: Joi.string().required(),
+  stock: Joi.number()
 });
 
 export const updateItemSchema = Joi.object().keys({
   name: Joi.string().optional(),
   price: Joi.number().optional(),
-  condition: Joi.string().optional(),
+  condition: Joi.number().optional().valid(...Object.values(ItemCondition)),
   color: Joi.string().optional(),
   size: Joi.string().optional(),
   imageUrls: Joi.string().optional(),
   factoryDate: Joi.string().optional(),
   description: Joi.string().optional(),
+  stock: Joi.number(),
   status: Joi.string().optional(),
-  orderId: Joi.string().optional()
+  orderId: Joi.string().optional(),
 });
 
 export const createAddressSchema = Joi.object().keys({

@@ -8,7 +8,7 @@ export const DBConfig:ConnectionOptions = {
   "password": "password",
   "database": "da_devo",
   "synchronize": true,
-  "logging": false,
+  "logging": ["error"],
   "entities": [
     "src/entities/**/*.ts"
   ],
