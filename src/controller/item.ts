@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { Connection, createQueryBuilder, getRepository } from "typeorm";
+import { getRepository } from "typeorm";
 import { HandleError } from "../decorator/errorDecorator";
 import { Items, ListingStatus } from "../entities/Items";
 import { Shops } from "../entities/Shops";
