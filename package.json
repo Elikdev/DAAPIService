@@ -10,7 +10,8 @@
       "start": "ts-node src/index.ts",
       "build": "tsc -p .",
       "dev": "nodemon src/index.ts",
-      "typeorm:cli": "ts-node ./node_modules/typeorm/cli -f ormconfig.json"
+      "typeorm:cli": "ts-node ./node_modules/typeorm/cli -f ormconfig.json",
+      "prepare": "husky install"
    },
    "dependencies": {
       "axios": "^0.21.1",

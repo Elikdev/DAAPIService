@@ -54,7 +54,7 @@ export class Items extends BaseEntity {
   size: string | null;
 
   @Column("json", {nullable: true })
-  imageUrls: object | null;
+  imageUrls: string | null;
 
   @Column({
     nullable: true,

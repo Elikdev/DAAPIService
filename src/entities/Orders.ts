@@ -28,7 +28,7 @@ export class Orders extends BaseEntity {
   amount: number | null;
 
   @Column("json", {nullable: true })
-  itemsJson: object | null;
+  itemsJson: string | null;
 
   @Column("character varying", {nullable: true })
   trackingNum: string | null;
