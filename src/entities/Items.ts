@@ -20,6 +20,14 @@ export enum ListingStatus {
   DELISTED = "delisted",
 }
 
+export enum ItemCondition {
+  NEW = 5,
+  LIKE_NEW = 4,
+  EXCELLENT = 3,
+  GOOD = 2,
+  FAIR = 1,
+}
+
 @Index("items_pkey", ["id"], { unique: true })
 @Entity("items")
 export class Items extends BaseEntity {
@@ -32,8 +40,12 @@ export class Items extends BaseEntity {
   @Column("double precision", {nullable: false})
   price: number;
 
-  @Column("character varying", {nullable: true })
-  condition: string | null;
+  @Column({
+    type: "enum",
+    enum: ItemCondition,
+    default: ItemCondition.EXCELLENT
+  })
+  condition: number;
 
   @Column("character varying", {nullable: true })
   color: string | null;
@@ -43,6 +55,12 @@ export class Items extends BaseEntity {
 
   @Column("json", {nullable: true })
   imageUrls: object | null;
+
+  @Column({
+    nullable: true,
+    default: 1,
+  })
+  stock: number;
 
   @Column({
     nullable: true
