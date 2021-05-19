@@ -4,4 +4,22 @@ services:
   tsnodedocker:
     build:
       target: production
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./src:/home/node/app/src
+      - ./nodemon.json:/home/node/app/nodemon.json
+    container_name: tsnodedocker
+    expose:
+      - '4000'
+    ports:
+      - '4000:4000'
     command: node build/index.js
+    environment:
+      APP_ENV: production
+    networks:
+      - daapi
+      
+networks:
+  daapi:
+    driver: bridge

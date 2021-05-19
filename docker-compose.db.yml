@@ -1,0 +1,22 @@
+version: '3'
+volumes:
+  pgdata:
+services:
+  postgresdb:
+    image: postgres:10-alpine
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    environment:
+      PGPORT: 5432
+      POSTGRES_HOST: 'postgresdb'
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'password'
+      POSTGRES_DB: 'da_devo'
+    networks:
+      - daapi
+
+networks:
+  daapi:
+    driver: bridge

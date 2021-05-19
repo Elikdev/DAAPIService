@@ -23,7 +23,6 @@ export class UserController {
     validator.validate(userData);
     const encryptedData = userData.encryptedData;
     const iv  = userData.iv;
-    const userId = req.body.userId;
     const encryptedDataDecoder = new Decode(sessionData.session_key);
     const userRepo = getRepository(Users);
     const openId = sessionData.openid;
@@ -32,7 +31,7 @@ export class UserController {
       .where("user.openId = :openId", { openId: openId })
       .leftJoinAndSelect("user.defaultAddress", "defaultAddress")
       .leftJoinAndSelect("user.shops", "shops")
-      .getOne()
+      .getOne();
 
     if (!user) {
       logger.info("Creating new user record.");
@@ -46,17 +45,16 @@ export class UserController {
         throw new AuthError("Failed to create user.");
       }
     }
+    const payload = {
+      customerId: user.id
+    };
 
-   const payload = {
-     customerId: user.id
-   };
+    const accessToken = JwtHelper.sign(payload);
 
-   const accessToken = JwtHelper.sign(payload);
-
-   res.send({
+    res.send({
       loginToken: accessToken,
       userInfo: user
-   })
+    });
 
   }
 
@@ -71,6 +69,6 @@ export class UserController {
     res.send({
       data: user
     });
-  };
+  }
 
 }
