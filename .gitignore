@@ -5,3 +5,5 @@ build/
 tmp/
 temp/
 pgdata
+.DS_Store
+src/.DS_Store
