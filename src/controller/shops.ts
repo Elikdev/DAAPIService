@@ -58,7 +58,17 @@ export class ShopController {
       .leftJoin("shops.owner", "users")
       .leftJoin("shops.items", "items")
       .orWhere("items.status = :new", { new: ListingStatus.NEW })
-      .select(["shops.id", "shops.rating", "shops.name", "shops.introduction", "shops.logoUrl", "users.username", "users.followersCount", "items.imageUrls"])
+      .select([
+        "shops.id", 
+        "shops.rating", 
+        "shops.name", 
+        "shops.introduction", 
+        "shops.logoUrl", 
+        "users.username", 
+        "users.followersCount", 
+        "items.id",
+        "items.imageUrls"
+      ])
       .getMany();
   
     res.send({
