@@ -22,9 +22,6 @@ export class Addresses {
   @Column("character varying", {nullable: false })
   street: string | null;
 
-  @Column("character varying", {nullable: false })
-  mobile: string;
-
   @ManyToOne(() => Users, user => user.addresses)
   user: Users;
 

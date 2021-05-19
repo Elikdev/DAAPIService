@@ -40,7 +40,10 @@ export class ShopController {
     const shops = await getRepository(Shops)
       .createQueryBuilder("shops")
       .leftJoinAndSelect("shops.owner", "users")
-      .select(["shops.id", "shops.name", "shops.introduction", "shops.logoUrl", "users.id", "users.username"])
+      .leftJoinAndSelect("shops.items", "items")
+      .select(["shops.avgRating", "shops.name", "shops.introduction", "shops.logoUrl", "users.username", "users.followersCount", "items.imageUrls"])
+      .andWhere("items.status = :new", { new: ListingStatus.NEW })
+      .limit(4)
       .getMany();
   
     res.send({

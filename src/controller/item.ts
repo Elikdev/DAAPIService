@@ -31,9 +31,13 @@ export class ItemController {
 
     // two query since one query with join will generate invalid query
     const inputIds = itemIds.map(item => item.id);
-    const result = await itemRepo.createQueryBuilder("item")
+    const result = await itemRepo
+      .createQueryBuilder("item")
       .where("item.id IN (:...ids)", { ids: inputIds })
       .leftJoinAndSelect("item.shop", "shops")
+      .leftJoinAndSelect("shops.owner", "users")
+      .leftJoinAndSelect("users.defaultAddress", "defaultAddress")
+      .select(["item", "shops.name", "shops.introduction", "shops.logoUrl", "users.username", "defaultAddress.city", "defaultAddress.district"])
       .getMany();
 
     res.send({

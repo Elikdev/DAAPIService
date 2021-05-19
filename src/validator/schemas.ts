@@ -14,11 +14,17 @@ export const createItemSchema = Joi.object().keys({
   condition: Joi.number().required().valid(...Object.values(ItemCondition)),
   color: Joi.string().optional(),
   size: Joi.string().required(),
-  imageUrls: Joi.string().required(),
+  imageUrls: Joi.array().required(),
   factoryDate: Joi.string(),
   description: Joi.string().required(),
-  stock: Joi.number()
-});
+  stock: Joi.number(),
+  year: Joi.string(),
+  brand: Joi.string(),
+  status: Joi.string(),
+  origin: Joi.string().optional(),
+  category: Joi.string(),
+  subcategory: Joi.string().optional()
+});  
 
 export const updateItemSchema = Joi.object().keys({
   name: Joi.string().optional(),
@@ -26,12 +32,16 @@ export const updateItemSchema = Joi.object().keys({
   condition: Joi.number().optional().valid(...Object.values(ItemCondition)),
   color: Joi.string().optional(),
   size: Joi.string().optional(),
-  imageUrls: Joi.string().optional(),
+  imageUrls: Joi.array().optional(),
   factoryDate: Joi.string().optional(),
   description: Joi.string().optional(),
   stock: Joi.number(),
   status: Joi.string().optional(),
   orderId: Joi.string().optional(),
+  brand: Joi.string().optional(),
+  origin: Joi.string().optional(),
+  category: Joi.string().optional(),
+  subcategory: Joi.string().optional()
 });
 
 export const createAddressSchema = Joi.object().keys({
@@ -40,7 +50,6 @@ export const createAddressSchema = Joi.object().keys({
   city: Joi.string().required(),
   district: Joi.string().required(),
   street: Joi.string().required(),
-  mobile: Joi.string().pattern(/^[0-9]+$/).required(), 
   isDefault: Joi.boolean().optional()
 });
 
@@ -50,7 +59,6 @@ export const updateAddressSchema = Joi.object().keys({
   city: Joi.string().optional(),
   district: Joi.string().optional(),
   street: Joi.string().optional(),
-  mobile: Joi.string().pattern(/^[0-9]+$/).optional(),
   isDefault: Joi.boolean().optional(),
   isDefaultBeforeUpdate: Joi.boolean().optional()
 }).min(1);

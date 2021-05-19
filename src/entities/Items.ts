@@ -53,8 +53,8 @@ export class Items extends BaseEntity {
   @Column("character varying", {nullable: true })
   size: string | null;
 
-  @Column("json", {nullable: true })
-  imageUrls: string | null;
+  @Column("character varying", { array: true })
+  imageUrls: string[] | null;
 
   @Column({
     nullable: true,
