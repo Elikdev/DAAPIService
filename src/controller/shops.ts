@@ -38,8 +38,8 @@ export class ShopController {
     });
   }
 
-  @HandleError("getShops")
-  static async getShops(req: Request, res: Response): Promise<void> {
+  @HandleError("discoverShops")
+  static async discoverShops(req: Request, res: Response): Promise<void> {
     const sorts = req.query.sort;
     const orderBy = getOrderByConditions(sorts, DEFAULT_SORT_BY);
     const repo = getRepository(Shops);
@@ -74,6 +74,22 @@ export class ShopController {
     res.send({
       data: shops,
       links: getPaginationLinks(req, pageNumber, pageSize)
+    });
+  }
+
+  @HandleError("getShop")
+  static async getShop(req: Request, res: Response): Promise<void> {
+    const shopId = req.params.id;
+    const shops = await getRepository(Shops)
+      .createQueryBuilder("shops")
+      .where("shops.id = :id", { id: shopId })
+      .leftJoinAndSelect("shops.owner", "users")
+      .leftJoinAndSelect("users.defaultAddress", "defaultAddress")
+      .select(["shops.id", "shops.name", "shops.introduction", "shops.logoUrl", "users.username", "users.followersCount", "users.followingsCount", "defaultAddress.city", "defaultAddress.district", "defaultAddress.street"])
+      .getOne();
+  
+    res.send({
+      data: shops 
     });
   }
 
@@ -112,7 +128,9 @@ export class ShopController {
       .createQueryBuilder("shops")
       .leftJoinAndSelect("shops.items", "items")
       .where("shops.id = :id", { id: shopId })
-      .andWhere("items.status = :new", { new: ListingStatus.NEW })
+      .andWhere("items.status IN (:...status)", {status: [ListingStatus.NEW, ListingStatus.SOLD]})
+      .loadRelationCountAndMap("shops.itemsCount", "shops.items")
+      .select(["shops.id", "items.id", "items.imageUrls"])
       .getOne();
 
     res.send({

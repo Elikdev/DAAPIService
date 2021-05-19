@@ -39,7 +39,7 @@ export class ItemController {
       .leftJoinAndSelect("item.shop", "shops")
       .leftJoinAndSelect("shops.owner", "users")
       .leftJoinAndSelect("users.defaultAddress", "defaultAddress")
-      .select(["item", "shops.name", "shops.introduction", "shops.logoUrl", "users.username", "defaultAddress.city", "defaultAddress.district"])
+      .select(["item", "shops.name", "shops.id", "shops.introduction", "shops.logoUrl", "users.username", "defaultAddress.city", "defaultAddress.district"])
       .getMany();
 
     res.send({

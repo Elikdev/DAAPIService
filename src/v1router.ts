@@ -37,9 +37,10 @@ v1router.patch("/addresses/:id", AddressController.updateAddress);
 v1router.delete("/addresses/:id", AddressController.deleteAddress);
 
 v1router.post("/shops", ShopController.createShop);
-v1router.get("/shops", ShopController.getShops);
+v1router.get("/shops", ShopController.discoverShops);
 v1router.get("/shops/:id/items", ShopController.getShopItems);
 v1router.post("/shops/:id/items", ItemController.createItem);
 v1router.patch("/shops/:id", ShopController.updateShop);
+v1router.get("/shops/:id", ShopController.getShop);
 
 
