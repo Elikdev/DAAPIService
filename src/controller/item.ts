@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { getRepository } from "typeorm";
+import { getRepository, OrderByCondition } from "typeorm";
 import { HandleError } from "../decorator/errorDecorator";
 import { Items, ListingStatus } from "../entities/Items";
 import { Shops } from "../entities/Shops";
@@ -11,12 +11,14 @@ import { createItemSchema, updateItemSchema } from "../validator/schemas";
 import { getOrderByConditions } from "./helper/orderByHelper";
 import { getPaginationLinks, getPaginationParams } from "./helper/paginationHelper";
 
+const DEFAULT_SORT_BY:OrderByCondition = { "createdtime":"DESC" };
+
 export class ItemController {
 
   @HandleError("getItems")
   static async getItems(req: Request, res: Response): Promise<void> {
     const sorts = req.query.sort;
-    const orderBy = getOrderByConditions(sorts);
+    const orderBy = getOrderByConditions(sorts, DEFAULT_SORT_BY);
     const itemRepo = getRepository(Items);
     const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
 

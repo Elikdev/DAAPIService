@@ -1,11 +1,9 @@
 import { OrderByCondition } from "typeorm";
 
-const DEFAULT_SORT_BY:OrderByCondition = { "createdtime":"DESC" };
-
-export const getOrderByConditions = (sorts: unknown ): OrderByCondition => {
+export const getOrderByConditions = (sorts: unknown, defaultOrder:OrderByCondition): OrderByCondition => {
   const condition:OrderByCondition = {};
   if (!sorts) {
-    return DEFAULT_SORT_BY;
+    return defaultOrder;
   }
 
   if (typeof sorts == "string") {
