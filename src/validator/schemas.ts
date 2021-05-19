@@ -2,10 +2,10 @@ import Joi from "joi";
 import { ItemCondition } from "../entities/Items";
 
 export const signUpSchema = Joi.object().keys({
-  username: Joi.string().required(),
-  mobile: Joi.string().pattern(/^[0-9]+$/).required(), 
-  mobilePrefix: Joi.string().max(5).required(),
-  code: Joi.string().required()
+  code: Joi.string().required(),
+  iv: Joi.string().required(),
+  encryptedData: Joi.string().required(),
+
 });
 
 export const createItemSchema = Joi.object().keys({

@@ -3,7 +3,7 @@ import qs from "qs";
 import { DependencyError } from "../error/dependencyError";
 import { logger } from "../logging/logger";
 
-export const getOpenId = async (wxCode: string): Promise<void> => {
+export const getSessionData = async (wxCode: string): Promise<any> => {
   const params =  {
     appid: process.env.WX_APP_ID,
     secret: process.env.WX_APP_SECRET,
@@ -14,12 +14,11 @@ export const getOpenId = async (wxCode: string): Promise<void> => {
   const wxurl = `https://api.weixin.qq.com/sns/jscode2session?${queryString}`;
 
   const response = await axios.post(wxurl);
-  const openId = response.data.openid;
+  const sessionData = response.data;
 
-  if (!openId) {
-    logger.error("Got error: " + JSON.stringify(response.data));
+  if (!sessionData) {
     throw new DependencyError("Failure retrieving openId from weixin.");
   }
 
-  return openId;
+  return sessionData;
 };
