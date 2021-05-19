@@ -48,7 +48,7 @@ export class UserController {
     };
 
     const accessToken = JwtHelper.sign(payload);
-    let returnData = {};
+    const returnData = {};
 
     if(user.role == Constants.SHOPPER) {
       res.send({
@@ -72,40 +72,40 @@ export class UserController {
         items: { //TODO fetch from db.
           count: 0,
           data: [ 
-                  [
-                    { id: "", image: "https://7061-pandabrickapp-gnsk7-1302575607.tcb.qcloud.la/1-2%402x.png?sign=3d82e2f6f704410f7a60d981ed207cd5&t=1595188995"},
-                    { id: "", image: "https://7061-pandabrickapp-gnsk7-1302575607.tcb.qcloud.la/1-2%402x.png?sign=3d82e2f6f704410f7a60d981ed207cd5&t=1595188995" },
-                    { id: "", image: "https://7061-pandabrickapp-gnsk7-1302575607.tcb.qcloud.la/1-2%402x.png?sign=3d82e2f6f704410f7a60d981ed207cd5&t=1595188995" },
-                  ],
-                  [
-                    { id: "", image: "https://7061-pandabrickapp-gnsk7-1302575607.tcb.qcloud.la/1-2%402x.png?sign=3d82e2f6f704410f7a60d981ed207cd5&t=1595188995" },
-                    { id: "", image: "https://7061-pandabrickapp-gnsk7-1302575607.tcb.qcloud.la/1-2%402x.png?sign=3d82e2f6f704410f7a60d981ed207cd5&t=1595188995" },
-                    { id: "", image: "https://7061-pandabrickapp-gnsk7-1302575607.tcb.qcloud.la/1-2%402x.png?sign=3d82e2f6f704410f7a60d981ed207cd5&t=1595188995" }
-                  ],
-                  [
-                    { id: "", image: "https://7061-pandabrickapp-gnsk7-1302575607.tcb.qcloud.la/1-2%402x.png?sign=3d82e2f6f704410f7a60d981ed207cd5&t=1595188995" },
-                    { id: "", image: "https://7061-pandabrickapp-gnsk7-1302575607.tcb.qcloud.la/1-2%402x.png?sign=3d82e2f6f704410f7a60d981ed207cd5&t=1595188995" },
-                    { id: "", image: "https://7061-pandabrickapp-gnsk7-1302575607.tcb.qcloud.la/1-2%402x.png?sign=3d82e2f6f704410f7a60d981ed207cd5&t=1595188995" }
-                  ],
-                  [
-                    { id: "", image: "https://7061-pandabrickapp-gnsk7-1302575607.tcb.qcloud.la/1-2%402x.png?sign=3d82e2f6f704410f7a60d981ed207cd5&t=1595188995" },
-                    { id: "", image: "https://7061-pandabrickapp-gnsk7-1302575607.tcb.qcloud.la/1-2%402x.png?sign=3d82e2f6f704410f7a60d981ed207cd5&t=1595188995" },
-                    { id: "", image: "https://7061-pandabrickapp-gnsk7-1302575607.tcb.qcloud.la/1-2%402x.png?sign=3d82e2f6f704410f7a60d981ed207cd5&t=1595188995" }
-                  ],
-                  [
-                    { id: "", image: "https://7061-pandabrickapp-gnsk7-1302575607.tcb.qcloud.la/1-2%402x.png?sign=3d82e2f6f704410f7a60d981ed207cd5&t=1595188995" },
-                    { id: "", image: "https://7061-pandabrickapp-gnsk7-1302575607.tcb.qcloud.la/1-2%402x.png?sign=3d82e2f6f704410f7a60d981ed207cd5&t=1595188995" },
-                    { id: "", image: "https://7061-pandabrickapp-gnsk7-1302575607.tcb.qcloud.la/1-2%402x.png?sign=3d82e2f6f704410f7a60d981ed207cd5&t=1595188995" }
-                  ],
-                  [
-                    { id: "", image: "https://7061-pandabrickapp-gnsk7-1302575607.tcb.qcloud.la/1-2%402x.png?sign=3d82e2f6f704410f7a60d981ed207cd5&t=1595188995" },
-                    { id: "", image: "https://7061-pandabrickapp-gnsk7-1302575607.tcb.qcloud.la/1-2%402x.png?sign=3d82e2f6f704410f7a60d981ed207cd5&t=1595188995" },
-                    { id: "", image: "https://7061-pandabrickapp-gnsk7-1302575607.tcb.qcloud.la/1-2%402x.png?sign=3d82e2f6f704410f7a60d981ed207cd5&t=1595188995" }
-                  ],
-                  [
-                    { id: "", image: "https://7061-pandabrickapp-gnsk7-1302575607.tcb.qcloud.la/1-2%402x.png?sign=3d82e2f6f704410f7a60d981ed207cd5&t=1595188995" },
-                  ]
-                ],
+            [
+              { id: "", image: "https://7061-pandabrickapp-gnsk7-1302575607.tcb.qcloud.la/1-2%402x.png?sign=3d82e2f6f704410f7a60d981ed207cd5&t=1595188995"},
+              { id: "", image: "https://7061-pandabrickapp-gnsk7-1302575607.tcb.qcloud.la/1-2%402x.png?sign=3d82e2f6f704410f7a60d981ed207cd5&t=1595188995" },
+              { id: "", image: "https://7061-pandabrickapp-gnsk7-1302575607.tcb.qcloud.la/1-2%402x.png?sign=3d82e2f6f704410f7a60d981ed207cd5&t=1595188995" },
+            ],
+            [
+              { id: "", image: "https://7061-pandabrickapp-gnsk7-1302575607.tcb.qcloud.la/1-2%402x.png?sign=3d82e2f6f704410f7a60d981ed207cd5&t=1595188995" },
+              { id: "", image: "https://7061-pandabrickapp-gnsk7-1302575607.tcb.qcloud.la/1-2%402x.png?sign=3d82e2f6f704410f7a60d981ed207cd5&t=1595188995" },
+              { id: "", image: "https://7061-pandabrickapp-gnsk7-1302575607.tcb.qcloud.la/1-2%402x.png?sign=3d82e2f6f704410f7a60d981ed207cd5&t=1595188995" }
+            ],
+            [
+              { id: "", image: "https://7061-pandabrickapp-gnsk7-1302575607.tcb.qcloud.la/1-2%402x.png?sign=3d82e2f6f704410f7a60d981ed207cd5&t=1595188995" },
+              { id: "", image: "https://7061-pandabrickapp-gnsk7-1302575607.tcb.qcloud.la/1-2%402x.png?sign=3d82e2f6f704410f7a60d981ed207cd5&t=1595188995" },
+              { id: "", image: "https://7061-pandabrickapp-gnsk7-1302575607.tcb.qcloud.la/1-2%402x.png?sign=3d82e2f6f704410f7a60d981ed207cd5&t=1595188995" }
+            ],
+            [
+              { id: "", image: "https://7061-pandabrickapp-gnsk7-1302575607.tcb.qcloud.la/1-2%402x.png?sign=3d82e2f6f704410f7a60d981ed207cd5&t=1595188995" },
+              { id: "", image: "https://7061-pandabrickapp-gnsk7-1302575607.tcb.qcloud.la/1-2%402x.png?sign=3d82e2f6f704410f7a60d981ed207cd5&t=1595188995" },
+              { id: "", image: "https://7061-pandabrickapp-gnsk7-1302575607.tcb.qcloud.la/1-2%402x.png?sign=3d82e2f6f704410f7a60d981ed207cd5&t=1595188995" }
+            ],
+            [
+              { id: "", image: "https://7061-pandabrickapp-gnsk7-1302575607.tcb.qcloud.la/1-2%402x.png?sign=3d82e2f6f704410f7a60d981ed207cd5&t=1595188995" },
+              { id: "", image: "https://7061-pandabrickapp-gnsk7-1302575607.tcb.qcloud.la/1-2%402x.png?sign=3d82e2f6f704410f7a60d981ed207cd5&t=1595188995" },
+              { id: "", image: "https://7061-pandabrickapp-gnsk7-1302575607.tcb.qcloud.la/1-2%402x.png?sign=3d82e2f6f704410f7a60d981ed207cd5&t=1595188995" }
+            ],
+            [
+              { id: "", image: "https://7061-pandabrickapp-gnsk7-1302575607.tcb.qcloud.la/1-2%402x.png?sign=3d82e2f6f704410f7a60d981ed207cd5&t=1595188995" },
+              { id: "", image: "https://7061-pandabrickapp-gnsk7-1302575607.tcb.qcloud.la/1-2%402x.png?sign=3d82e2f6f704410f7a60d981ed207cd5&t=1595188995" },
+              { id: "", image: "https://7061-pandabrickapp-gnsk7-1302575607.tcb.qcloud.la/1-2%402x.png?sign=3d82e2f6f704410f7a60d981ed207cd5&t=1595188995" }
+            ],
+            [
+              { id: "", image: "https://7061-pandabrickapp-gnsk7-1302575607.tcb.qcloud.la/1-2%402x.png?sign=3d82e2f6f704410f7a60d981ed207cd5&t=1595188995" },
+            ]
+          ],
           paginations: {}
         }, 
         shopMetaData: { 
