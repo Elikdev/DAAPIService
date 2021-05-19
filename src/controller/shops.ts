@@ -1,6 +1,6 @@
 import { HandleError } from "../decorator/errorDecorator";
 import { Request, Response } from "express";
-import { getRepository } from "typeorm";
+import { getRepository, OrderByCondition } from "typeorm";
 import { Shops } from "../entities/Shops";
 import { Users } from "../entities/Users";
 import { BadRequestError } from "../error/badRequestError";
@@ -8,8 +8,11 @@ import { RequestValidator } from "../validator/requestValidator";
 import { createShopSchema, updateShopSchema } from "../validator/schemas";
 import { ResourceNotFoundError } from "../error/notfoundError";
 import { ListingStatus } from "../entities/Items";
+import { getOrderByConditions } from "./helper/orderByHelper";
+import { getPaginationLinks, getPaginationParams } from "./helper/paginationHelper";
 
 const MAX_OWNED_SHOPS = 1;
+const DEFAULT_SORT_BY:OrderByCondition = { "rating":"DESC", "createdtime":"ASC"};
 
 export class ShopController {
   @HandleError("createShop")
@@ -37,17 +40,30 @@ export class ShopController {
 
   @HandleError("getShops")
   static async getShops(req: Request, res: Response): Promise<void> {
-    const shops = await getRepository(Shops)
-      .createQueryBuilder("shops")
-      .leftJoinAndSelect("shops.owner", "users")
-      .leftJoinAndSelect("shops.items", "items")
-      .select(["shops.avgRating", "shops.name", "shops.introduction", "shops.logoUrl", "users.username", "users.followersCount", "items.imageUrls"])
-      .andWhere("items.status = :new", { new: ListingStatus.NEW })
-      .limit(4)
+    const sorts = req.query.sort;
+    const orderBy = getOrderByConditions(sorts, DEFAULT_SORT_BY);
+    const repo = getRepository(Shops);
+    const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
+
+    const ids = await repo.createQueryBuilder("shops")
+      .select("shops.id")
+      .orderBy(orderBy)
+      .skip(skipSize)
+      .take(pageSize)
+      .getMany();
+
+    const inputIds = ids.map(shop => shop.id);
+    const shops = await repo.createQueryBuilder("shops")
+      .where("shops.id IN (:...ids)", { ids: inputIds })
+      .leftJoin("shops.owner", "users")
+      .leftJoin("shops.items", "items")
+      .orWhere("items.status = :new", { new: ListingStatus.NEW })
+      .select(["shops.id", "shops.rating", "shops.name", "shops.introduction", "shops.logoUrl", "users.username", "users.followersCount", "items.imageUrls"])
       .getMany();
   
     res.send({
-      data: shops
+      data: shops,
+      links: getPaginationLinks(req, pageNumber, pageSize)
     });
   }
 

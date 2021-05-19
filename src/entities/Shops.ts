@@ -30,7 +30,7 @@ export class Shops extends BaseEntity {
   address: Addresses;
 
   @Column("float", {default: 0.0 })
-  avgRating: number;
+  rating: number;
 
   @Column("character varying", {nullable: true })
   logoUrl: string;
@@ -45,8 +45,8 @@ export class Shops extends BaseEntity {
   owner: Users;
 
   @CreateDateColumn({type: "timestamp"})
-  createdAt: string;
+  createdtime: string;
 
   @UpdateDateColumn({type: "timestamp"})
-  updatedAt: string;
+  updatedtime: string;
 }
