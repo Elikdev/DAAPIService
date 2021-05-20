@@ -73,7 +73,13 @@ export class ItemController {
     const itemId = req.params.id;
     const itemRepo = getRepository(Items);
 
-    const item = await itemRepo.findOne({id: itemId});
+    const item = await itemRepo.createQueryBuilder("item")
+      .where("item.id = :id", { id: itemId })
+      .leftJoinAndSelect("item.shop", "shops")
+      .leftJoinAndSelect("shops.owner", "users")
+      .leftJoinAndSelect("users.defaultAddress", "defaultAddress")
+      .select(["item", "shops.name", "shops.id", "shops.introduction", "shops.logoUrl", "users.username", "defaultAddress.city", "defaultAddress.district"])
+      .getOne();
     if (!item) {
       throw new ResourceNotFoundError("Item not found.");
     }
