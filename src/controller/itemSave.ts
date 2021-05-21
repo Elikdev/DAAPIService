@@ -85,6 +85,8 @@ export class ItemSaveController {
       .leftJoinAndSelect("users.itemSaves", "itemSaves")
       .leftJoinAndSelect("itemSaves.item", "item")
       .where("users.id = :id", { id: userId })
+      .loadRelationCountAndMap("users.itemSavesCount", "users.itemSaves")
+      .select(["users.id", "itemSaves.id", "item.id", "item.imageUrls"])
       .getOne();
 
     res.send({
