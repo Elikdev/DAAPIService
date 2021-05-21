@@ -33,7 +33,7 @@ v1router.get("/users/:id/followings", UserRelationController.getUserFollowings);
 
 v1router.post("/addresses", AddressController.createAddress);
 v1router.get("/addresses", AddressController.getAddresses);
-v1router.patch("/addresses/:id", AddressController.updateAddress);
+v1router.put("/addresses/:id", AddressController.updateAddress);
 v1router.delete("/addresses/:id", AddressController.deleteAddress);
 
 v1router.post("/shops", ShopController.createShop);

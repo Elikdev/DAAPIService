@@ -102,7 +102,6 @@ export class AddressController {
   @HandleError("getAddresses")
   static async getAddresses(req: Request, res: Response): Promise<void> {
     const userId = req.body.userId;
-    const isDefault = req.query.defaultAddress === "true";
     const user = await getRepository(Users)
       .createQueryBuilder("user")
       .leftJoinAndSelect("user.addresses", "address", "address.isActive = :isActive", {isActive: true})
@@ -114,7 +113,7 @@ export class AddressController {
       throw new ResourceNotFoundError("User is not found.");
     }              
 
-    const result = isDefault? user.defaultAddress : user.addresses;
+    const result = {addresses: user.addresses, defaultAddress: user.defaultAddress}
     res.send({
       data: result
     });

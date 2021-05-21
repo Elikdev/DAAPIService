@@ -50,6 +50,7 @@ export const createAddressSchema = Joi.object().keys({
   city: Joi.string().required(),
   district: Joi.string().required(),
   street: Joi.string().required(),
+  phoneNumber: Joi.string().pattern(/^[0-9]+$/).required(),
   isDefault: Joi.boolean().optional()
 });
 
@@ -58,6 +59,7 @@ export const updateAddressSchema = Joi.object().keys({
   province: Joi.string().optional(),
   city: Joi.string().optional(),
   district: Joi.string().optional(),
+  phoneNumber: Joi.string().optional(),
   street: Joi.string().optional(),
   isDefault: Joi.boolean().optional(),
   isDefaultBeforeUpdate: Joi.boolean().optional()

@@ -1,7 +1,7 @@
 import { AfterInsert, AfterRemove, BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn, ManyToOne, JoinTable } from "typeorm";
 import { Users } from "./Users";
 
-@Entity("user_relation")
+@Entity("user_relations")
 export class UserRelations extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string | null;

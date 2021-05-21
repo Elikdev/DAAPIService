@@ -27,6 +27,7 @@ export class UserController {
     const userRepo = getRepository(Users);
     const openId = sessionData.openid;
     const userInfo = encryptedDataDecoder.decryptData(encryptedData, iv);
+    
     let user = await userRepo.createQueryBuilder("user")
       .where("user.openId = :openId", { openId: openId })
       .leftJoinAndSelect("user.defaultAddress", "defaultAddress")
