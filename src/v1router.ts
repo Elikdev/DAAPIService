@@ -26,6 +26,7 @@ v1router.patch("/items/:id", ItemController.updateItem);
 
 v1router.post("/users/:id/follow", UserRelationController.follow);
 v1router.post("/users/:id/unfollow", UserRelationController.unfollow);
+v1router.get("/users/:id/isFollowed", UserRelationController.isFollowed);
 v1router.get("/users/:id/savedItems", ItemSaveController.getUserSavedItems);
 v1router.get("/users/:id/likedItems", ItemLikeController.getUserLikedItems);
 v1router.get("/users/:id/followers", UserRelationController.getUserFollowers);

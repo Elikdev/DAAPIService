@@ -14,6 +14,13 @@ export class UserRelationController {
     const followerId = req.body.userId;
     const followeeId = parseInt(req.params.id);
 
+    if (followerId == followeeId) {
+      res.send({
+        message: "Users can not follow themselves."
+      });
+      return next();
+    }
+
     const userRepo = getRepository(Users);
     const follower = await userRepo.findOne({id: followerId});
     if (!follower) {
@@ -51,6 +58,13 @@ export class UserRelationController {
     const followerId = req.body.userId;
     const followeeId = parseInt(req.params.id);
 
+    if (followerId == followeeId) {
+      res.send({
+        message: "Users can not unfollow themselves."
+      });
+      return next();
+    }
+
     const userRepo = getRepository(Users);
     const follower = await userRepo.findOne({id: followerId});
     if (!follower) {
@@ -76,6 +90,35 @@ export class UserRelationController {
       message: "UserRelationEntry deleted.",
       data: result
     });
+  }
+
+  @HandleError("isFollowed")
+  static async isFollowed(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const followerId = req.body.userId;
+    const followeeId = parseInt(req.params.id);
+
+    if (followerId == followeeId) {
+      res.send({
+        message: "Users can not follow themselves.",
+        data: false
+      });
+      return next();
+    }
+
+    const userRelationRepo = getRepository(UserRelations);
+    const userRelationEntry = await getRepository(UserRelations)
+      .createQueryBuilder("userRelations")
+      .leftJoinAndSelect("userRelations.follower", "follower")
+      .leftJoinAndSelect("userRelations.followee", "followee")
+      .where("follower.id = :followerId", {followerId: followerId})
+      .andWhere("followee.id = :followeeId", {followeeId: followeeId})
+      .getOne();
+      
+    const isFollowed = userRelationEntry != null;
+    res.send({
+      data: isFollowed
+    });
+
   }
 
 

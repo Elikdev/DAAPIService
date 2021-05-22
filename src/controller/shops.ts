@@ -64,6 +64,7 @@ export class ShopController {
         "shops.name", 
         "shops.introduction", 
         "shops.logoUrl", 
+        "users.id",
         "users.username", 
         "users.followersCount", 
         "items.id",
@@ -85,7 +86,7 @@ export class ShopController {
       .where("shops.id = :id", { id: shopId })
       .leftJoinAndSelect("shops.owner", "users")
       .leftJoinAndSelect("users.defaultAddress", "defaultAddress")
-      .select(["shops.id", "shops.name", "shops.introduction", "shops.logoUrl", "users.username", "users.followersCount", "users.followingsCount", "defaultAddress.city", "defaultAddress.district", "defaultAddress.street"])
+      .select(["shops.id", "shops.name", "shops.introduction", "shops.logoUrl", "users.id", "users.username", "users.followersCount", "users.followingsCount", "defaultAddress.city", "defaultAddress.district", "defaultAddress.street"])
       .getOne();
   
     res.send({
