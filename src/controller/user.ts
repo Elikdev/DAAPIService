@@ -8,7 +8,7 @@ import { AuthError } from "../error/authError";
 import { ResourceNotFoundError } from "../error/notfoundError";
 import { logger } from "../logging/logger";
 import { RequestValidator } from "../validator/requestValidator";
-import { signUpSchema } from "../validator/schemas";
+import { signUpSchema, updateUserSchema } from "../validator/schemas";
 import { Decode } from "./helper/wxDecode";
 import { Constants } from "../config/constants";
 
@@ -30,7 +30,6 @@ export class UserController {
     
     let user = await userRepo.createQueryBuilder("user")
       .where("user.openId = :openId", { openId: openId })
-      .leftJoinAndSelect("user.defaultAddress", "defaultAddress")
       .leftJoinAndSelect("user.shops", "shops")
       .getOne();
 
@@ -70,6 +69,34 @@ export class UserController {
     res.send({
       data: user
     });
+  }
+
+
+  @HandleError("updateUser")
+  static async updateUser(req: Request, res: Response): Promise<void> {
+    const userId = req.params.id;
+    const userData = req.body.data;
+
+    const validator = new RequestValidator(updateUserSchema);
+    validator.validate(userData);
+
+    const userRepo = await getRepository(Users);
+    const result = await userRepo.createQueryBuilder()
+      .update(Users, userData)
+      .where("id = :id", { id: userId })
+      .returning("*")
+      .updateEntity(true)
+      .execute()
+      .then(response => response.raw[0]);
+
+    
+    if (!result) {
+      throw new ResourceNotFoundError("User not found.");
+    }
+    res.send({
+      data: result
+    });
+
   }
 
 }

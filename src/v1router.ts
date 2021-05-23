@@ -12,6 +12,7 @@ export const v1router = Router();
 
 v1router.post("/signup", UserController.signUp);
 v1router.post("/signin", UserController.signIn);
+v1router.put('/users/:id', UserController.updateUser)
 
 // Do auth filtering
 v1router.use(authMiddleWare);
@@ -22,7 +23,7 @@ v1router.post("/items/:id/unlike", ItemLikeController.unlikeItem);
 v1router.post("/items/:id/unsave", ItemSaveController.unsaveItem);
 v1router.get("/items/:id", ItemController.getItem);
 v1router.get("/items", ItemController.getItems);
-v1router.patch("/items/:id", ItemController.updateItem);
+v1router.put("/items/:id", ItemController.updateItem);
 
 v1router.post("/users/:id/follow", UserRelationController.follow);
 v1router.post("/users/:id/unfollow", UserRelationController.unfollow);
@@ -41,7 +42,7 @@ v1router.post("/shops", ShopController.createShop);
 v1router.get("/shops", ShopController.discoverShops);
 v1router.get("/shops/:id/items", ShopController.getShopItems);
 v1router.post("/shops/:id/items", ItemController.createItem);
-v1router.patch("/shops/:id", ShopController.updateShop);
+v1router.put("/shops/:id", ShopController.updateShop);
 v1router.get("/shops/:id", ShopController.getShop);
 
 

@@ -38,6 +38,9 @@ export class Users extends BaseEntity {
   @Column("character varying", {nullable: true })
   role: string | null;
 
+  @Column("character varying", {nullable: true })
+  introduction: string | "null";
+
   @OneToMany(() => Orders, (orders) => orders.seller)
   orders: Orders[];
 

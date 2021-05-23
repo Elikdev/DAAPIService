@@ -35,6 +35,9 @@ export class Shops extends BaseEntity {
   @Column("character varying", {nullable: true })
   logoUrl: string;
 
+  @Column("character varying", {nullable: true })
+  location: string;
+
   @Column("float", { default: 0.0})
   commissionRate: number;
 

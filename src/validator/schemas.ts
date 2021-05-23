@@ -71,11 +71,20 @@ export const createShopSchema = Joi.object().keys({
   introduction: Joi.string().max(500),
   addressId: Joi.string().uuid(),
   logoUrl: Joi.string(),
+  location: Joi.string().optional(),
+
 });
+
+export const updateUserSchema = Joi.object().keys({
+  username: Joi.string().max(20),
+  introduction: Joi.string().max(500)
+});
+
 
 export const updateShopSchema = Joi.object().keys({
   name: Joi.string().max(20),
   introduction: Joi.string().max(500),
   addressId: Joi.string().uuid(),
   logoUrl: Joi.string(),
+  location: Joi.string().max(500)
 });
