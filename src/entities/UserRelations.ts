@@ -19,26 +19,26 @@ export class UserRelations extends BaseEntity {
   updatedAt: string;
 
   @AfterInsert()
-  async afterInsertOperations() {
-    await Users.createQueryBuilder().update(Users)
+  async afterInsertOperations(): Promise<void>  {
+    Users.createQueryBuilder().update(Users)
       .set({followingsCount: this.follower.followingsCount + 1})
       .where("id = :id", { id: this.follower.id })
       .execute();
 
-    await Users.createQueryBuilder().update(Users)
+    Users.createQueryBuilder().update(Users)
       .set({followersCount: this.followee.followersCount + 1})
       .where("id = :id", { id: this.followee.id })
       .execute();
   }
 
   @AfterRemove()
-  async afterRemoveOperations() {
-    await Users.createQueryBuilder().update(Users)
+  async afterRemoveOperations(): Promise<void>  {
+    Users.createQueryBuilder().update(Users)
       .set({followingsCount: this.follower.followingsCount - 1})
       .where("id = :id", { id: this.follower.id })
       .execute();
 
-    await Users.createQueryBuilder().update(Users)
+    Users.createQueryBuilder().update(Users)
       .set({followersCount: this.followee.followersCount - 1})
       .where("id = :id", { id: this.followee.id })
       .execute();    

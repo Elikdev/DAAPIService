@@ -20,16 +20,16 @@ export class ItemLikes extends BaseEntity {
   user: Users;
 
   @AfterInsert()
-  async afterInsertOperations() {
-    await Items.createQueryBuilder().update(Items)
+  async afterInsertOperations(): Promise<void> {
+    Items.createQueryBuilder().update(Items)
       .set({itemLikesCount: this.item.itemLikesCount + 1})
       .where("id = :id", { id: this.item.id })
       .execute();
   }
 
   @AfterRemove()
-  async afterRemoveOperations() {
-    await Items.createQueryBuilder().update(Items)
+  async afterRemoveOperations(): Promise<void> {
+    Items.createQueryBuilder().update(Items)
       .set({itemLikesCount: this.item.itemLikesCount - 1})
       .where("id = :id", { id: this.item.id })
       .execute();

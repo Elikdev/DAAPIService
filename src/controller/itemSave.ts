@@ -6,7 +6,6 @@ import { ItemSaves } from "../entities/ItemSaves";
 import { Users } from "../entities/Users";
 import { ResourceNotFoundError } from "../error/notfoundError";
 import { logger } from "../logging/logger";
-import { RequestValidator } from "../validator/requestValidator";
 
 export class ItemSaveController {
 

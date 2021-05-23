@@ -113,7 +113,7 @@ export class AddressController {
       throw new ResourceNotFoundError("User is not found.");
     }              
 
-    const result = {addresses: user.addresses, defaultAddress: user.defaultAddress}
+    const result = {addresses: user.addresses, defaultAddress: user.defaultAddress};
     res.send({
       data: result
     });

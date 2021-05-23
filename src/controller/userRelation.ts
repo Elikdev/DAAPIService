@@ -5,7 +5,6 @@ import { ResourceNotFoundError } from "../error/notfoundError";
 import { Users } from "../entities/Users";
 import { UserRelations } from "../entities/UserRelations";
 import { logger } from "../logging/logger";
-import { RequestValidator } from "../validator/requestValidator";
 
 export class UserRelationController {
 
@@ -104,8 +103,7 @@ export class UserRelationController {
       });
       return next();
     }
-
-    const userRelationRepo = getRepository(UserRelations);
+    
     const userRelationEntry = await getRepository(UserRelations)
       .createQueryBuilder("userRelations")
       .leftJoinAndSelect("userRelations.follower", "follower")
