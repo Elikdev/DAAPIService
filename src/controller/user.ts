@@ -31,6 +31,12 @@ export class UserController {
     let user = await userRepo.createQueryBuilder("user")
       .where("user.openId = :openId", { openId: openId })
       .leftJoinAndSelect("user.shops", "shops")
+      .leftJoinAndSelect("user.itemLikes", "itemLikes")
+      .leftJoinAndSelect("itemLikes.item", "likedItem")
+      .leftJoinAndSelect("user.itemSaves", "itemSaves")
+      .leftJoinAndSelect("itemSaves.item", "savedItem")
+      .loadRelationCountAndMap("user.itemLikesCount", "user.itemLikes")
+      .loadRelationCountAndMap("user.itemSavesCount", "user.itemSaves")
       .getOne();
 
     if (!user) {
