@@ -69,10 +69,12 @@ export class ItemLikeController {
       return next();
     }
 
+    const itemLikeId = itemLike.id;
     const result = await itemLikeRepo.remove(itemLike);
+
     res.send({
       message: "ItemLike deleted.",
-      data: result
+      id: itemLikeId
     });
   }  
 

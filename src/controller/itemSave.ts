@@ -69,10 +69,11 @@ export class ItemSaveController {
       return next();
     }
 
+    const itemSaveId = itemSave.id;
     const result = await itemSaveRepo.remove(itemSave);
     res.send({
       message: "ItemSave deleted.",
-      data: result
+      id: itemSaveId
     });
   }
 
