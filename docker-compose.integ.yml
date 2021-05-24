@@ -1,0 +1,45 @@
+version: '3.7'
+
+volumes:
+  pgdata:
+services:
+  postgresdb:
+    image: postgres:10-alpine
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    environment:
+      PGPORT: 5432
+      POSTGRES_HOST: 'postgresdb'
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'password'
+      POSTGRES_DB: 'da_test'
+    networks:
+      - daapi
+  tsnodedocker:
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: base
+    volumes:
+      - ./src:/home/node/app/src
+      - ./nodemon.json:/home/node/app/nodemon.json
+    container_name: tsnodedocker
+    expose:
+      - '4000'
+    ports:
+      - '4000:4000'
+    command: >
+      bash -c "/home/node/app/bin/run-web.sh"
+    environment:
+      APP_ENV: test
+    depends_on:
+     - postgresdb
+    networks:
+      - daapi
+  
+networks:
+  daapi:
+    driver: bridge

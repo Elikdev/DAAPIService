@@ -12,7 +12,7 @@ export const v1router = Router();
 
 v1router.post("/signup", UserController.signUp);
 v1router.post("/signin", UserController.signIn);
-v1router.put('/users/:id', UserController.updateUser)
+v1router.put("/users/:id", UserController.updateUser);
 
 // Do auth filtering
 v1router.use(authMiddleWare);

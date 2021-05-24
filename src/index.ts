@@ -3,14 +3,14 @@ import {Request, Response} from "express";
 import { logger } from "./logging/logger";
 import "reflect-metadata";
 import {createConnection} from "typeorm";
-import {DBConfig} from "./config/dbconfig";
+import {getDBConfig} from "./config/dbconfig";
 import bodyParser from "body-parser";
 import rTracer from "cls-rtracer";
 import { v1router } from "./v1router";
 import * as dotenv from "dotenv";
-import { UserController } from "./controller/user";
 
 const PORT = 4000;
+const DBConfig = getDBConfig();
 
 createConnection(DBConfig).then(async connection => {
   setConfig();
@@ -35,6 +35,9 @@ const setConfig = ():void => {
   switch(APP_ENV) {
   case "development":
     dotenv.config({ path: __dirname+"/../.env" });
+    break;
+  case "test": 
+    dotenv.config({ path: __dirname+"/../.env.test" });
     break;
   case "production": 
     dotenv.config({ path: __dirname+"/../.env.prod" });
