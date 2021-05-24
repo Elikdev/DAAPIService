@@ -38,8 +38,7 @@ export class ItemController {
       .where("item.id IN (:...ids)", { ids: inputIds })
       .leftJoinAndSelect("item.shop", "shops")
       .leftJoinAndSelect("shops.owner", "users")
-      .leftJoinAndSelect("users.defaultAddress", "defaultAddress")
-      .select(["item", "shops.name", "shops.id", "shops.introduction", "shops.logoUrl", "users.id", "users.username", "defaultAddress.city", "defaultAddress.district"])
+      .select(["item", "shops.name", "shops.id", "shops.introduction", "shops.logoUrl", "shops.location", "users.id", "users.username"])
       .getMany();
 
     res.send({

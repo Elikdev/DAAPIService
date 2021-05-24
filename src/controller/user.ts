@@ -105,4 +105,24 @@ export class UserController {
 
   }
 
+
+  @HandleError("GetUser")
+  static async getUser(req: Request, res: Response): Promise<void> {
+    const userId = req.params.id;
+    const userRepo = await getRepository(Users);
+    const result = await userRepo.createQueryBuilder("users")
+      .where("users.id = :id", { id: userId })
+      .leftJoinAndSelect("users.shops", "shops")
+      .select(["shops.id", "shops.name", "shops.introduction", "shops.location", "shops.logoUrl", "users.id", "users.username", "users.followersCount", "users.followingsCount", "users.avatarUrl", "users.introduction"])
+      .getOne();
+    
+    if (!result) {
+      throw new ResourceNotFoundError("User not found.");
+    }
+    res.send({
+      data: result
+    });
+
+  }
+
 }

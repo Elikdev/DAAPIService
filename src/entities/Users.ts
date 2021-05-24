@@ -39,7 +39,11 @@ export class Users extends BaseEntity {
   role: string | null;
 
   @Column("character varying", {nullable: true })
-  introduction: string | "null";
+  introduction: string | null;
+
+
+  @Column("character varying", {nullable: true })
+  avatarUrl: string | null;
 
   @OneToMany(() => Orders, (orders) => orders.seller)
   orders: Orders[];

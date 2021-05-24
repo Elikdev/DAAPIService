@@ -5,6 +5,7 @@ import { ResourceNotFoundError } from "../error/notfoundError";
 import { Users } from "../entities/Users";
 import { UserRelations } from "../entities/UserRelations";
 import { logger } from "../logging/logger";
+import { ListingStatus } from "../entities/Items";
 
 export class UserRelationController {
 
@@ -127,7 +128,25 @@ export class UserRelationController {
       .createQueryBuilder("users")
       .leftJoinAndSelect("users.followings", "followings")
       .leftJoinAndSelect("followings.followee", "followee")
+      .leftJoinAndSelect("followee.shops", "shops")
+      .leftJoinAndSelect("shops.items", "items")
+      .andWhere("items.status = :new", { new: ListingStatus.NEW })
       .where("users.id = :id", { id: userId })
+      .select([
+        "users.id",
+        "followings", 
+        "followee.id", 
+        "followee.username", 
+        "followee.followersCount", 
+        "followee.avatarUrl",
+        "shops.id", 
+        "shops.rating", 
+        "shops.name", 
+        "shops.introduction", 
+        "shops.logoUrl", 
+        "items.id",
+        "items.imageUrls",
+      ])
       .getOne();
 
     res.send({
@@ -142,7 +161,25 @@ export class UserRelationController {
       .createQueryBuilder("users")
       .leftJoinAndSelect("users.followers", "followers")
       .leftJoinAndSelect("followers.follower", "follower")
+      .leftJoinAndSelect("follower.shops", "shops")
+      .leftJoinAndSelect("shops.items", "items")
+      .andWhere("items.status = :new", { new: ListingStatus.NEW })
       .where("users.id = :id", { id: userId })
+      .select([
+        "users.id",
+        "followers", 
+        "follower.id", 
+        "follower.username", 
+        "follower.followersCount", 
+        "follower.avatarUrl", 
+        "shops.id", 
+        "shops.rating", 
+        "shops.name", 
+        "shops.introduction", 
+        "shops.logoUrl", 
+        "items.id",
+        "items.imageUrls",
+      ])
       .getOne();
 
     res.send({
