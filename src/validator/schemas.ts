@@ -77,7 +77,9 @@ export const createShopSchema = Joi.object().keys({
 
 export const updateUserSchema = Joi.object().keys({
   username: Joi.string().max(20),
-  introduction: Joi.string().max(500)
+  introduction: Joi.string().max(500),
+  avatarUrl: Joi.string().max(500)
+
 });
 
 
