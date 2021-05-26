@@ -131,7 +131,7 @@ export class ShopController {
       .where("shops.id = :id", { id: shopId })
       .andWhere("items.status IN (:...status)", {status: [ListingStatus.NEW, ListingStatus.SOLD]})
       .loadRelationCountAndMap("shops.itemsCount", "shops.items")
-      .select(["shops.id", "items.id", "items.imageUrls"])
+      .select(["shops.id", "items"])
       .getOne();
 
     res.send({
