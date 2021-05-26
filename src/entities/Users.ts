@@ -27,7 +27,7 @@ export class Users extends BaseEntity {
   openId: string;
 
   @Column()
-  username: string
+  username: string;
 
   @Column("character varying", {nullable: false })
   mobilePrefix: string;
@@ -45,8 +45,8 @@ export class Users extends BaseEntity {
   @Column("character varying", {nullable: true })
   avatarUrl: string | null;
 
-  @OneToMany(() => Orders, (orders) => orders.seller)
-  orders: Orders[];
+  @OneToMany(() => Orders, (orders) => orders.buyer)
+  buyerOrders: Orders[];
 
   @OneToMany(() => Shops, (shops) => shops.owner, { cascade: true })
   @JoinColumn()

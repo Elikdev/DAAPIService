@@ -13,6 +13,7 @@ import {
 import { Addresses } from "./Addresses";
 import { Items } from "./Items";
 import { Users } from "./Users";
+import { Orders } from "./Orders";
 
 @Entity("shops")
 export class Shops extends BaseEntity {
@@ -25,9 +26,8 @@ export class Shops extends BaseEntity {
   @Column("character varying", {nullable: true })
   introduction: string | null;
 
-  @OneToOne(() => Addresses)
-  @JoinColumn()
-  address: Addresses;
+  @OneToMany(() => Orders, (orders) => orders.shop)
+  shopOrders: Orders[];
 
   @Column("float", {default: 0.0 })
   rating: number;

@@ -1,6 +1,7 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Shops } from "./Shops";
 import { Users } from "./Users";
+import { Orders } from "./Orders";
 
 @Entity("addresses")
 export class Addresses {
@@ -28,8 +29,8 @@ export class Addresses {
   @ManyToOne(() => Users, user => user.addresses)
   user: Users;
 
-  @OneToOne(() => Shops)
-  shop: Shops
+  @OneToMany(() => Orders, (orders) => orders.buyerAddress)
+  orders: Orders[];
 
   @Column("boolean", {default: true })
   isActive: boolean;

@@ -10,19 +10,23 @@ import {
 } from "typeorm";
 import { Items } from "./Items";
 import { Users } from "./Users";
+import { Addresses } from "./Addresses";
+import { Shops } from "./Shops";
 
-@Index("orders_buyer_id_key", ["buyerId"], { unique: true })
 @Index("orders_pkey", ["id"], { unique: true })
 @Entity("orders")
 export class Orders extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @Column("integer", {unique: true })
-  buyerId: number;
+  @ManyToOne(() => Users, (users) => users.buyerOrders)
+  buyer: Users;
 
-  @Column("integer", {nullable: true })
-  sellerShopId: number | null;
+  @ManyToOne(() => Shops, (shops) => shops.shopOrders)
+  shop: Shops;
+
+  @ManyToOne(() => Addresses, (addresses) => addresses.orders)
+  buyerAddress: Addresses;
 
   @Column("double precision", {nullable: true })
   amount: number | null;
@@ -44,8 +48,4 @@ export class Orders extends BaseEntity {
 
   @OneToMany(() => Items, (items) => items.order)
   orderItems: Items[];
-
-  @ManyToOne(() => Users, (users) => users.orders)
-  @JoinColumn([{referencedColumnName: "id" }])
-  seller: Users;
 }
