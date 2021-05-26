@@ -1,6 +1,8 @@
 import {
   BaseEntity,
   Column,
+  CreateDateColumn,
+  UpdateDateColumn,
   Entity,
   Index,
   JoinColumn,
@@ -12,6 +14,15 @@ import { Items } from "./Items";
 import { Users } from "./Users";
 import { Addresses } from "./Addresses";
 import { Shops } from "./Shops";
+
+export enum OrderStatus {
+  OPEN = "open",
+  PAID = "paid",
+  CONFIRMED = "confirmed",
+  SHIPPED = "shipped",
+  COMPLETED = "completed",
+  CANCELLED = "cancelled"
+}
 
 @Index("orders_pkey", ["id"], { unique: true })
 @Entity("orders")
@@ -29,7 +40,13 @@ export class Orders extends BaseEntity {
   buyerAddress: Addresses;
 
   @Column("double precision", {nullable: true })
-  amount: number | null;
+  totalPrice: number | null;
+
+  @Column("double precision", {nullable: true })
+  itemsPrice: number | null;
+
+  @Column("double precision", {nullable: true })
+  processingFee: number | null;
 
   @Column("json", {nullable: true })
   itemsJson: string | null;
@@ -37,14 +54,18 @@ export class Orders extends BaseEntity {
   @Column("character varying", {nullable: true })
   trackingNum: string | null;
 
-  @Column("character varying", {nullable: true })
-  status: string | null;
+  @Column({
+    type: "enum",
+    enum: OrderStatus,
+    default: OrderStatus.OPEN
+  })
+  status: string;
 
-  @Column("timestamp without time zone", {nullable: true })
-  updatedAt: Date | null;
+  @CreateDateColumn({type: "timestamp"})
+  createdtime: string;
 
-  @Column("character varying", {nullable: true })
-  createdAt: string | null;
+  @UpdateDateColumn({type: "timestamp"})
+  updatedtime: string;
 
   @OneToMany(() => Items, (items) => items.order)
   orderItems: Items[];

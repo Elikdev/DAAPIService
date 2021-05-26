@@ -7,13 +7,14 @@ import { ItemSaveController } from "./controller/itemSave";
 import { UserRelationController } from "./controller/userRelation";
 import { AddressController } from "./controller/address";
 import { ShopController } from "./controller/shops";
+import { OrderController } from "./controller/order";
 
 export const v1router = Router();
 
 v1router.post("/signup", UserController.signUp);
 v1router.post("/signin", UserController.signIn);
-v1router.put('/users/:id', UserController.updateUser)
-v1router.get('/users/:id', UserController.getUser)
+v1router.put("/users/:id", UserController.updateUser);
+v1router.get("/users/:id", UserController.getUser);
 
 
 // Do auth filtering
@@ -46,5 +47,9 @@ v1router.get("/shops/:id/items", ShopController.getShopItems);
 v1router.post("/shops/:id/items", ItemController.createItem);
 v1router.put("/shops/:id", ShopController.updateShop);
 v1router.get("/shops/:id", ShopController.getShop);
+v1router.get("/shops/:id/orders", OrderController.getShopOrders);
+
+v1router.post("/orders", OrderController.createOrder);
+v1router.get("/orders", OrderController.getBuyerOrders);
 
 

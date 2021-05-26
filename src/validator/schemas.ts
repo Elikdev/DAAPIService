@@ -25,7 +25,20 @@ export const createItemSchema = Joi.object().keys({
   category: Joi.string(),
   subcategory: Joi.string().optional(),
   shippingType: Joi.string().required().valid(...Object.values(ShippingType)),
-});  
+});
+
+export const createOrderSchema = Joi.object().keys({
+  totalPrice: Joi.number().required(),
+  itemsPrice: Joi.number().required(),
+  itemId: Joi.string().uuid().required(),
+  processingFee: Joi.number().required(),
+  itemImageUrls: Joi.array().required(),
+  itemName: Joi.string().required(),
+  itemSize: Joi.string().required(),
+  trackingNum: Joi.string().optional(),
+  shopId: Joi.string().uuid().required(),
+  addressId: Joi.string().uuid().required()
+});   
 
 export const updateItemSchema = Joi.object().keys({
   name: Joi.string().optional(),
@@ -69,10 +82,8 @@ export const updateAddressSchema = Joi.object().keys({
 export const createShopSchema = Joi.object().keys({
   name: Joi.string().max(20).required(),
   introduction: Joi.string().max(500),
-  addressId: Joi.string().uuid(),
   logoUrl: Joi.string(),
-  location: Joi.string().optional(),
-
+  location: Joi.string().optional()
 });
 
 export const updateUserSchema = Joi.object().keys({

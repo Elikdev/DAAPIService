@@ -1,10 +1,10 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, OneToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, ManyToOne, OneToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Shops } from "./Shops";
 import { Users } from "./Users";
 import { Orders } from "./Orders";
 
 @Entity("addresses")
-export class Addresses {
+export class Addresses extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string | null;
 
