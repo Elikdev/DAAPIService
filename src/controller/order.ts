@@ -9,8 +9,7 @@ import { ResourceNotFoundError } from "../error/notfoundError";
 import { logger } from "../logging/logger";
 import { RequestValidator } from "../validator/requestValidator";
 import { createOrderSchema } from "../validator/schemas";
-import { getOrderByConditions } from "./helper/orderByHelper";
-import { getPaginationLinks, getPaginationParams } from "./helper/paginationHelper";
+import { OrderUtility } from "./helper/orderUtility";
 
 export class OrderController {
 
@@ -39,9 +38,10 @@ export class OrderController {
     orderData.shop = shop;
     orderData.itemsJson = {
       "id" : orderData.itemId,
+      "name" : orderData.itemName,
       "imageUrls": orderData.itemImageUrls,
       "size": orderData.itemSize
-    }
+    };
 
     const savedOrder = await getRepository(Orders).save(orderData);
     res.send({
@@ -57,6 +57,8 @@ export class OrderController {
       .leftJoinAndSelect("orders.buyer", "buyer")
       .where("buyer.id = :id", { id: userId })
       .getMany();
+
+    buyerOrders.forEach(order => OrderUtility.transformOrderResponse(order));  
 
     res.send({
       data: buyerOrders
