@@ -15,7 +15,6 @@ export const createItemSchema = Joi.object().keys({
   color: Joi.string().optional(),
   size: Joi.string().required(),
   imageUrls: Joi.array().required(),
-  factoryDate: Joi.string(),
   description: Joi.string().required(),
   stock: Joi.number(),
   year: Joi.string(),
