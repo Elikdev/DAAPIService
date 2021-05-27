@@ -37,6 +37,7 @@ export const createOrderSchema = Joi.object().keys({
   itemSize: Joi.string().required(),
   trackingNum: Joi.string().optional(),
   shopId: Joi.string().uuid().required(),
+  shopName: Joi.string().required(),
   addressId: Joi.string().uuid().required()
 });   
 

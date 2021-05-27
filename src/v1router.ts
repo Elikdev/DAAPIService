@@ -51,5 +51,6 @@ v1router.get("/shops/:id/orders", OrderController.getShopOrders);
 
 v1router.post("/orders", OrderController.createOrder);
 v1router.get("/orders", OrderController.getBuyerOrders);
+v1router.get("/orders/:id", OrderController.getOrder);
 
 

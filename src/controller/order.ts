@@ -40,12 +40,29 @@ export class OrderController {
       "id" : orderData.itemId,
       "name" : orderData.itemName,
       "imageUrls": orderData.itemImageUrls,
-      "size": orderData.itemSize
+      "size": orderData.itemSize,
+      "shopName": orderData.shopName
     };
 
     const savedOrder = await getRepository(Orders).save(orderData);
     res.send({
       data: savedOrder
+    });
+  }
+
+  @HandleError("getOrder")
+  static async getOrder(req: Request, res: Response): Promise<void> {
+    const orderId = req.params.id;
+    const order = await getRepository(Orders)
+      .createQueryBuilder("orders")
+      .where("orders.id = :id", { id: orderId })
+      .leftJoinAndSelect("orders.buyerAddress", "buyerAddress")
+      .getOne();
+
+    OrderUtility.transformOrderResponse(order);  
+  
+    res.send({
+      data: order 
     });
   }
 
