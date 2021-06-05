@@ -53,24 +53,27 @@ export class ShopController {
       .getMany();
 
     const inputIds = ids.map(shop => shop.id);
-    const shops = await repo.createQueryBuilder("shops")
-      .where("shops.id IN (:...ids)", { ids: inputIds })
-      .leftJoin("shops.owner", "users")
-      .leftJoin("shops.items", "items")
-      .orWhere("items.status = :new", { new: ListingStatus.NEW })
-      .select([
-        "shops.id", 
-        "shops.rating", 
-        "shops.name", 
-        "shops.introduction", 
-        "shops.logoUrl", 
-        "users.id",
-        "users.username", 
-        "users.followersCount", 
-        "items.id",
-        "items.imageUrls"
-      ])
-      .getMany();
+    let shops: any[] = []
+    if(inputIds.length !== 0) {
+      shops = await repo.createQueryBuilder("shops")
+        .where("shops.id IN (:...ids)", { ids: inputIds })
+        .leftJoin("shops.owner", "users")
+        .leftJoin("shops.items", "items")
+        .orWhere("items.status = :new", { new: ListingStatus.NEW })
+        .select([
+          "shops.id", 
+          "shops.rating", 
+          "shops.name", 
+          "shops.introduction", 
+          "shops.logoUrl", 
+          "users.id",
+          "users.username", 
+          "users.followersCount", 
+          "items.id",
+          "items.imageUrls"
+        ])
+        .getMany();
+     }
   
     res.send({
       data: shops,

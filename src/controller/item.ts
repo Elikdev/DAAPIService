@@ -31,15 +31,20 @@ export class ItemController {
       .take(pageSize)
       .getMany();
 
-    // two query since one query with join will generate invalid query
-    const inputIds = itemIds.map(item => item.id);
-    const result = await itemRepo
-      .createQueryBuilder("item")
-      .where("item.id IN (:...ids)", { ids: inputIds })
-      .leftJoinAndSelect("item.shop", "shops")
-      .leftJoinAndSelect("shops.owner", "users")
-      .select(["item", "shops.name", "shops.id", "shops.introduction", "shops.logoUrl", "shops.location", "users.id", "users.username"])
-      .getMany();
+    let result: any[] = []
+
+    if(itemIds.length !== 0) {
+      // two query since one query with join will generate invalid query
+      let inputIds = itemIds.map(item => item.id);
+
+      result = await itemRepo
+        .createQueryBuilder("item")
+        .where("item.id IN (:...ids)", { ids: inputIds })
+        .leftJoinAndSelect("item.shop", "shops")
+        .leftJoinAndSelect("shops.owner", "users")
+        .select(["item", "shops.name", "shops.id", "shops.introduction", "shops.logoUrl", "shops.location", "users.id", "users.username"])
+        .getMany();
+    }
 
     res.send({
       data: result,
