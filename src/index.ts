@@ -22,17 +22,20 @@ createConnection(DBConfig).then(async connection => {
   app.use(rTracer.expressMiddleware());
   const router = Router();
 
-  if (process.env.APP_ENV !== "local") {
+  if (process.env.APP_ENV !== "development") {
     let options = {
       key: fs.readFileSync("/home/admin/app/src/5752003_www.integ.lt.pbrick.cn.key"),
       cert: fs.readFileSync("/home/admin/app/src/5752003_www.integ.lt.pbrick.cn.pem")
     };
-    https.createServer(options, app).listen(443);
-  }
-
-  app.listen(PORT, () => {
+    https.createServer(options, app).listen(PORT);
     logger.info(`>>>>> Haven't felt like this in a longtime=${PORT} <<<<<`);
-  });
+
+  } else {
+    app.listen(PORT, () => {
+      logger.info(`>>>>> Haven't felt like this in a longtime=${PORT} <<<<<`);
+    });
+  }
+  
   app.use("/", router);
   app.get("/health", (req: Request, res: Response) => res.send("Serivce is healthy."));
   router.use("/v1", v1router);
