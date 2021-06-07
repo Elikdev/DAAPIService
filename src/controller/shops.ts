@@ -53,7 +53,7 @@ export class ShopController {
       .getMany();
 
     const inputIds = ids.map(shop => shop.id);
-    let shops: any[] = []
+    let shops: any[] = [];
     if(inputIds.length !== 0) {
       shops = await repo.createQueryBuilder("shops")
         .where("shops.id IN (:...ids)", { ids: inputIds })
@@ -73,7 +73,7 @@ export class ShopController {
           "items.imageUrls"
         ])
         .getMany();
-     }
+    }
   
     res.send({
       data: shops,
