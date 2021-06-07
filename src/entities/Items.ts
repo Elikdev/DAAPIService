@@ -29,8 +29,8 @@ export enum ItemCondition {
 }
 
 export enum ShippingType {
-  "shipped",
-  "payOnDelivery"
+  SHIPPED = "shipped",
+  PAY_ON_DELIVERY = "payOnDelivery"
 }
 
 @Index("items_pkey", ["id"], { unique: true })
@@ -89,8 +89,9 @@ export class Items extends BaseEntity {
   brand: string;
 
   @Column({
-    nullable: true,
-    length: 50,
+    type: "enum",
+    enum: ShippingType,
+    default: ShippingType.SHIPPED
   })
   shippingType: string;
 

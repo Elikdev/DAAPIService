@@ -8,8 +8,9 @@ import bodyParser from "body-parser";
 import rTracer from "cls-rtracer";
 import { v1router } from "./v1router";
 import * as dotenv from "dotenv";
-const https = require("https");
-const fs = require("fs");
+import https from "https";
+import fs from "fs";
+
 const PORT = 4000;
 const DBConfig = getDBConfig();
 
@@ -23,7 +24,7 @@ createConnection(DBConfig).then(async connection => {
   const router = Router();
 
   if (process.env.APP_ENV !== "development") {
-    let options = {
+    const options = {
       key: fs.readFileSync("ssl/5752003_www.integ.lt.pbrick.cn.key"),
       cert: fs.readFileSync("ssl/5752003_www.integ.lt.pbrick.cn.pem")
     };

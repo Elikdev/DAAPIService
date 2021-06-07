@@ -39,11 +39,11 @@ export const DevDBConfig:ConnectionOptions = {
 
 export const TestDBConfig:ConnectionOptions = {
   "type": "postgres",
-  "host": "postgresdb",
-  "port": 5432,
-  "username": "postgres",
-  "password": "password",
-  "database": "da_test",
+  "host": "pgm-uf63361v5rj57d2xwo.pg.rds.aliyuncs.com",
+  "port": 1921,
+  "username": "vintagedb",
+  "password": "ZR4uNjJswE4Yz",
+  "database": "dadb",
   "synchronize": true,
   "logging": ["error"],
   "entities": [

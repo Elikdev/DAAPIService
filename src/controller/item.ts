@@ -31,11 +31,11 @@ export class ItemController {
       .take(pageSize)
       .getMany();
 
-    let result: any[] = []
+    let result: any[] = [];
 
     if(itemIds.length !== 0) {
       // two query since one query with join will generate invalid query
-      let inputIds = itemIds.map(item => item.id);
+      const inputIds = itemIds.map(item => item.id);
 
       result = await itemRepo
         .createQueryBuilder("item")
