@@ -1,7 +1,5 @@
 version: '3.7'
 
-volumes:
-  pgdata:
 services:
   tsnodedocker:
     restart: always
@@ -17,8 +15,7 @@ services:
       - '4000'
     ports:
       - '4000:4000'
-    command: >
-      bash -c "/home/node/app/bin/run-web.sh"
+    command: npm run start
     environment:
       APP_ENV: test
     networks:

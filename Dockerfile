@@ -14,10 +14,12 @@ RUN npm install
 
 COPY . .
 
-# FROM base as production
+FROM base as production
 
-# ENV NODE_PATH=./build
-
-# RUN npm run build
+ENV NODE_PATH=./build
 
 # RUN npm ci --only=production
+
+RUN npm install
+
+RUN npm run build
