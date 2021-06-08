@@ -9,7 +9,6 @@ services:
       target: base
     volumes:
       - ./src:/home/node/app/src
-      - ./nodemon.json:/home/node/app/nodemon.json
     container_name: tsnodedocker
     expose:
       - '4000'
