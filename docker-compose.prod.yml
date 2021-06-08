@@ -2,6 +2,7 @@ version: '3.7'
 
 services:
   tsnodedocker:
+    restart: always
     build:
       target: production
       context: .
@@ -14,7 +15,7 @@ services:
       - '4000'
     ports:
       - '4000:4000'
-    command: node build/index.js
+    command: npm run start
     environment:
       APP_ENV: production
     networks:

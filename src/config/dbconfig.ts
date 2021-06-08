@@ -7,6 +7,8 @@ export const getDBConfig = ():ConnectionOptions => {
     return DevDBConfig;
   case "test": 
     return TestDBConfig;
+  case "production": 
+    return ProdDBConfig;
   default:
     return DevDBConfig;
   }
@@ -62,4 +64,28 @@ export const TestDBConfig:ConnectionOptions = {
   }
 };
 
-
+// TODO: Disable synchronize and use migrations
+export const ProdDBConfig:ConnectionOptions = {
+  "type": "postgres",
+  "host": "pgm-uf64m84wg1q2i630do.pg.rds.aliyuncs.com",
+  "port": 1921,
+  "username": "vintagedbprod",
+  "password": "BEYDGZJ3grT7w",
+  "database": "dadb",
+  "synchronize": true,
+  "logging": ["error"],
+  "entities": [
+    "src/entities/**/*.ts"
+  ],
+  "migrations": [
+    "src/migrations/**/*.ts"
+  ],
+  "subscribers": [
+    "src/subscribers/**/*.ts"
+  ],
+  "cli": {
+    "entitiesDir": "src/entities",
+    "migrationsDir": "src/migrations",
+    "subscribersDir": "src/subscribers"
+  }
+};
