@@ -9,10 +9,12 @@ import rTracer from "cls-rtracer";
 import { v1router } from "./v1router";
 import * as dotenv from "dotenv";
 import https from "https";
-import fs from "fs";
+import { getServerOptions } from "./config/serverconfig";
+import { http } from "winston";
 
 const PORT = 4000;
 const DBConfig = getDBConfig();
+const httpsOptions = getServerOptions();
 
 createConnection(DBConfig).then(async connection => {
   setConfig();
@@ -22,20 +24,23 @@ createConnection(DBConfig).then(async connection => {
   app.use(bodyParser.json());
   app.use(rTracer.expressMiddleware());
   const router = Router();
+  
+  https.createServer(httpsOptions, app).listen(PORT);
+  logger.info(`>>>>> Haven't felt like this in a longtime=${PORT} <<<<<`);
+  
+  // if (process.env.APP_ENV !== "development") {
+  //   const options = {
+  //     key: fs.readFileSync("ssl/5752003_www.integ.lt.pbrick.cn.key"),
+  //     cert: fs.readFileSync("ssl/5752003_www.integ.lt.pbrick.cn.pem")
+  //   };
+  //   https.createServer(options, app).listen(PORT);
+  //   logger.info(`>>>>> Haven't felt like this in a longtime=${PORT} <<<<<`);
 
-  if (process.env.APP_ENV !== "development") {
-    const options = {
-      key: fs.readFileSync("ssl/5752003_www.integ.lt.pbrick.cn.key"),
-      cert: fs.readFileSync("ssl/5752003_www.integ.lt.pbrick.cn.pem")
-    };
-    https.createServer(options, app).listen(PORT);
-    logger.info(`>>>>> Haven't felt like this in a longtime=${PORT} <<<<<`);
-
-  } else {
-    app.listen(PORT, () => {
-      logger.info(`>>>>> Haven't felt like this in a longtime=${PORT} <<<<<`);
-    });
-  }
+  // } else {
+  //   app.listen(PORT, () => {
+  //     logger.info(`>>>>> Haven't felt like this in a longtime=${PORT} <<<<<`);
+  //   });
+  // }
 
   app.use("/", router);
   app.get("/health", (req: Request, res: Response) => res.send("Serivce is healthy."));
