@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { getRepository, OrderByCondition } from "typeorm";
+import { getRepository } from "typeorm";
 import { HandleError } from "../decorator/errorDecorator";
 import { Shops } from "../entities/Shops";
 import { Users } from "../entities/Users";
@@ -10,6 +10,7 @@ import { logger } from "../logging/logger";
 import { RequestValidator } from "../validator/requestValidator";
 import { createOrderSchema } from "../validator/schemas";
 import { OrderUtility } from "./helper/orderUtility";
+import { Items } from "../entities/Items";
 
 export class OrderController {
 
@@ -33,15 +34,19 @@ export class OrderController {
     }
 
     const user = await Users.findOne({id: userId});
+    const item = await Items.findOne({id: orderData.itemId});
     orderData.buyer = user;
     orderData.buyerAddress = address;
     orderData.shop = shop;
+    if (!item) {
+      throw new ResourceNotFoundError("Item not found.");
+    }
     orderData.itemsJson = {
       "id" : orderData.itemId,
-      "name" : orderData.itemName,
-      "imageUrls": orderData.itemImageUrls,
-      "size": orderData.itemSize,
-      "shopName": orderData.shopName
+      "name": item.name,
+      "imageUrls": item.imageUrls,
+      "size": item.size,
+      "shopName": item.shop
     };
 
     const savedOrder = await getRepository(Orders).save(orderData);

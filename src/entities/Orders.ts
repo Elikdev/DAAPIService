@@ -5,7 +5,6 @@ import {
   UpdateDateColumn,
   Entity,
   Index,
-  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn
@@ -22,6 +21,15 @@ export enum OrderStatus {
   SHIPPED = "shipped",
   COMPLETED = "completed",
   CANCELLED = "cancelled"
+}
+
+export enum OrderCNStatus {
+  OPEN = "未付款",
+  PAID = "已付款",
+  CONFIRMED = "已确认",
+  SHIPPED = "待收货",
+  COMPLETED = "已完成",
+  CANCELLED = "已取消"
 }
 
 @Index("orders_pkey", ["id"], { unique: true })

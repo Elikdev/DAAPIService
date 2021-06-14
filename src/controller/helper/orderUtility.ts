@@ -1,11 +1,6 @@
-import { OrderStatus } from "../../entities/Orders";
+import { OrderStatus, OrderCNStatus } from "../../entities/Orders";
 
 // Shipment status to display
-const TO_SHIP_STATUS = "待发货";
-const TO_RECEIVE_STATUS = "待收货";
-const COMPLETED_STATUS = "已完成";
-const UNPAID_STATUS = "未付款";
-const PAID_STATUS = "已付款";
 const STATUS_CODE_TO_DISPLAY_TRANSIT_STATUS_MAP = {
   "PAID" : "已付款，等待处理",
   "CONFIRMED" : "等待卖家发货",
@@ -18,46 +13,52 @@ const STATUS_CODE_TO_DISPLAY_TRANSIT_STATUS_MAP = {
 };
 
 export class OrderUtility {  
-  static transformOrderResponse(order: any) {
+  static transformOrderResponse(order: any): void {
     order.displayStatusCN = OrderUtility.getDisplayStatusInCN(order.status);
     // order.display_transit_status_cn = OrderUtility.getTransitStatusInCN(order.package_status_code || order.status);
   }
 
-  static getDisplayStatusInCN(orderStatus: string) {
-
-    if (OrderUtility.isToShipOrder(orderStatus)) {
-      return TO_SHIP_STATUS;
+  static getDisplayStatusInCN(orderStatus: string): string | undefined {
+    if (OrderUtility.isUnpaidOrder(orderStatus)) {
+      return OrderCNStatus.OPEN;
+    }
     // Marks as paid when payment finished on client side
-    } else if (OrderUtility.isPaidOrder(orderStatus)) {
-      return PAID_STATUS;
+    else if (OrderUtility.isPaidOrder(orderStatus)) {
+      return OrderCNStatus.PAID;
+    // Marks as confirmed when payment confirmed by wechat callback
+    } else if (OrderUtility.isToShipOrder(orderStatus)) {
+      return OrderCNStatus.CONFIRMED;
     } else if (OrderUtility.isToReceiveOrder(orderStatus)) {
-      return TO_RECEIVE_STATUS;
+      return OrderCNStatus.SHIPPED;
     } else if (OrderUtility.isCompletedOrder(orderStatus)) {
-      return COMPLETED_STATUS;
-    } else if (OrderUtility.isUnpaidOrder(orderStatus)) {
-      return UNPAID_STATUS;
+      return OrderCNStatus.COMPLETED;
+    } else if (OrderUtility.isCancelledOrder(orderStatus)) {
+      return OrderCNStatus.CANCELLED;
     }
   }
 
-  static isUnpaidOrder(orderStatus: string) {
+  static isUnpaidOrder(orderStatus: string): boolean {
     return orderStatus === OrderStatus.OPEN;
   }
-  static isPaidOrder(orderStatus: string) {
+  static isPaidOrder(orderStatus: string): boolean {
     return orderStatus === OrderStatus.PAID;
   }
 
-  static isToShipOrder(orderStatus: string) {
+  static isToShipOrder(orderStatus: string): boolean {
     return orderStatus === OrderStatus.CONFIRMED;
   }
 
-  static isToReceiveOrder(orderStatus: string) {
+  static isToReceiveOrder(orderStatus: string): boolean {
     return orderStatus === OrderStatus.SHIPPED;
   }
 
-  static isCompletedOrder(orderStatus: string) {
+  static isCompletedOrder(orderStatus: string): boolean {
     return orderStatus === OrderStatus.COMPLETED;
   }
 
+  static isCancelledOrder(orderStatus: string): boolean {
+    return orderStatus === OrderStatus.CANCELLED;
+  }
 }
 
 
