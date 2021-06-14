@@ -2,11 +2,11 @@
 import { ServerOptions } from "https";
 import fs from "fs";
 
-export const getServerOptions = ():ServerOptions => {
+export const getServerOptions = ():ServerOptions|null => {
   const APP_ENV = process.env.APP_ENV;
   switch(APP_ENV) {
   case "development":
-    return {};
+    return null;
   case "test": 
     return {
       key: fs.readFileSync("ssl/5752003_www.integ.lt.pbrick.cn.key"),
@@ -18,6 +18,6 @@ export const getServerOptions = ():ServerOptions => {
       cert: fs.readFileSync("ssl/5766922_www.prod.lt.pbrick.cn.pem")
     };
   default:
-    return {};
+    return null;
   }
 };

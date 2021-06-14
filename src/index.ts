@@ -13,7 +13,7 @@ import { getServerOptions } from "./config/serverconfig";
 
 const PORT = 4000;
 const DBConfig = getDBConfig();
-const options = getServerOptions();
+const httpsOptions = getServerOptions();
 
 createConnection(DBConfig).then(async connection => {
   setConfig();
@@ -23,8 +23,12 @@ createConnection(DBConfig).then(async connection => {
   app.use(bodyParser.json());
   app.use(rTracer.expressMiddleware());
   const router = Router();
-  
-  https.createServer(options, app).listen(PORT);
+
+  if (httpsOptions) {
+    https.createServer(httpsOptions, app).listen(PORT);
+  } else {
+    app.listen(PORT);
+  }
   logger.info(`>>>>> Haven't felt like this in a longtime=${PORT} <<<<<`);
   
   app.use("/", router);
