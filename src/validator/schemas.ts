@@ -36,7 +36,7 @@ export const createOrderSchema = Joi.object().keys({
   addressId: Joi.string().uuid().required()
 });
 
-export const batchCreateOrderSchema = Joi.array().items(createOrderSchema);
+export const batchCreateOrderSchema = Joi.array().items(createOrderSchema).min(1).required();
 
 export const updateItemSchema = Joi.object().keys({
   name: Joi.string().optional(),
