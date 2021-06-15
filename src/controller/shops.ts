@@ -132,7 +132,7 @@ export class ShopController {
       .createQueryBuilder("shops")
       .leftJoinAndSelect("shops.items", "items")
       .where("shops.id = :id", { id: shopId })
-      .andWhere("items.status IN (:...status)", {status: [ListingStatus.NEW, ListingStatus.SOLD]})
+      .andWhere("items.status IN (:...status)", {status: [ListingStatus.NEW, ListingStatus.SOLD, ListingStatus.DELISTED]})
       .loadRelationCountAndMap("shops.itemsCount", "shops.items")
       .select(["shops.id", "items"])
       .getOne();

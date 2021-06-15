@@ -44,6 +44,7 @@ export const updateItemSchema = Joi.object().keys({
   color: Joi.string().optional(),
   size: Joi.string().optional(),
   imageUrls: Joi.array().optional(),
+  status: Joi.string().optional(),
   factoryDate: Joi.string().optional(),
   description: Joi.string().optional(),
   stock: Joi.number().optional(),
