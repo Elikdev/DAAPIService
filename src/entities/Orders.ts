@@ -56,9 +56,6 @@ export class Orders extends BaseEntity {
   @Column("double precision", {nullable: true })
   processingFee: number | null;
 
-  @Column("json", {nullable: true })
-  itemsJson: string | null;
-
   @Column("character varying", {nullable: true })
   trackingNum: string | null;
 
@@ -75,6 +72,6 @@ export class Orders extends BaseEntity {
   @UpdateDateColumn({type: "timestamp"})
   updatedtime: string;
 
-  @OneToMany(() => Items, (items) => items.order)
+  @OneToMany(() => Items, (items) => items.order, { cascade: true })
   orderItems: Items[];
 }

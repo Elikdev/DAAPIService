@@ -1,57 +1,37 @@
 import { Request, Response } from "express";
-import { getRepository } from "typeorm";
+import { getRepository, OrderByCondition } from "typeorm";
 import { HandleError } from "../decorator/errorDecorator";
-import { Shops } from "../entities/Shops";
-import { Users } from "../entities/Users";
-import { Addresses } from "../entities/Addresses";
 import { Orders } from "../entities/Orders";
-import { ResourceNotFoundError } from "../error/notfoundError";
 import { logger } from "../logging/logger";
 import { RequestValidator } from "../validator/requestValidator";
-import { createOrderSchema } from "../validator/schemas";
+import { batchCreateOrderSchema } from "../validator/schemas";
+import { createSingleOrder } from "./helper/orderCreater";
 import { OrderUtility } from "./helper/orderUtility";
-import { Items } from "../entities/Items";
+import { getOrderByConditions } from "./helper/orderByHelper";
+
+// By default latest orders first
+const DEFAULT_SORT_BY:OrderByCondition = { "orders.createdtime":"DESC" };
 
 export class OrderController {
 
   @HandleError("createOrder")
   static async createOrder(req: Request, res: Response): Promise<void> {
     const userId = req.body.userId;
-    const orderData = req.body.data;
-    const validator = new RequestValidator(createOrderSchema);
-    validator.validate(orderData);
+    const orderDataArray = req.body.data;
+    const validator = new RequestValidator(batchCreateOrderSchema);
+    validator.validate(orderDataArray);
+    let numberOfSaves = 0;
+    const results: any[] = await Promise.all(orderDataArray.map(
+      async (orderData: any) => {
+        const result = await createSingleOrder(userId, orderData);
+        numberOfSaves += 1;
+        return result;
+      }));
+    logger.info(`Created ${numberOfSaves} orders in DB.`);
 
-    const shopId = orderData.shopId;
-    const addressId = orderData.addressId;
-    const shop = await Shops.findOne({id: shopId});
-    if (!shop) {
-      throw new ResourceNotFoundError("Shop not found.");
-    }
-
-    const address = await Addresses.findOne({id: addressId});
-    if (!address) {
-      throw new ResourceNotFoundError("Address not found.");
-    }
-
-    const user = await Users.findOne({id: userId});
-    const item = await Items.findOne({id: orderData.itemId});
-    orderData.buyer = user;
-    orderData.buyerAddress = address;
-    orderData.shop = shop;
-    if (!item) {
-      throw new ResourceNotFoundError("Item not found.");
-    }
-    orderData.itemsJson = {
-      "id" : orderData.itemId,
-      "name": item.name,
-      "imageUrls": item.imageUrls,
-      "size": item.size,
-      "shopName": item.shop
-    };
-
-    const savedOrder = await getRepository(Orders).save(orderData);
     res.send({
-      data: savedOrder
+      data: results,
+      totalCount: results.length
     });
   }
 
@@ -62,6 +42,7 @@ export class OrderController {
       .createQueryBuilder("orders")
       .where("orders.id = :id", { id: orderId })
       .leftJoinAndSelect("orders.buyerAddress", "buyerAddress")
+      .leftJoinAndSelect("orders.orderItems", "item")
       .getOne();
 
     OrderUtility.transformOrderResponse(order);  
@@ -74,30 +55,40 @@ export class OrderController {
   @HandleError("getBuyerOrders")
   static async getBuyerOrders(req: Request, res: Response): Promise<void> {
     const userId = req.body.userId;
+    const sorts = req.query.sort;
+    const orderBy = getOrderByConditions(sorts, DEFAULT_SORT_BY, "orders.");
     const buyerOrders = await getRepository(Orders)
       .createQueryBuilder("orders")
+      .orderBy(orderBy)
       .leftJoinAndSelect("orders.buyer", "buyer")
       .where("buyer.id = :id", { id: userId })
+      .leftJoinAndSelect("orders.orderItems", "item")
       .getMany();
 
     buyerOrders.forEach(order => OrderUtility.transformOrderResponse(order));  
 
     res.send({
-      data: buyerOrders
+      data: buyerOrders,
+      totalCount: buyerOrders.length
     });
   }
 
   @HandleError("getShopOrders")
   static async getShopOrders(req: Request, res: Response): Promise<void> {
     const shopId = req.params.id;
-    const shoprOrders = await getRepository(Orders)
+    const sorts = req.query.sort;
+    const orderBy = getOrderByConditions(sorts, DEFAULT_SORT_BY, "orders.");
+    const shopOrders = await getRepository(Orders)
       .createQueryBuilder("orders")
       .leftJoinAndSelect("orders.shop", "shop")
       .where("shop.id = :id", { id: shopId })
+      .leftJoinAndSelect("orders.orderItems", "item")
+      .orderBy(orderBy)
       .getMany();
 
     res.send({
-      data: shoprOrders
+      data: shopOrders,
+      totalCount: shopOrders.length
     });
   }
 }

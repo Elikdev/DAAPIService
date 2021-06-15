@@ -29,16 +29,14 @@ export const createItemSchema = Joi.object().keys({
 export const createOrderSchema = Joi.object().keys({
   totalPrice: Joi.number().required(),
   itemsPrice: Joi.number().required(),
-  itemId: Joi.string().uuid().required(),
-  processingFee: Joi.number().required(),
-  itemImageUrls: Joi.array().required(),
-  itemName: Joi.string().required(),
-  itemSize: Joi.string().required(),
+  itemIds: Joi.array().items(Joi.string().uuid()).min(1).required(),
+  processingFee: Joi.number().optional(),
   trackingNum: Joi.string().optional(),
   shopId: Joi.string().uuid().required(),
-  shopName: Joi.string().required(),
   addressId: Joi.string().uuid().required()
-});   
+});
+
+export const batchCreateOrderSchema = Joi.array().items(createOrderSchema);
 
 export const updateItemSchema = Joi.object().keys({
   name: Joi.string().optional(),
