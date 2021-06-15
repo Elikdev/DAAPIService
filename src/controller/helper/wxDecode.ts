@@ -1,7 +1,8 @@
 // 引入crypto-js
 import CryptoJS from "crypto-js";
 import {Base64} from "js-base64";
- 
+import { logger } from "../../logging/logger";
+
 export class Decode {
   sessionKey: string
  
@@ -18,9 +19,15 @@ export class Decode {
         mode: CryptoJS.mode.CBC,
         padding: CryptoJS.pad.Pkcs7
       });
+      logger.info("Decrypting user data with iv:" + ivv);
+
       const decryptedData =  Base64.decode(CryptoJS.enc.Base64.stringify(decrypt));
+      
+      logger.info("Decryped data:" + decryptedData);
+
       return JSON.parse(decryptedData);
     }catch(error) {
+
       console.log(error);
     }
   }

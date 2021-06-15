@@ -26,8 +26,13 @@ export class UserController {
     const encryptedDataDecoder = new Decode(sessionData.session_key);
     const userRepo = getRepository(Users);
     const openId = sessionData.openid;
+
+    logger.info("Decrypting user data with session_key:" + sessionData.session_key);
+
     const userInfo = encryptedDataDecoder.decryptData(encryptedData, iv);
     
+
+
     let user = await userRepo.createQueryBuilder("user")
       .where("user.openId = :openId", { openId: openId })
       .leftJoinAndSelect("user.shops", "shops")
