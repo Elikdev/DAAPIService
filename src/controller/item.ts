@@ -133,7 +133,7 @@ export class ItemController {
 }
 
 const verifyItem = (item: Items): void => {
-  if (item.status != ListingStatus.NEW) {
+  if (item.status == ListingStatus.SOLD) { // only new and delisted items could be updated
     throw new BadRequestError(`item ${item.id} with status=${item.status} is not valid`);
   }
 };
