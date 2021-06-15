@@ -1,17 +1,5 @@
 import { OrderStatus, OrderCNStatus } from "../../entities/Orders";
 
-// Shipment status to display
-const STATUS_CODE_TO_DISPLAY_TRANSIT_STATUS_MAP = {
-  "PAID" : "已付款，等待处理",
-  "CONFIRMED" : "等待卖家发货",
-  "SELLER_TO_SHIP" : "等待卖家发货",
-  "SELLER_SHIPPED" : "发往熊猫砖仓库",
-  "ARRIVED_WH" : "运抵熊猫砖仓库，鉴定中",
-  "RELEASE_TO_BUYER" : "已发往国内",
-  "COMPLETED" : "已确认收货",
-  "CLOSED" : "订单已完成"
-};
-
 export class OrderUtility {  
   static transformOrderResponse(order: any): void {
     order.displayStatusCN = OrderUtility.getDisplayStatusInCN(order.status);

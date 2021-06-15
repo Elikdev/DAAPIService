@@ -1,7 +1,9 @@
 import { OrderByCondition } from "typeorm";
 
-export const getOrderByConditions = (sorts: unknown, defaultOrder:OrderByCondition): OrderByCondition => {
+export const getOrderByConditions = (sorts: unknown, defaultOrder:OrderByCondition, sortPrefix?: string): OrderByCondition => {
   const condition:OrderByCondition = {};
+  // add prefix for joining tables with same column names
+  const prefix = sortPrefix || "";
   if (!sorts) {
     return defaultOrder;
   }
@@ -10,7 +12,7 @@ export const getOrderByConditions = (sorts: unknown, defaultOrder:OrderByConditi
     sorts.split(",").forEach(sort => {
       const sortTuple = processSort(sort);
       if (sortTuple) {
-        condition[sortTuple[0]] = sortTuple[1];
+        condition[prefix + sortTuple[0]] = sortTuple[1];
       }
     });
   }
