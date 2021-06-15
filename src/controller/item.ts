@@ -4,6 +4,7 @@ import { HandleError } from "../decorator/errorDecorator";
 import { Items, ListingStatus } from "../entities/Items";
 import { Shops } from "../entities/Shops";
 import { Users } from "../entities/Users";
+import { BadRequestError } from "../error/badRequestError";
 import { ResourceNotFoundError } from "../error/notfoundError";
 import { logger } from "../logging/logger";
 import { RequestValidator } from "../validator/requestValidator";
@@ -95,6 +96,7 @@ export class ItemController {
 
   @HandleError("updateItem")
   static async updateItem(req: Request, res: Response): Promise<void> {
+    const userId = req.body.userId;
     const itemData = req.body.data;
     const validator = new RequestValidator(updateItemSchema);
     validator.validate(itemData);
@@ -102,9 +104,18 @@ export class ItemController {
     const itemId = req.params.id;
     const itemRepo = getRepository(Items);
 
-    const item = await itemRepo.findOne({id: itemId});
+    const item = await itemRepo.findOne({id: itemId}, {relations: ["shop"]});
+
+    logger.debug(`updating ${JSON.stringify(item)}`);
+    
     if (!item) {
       throw new ResourceNotFoundError("Item not found.");
+    }
+    verifyItem(item);
+    const user = await Users.findOne({id: userId});
+    const shop = await Shops.findOne({id: item.shop.id, owner: user});
+    if (!shop) {
+      throw new ResourceNotFoundError("Shop not found.");
     }
 
     const result = await itemRepo.createQueryBuilder()
@@ -120,3 +131,9 @@ export class ItemController {
     });
   }  
 }
+
+const verifyItem = (item: Items): void => {
+  if (item.status != ListingStatus.NEW) {
+    throw new BadRequestError(`item ${item.id} with status=${item.status} is not valid`);
+  }
+};

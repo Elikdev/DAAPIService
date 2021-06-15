@@ -5,7 +5,8 @@ import { Addresses } from "../../entities/Addresses";
 import { Orders } from "../../entities/Orders";
 import { ResourceNotFoundError } from "../../error/notfoundError";
 import { logger } from "../../logging/logger";
-import { Items } from "../../entities/Items";
+import { Items, ListingStatus } from "../../entities/Items";
+import { BadRequestError } from "../../error/badRequestError";
 
 export const createSingleOrder = async (userId: any, orderData: any): Promise<any> => {
   const shopId = orderData.shopId;
@@ -23,12 +24,30 @@ export const createSingleOrder = async (userId: any, orderData: any): Promise<an
   orderData.buyerAddress = address;
   orderData.shop = shop;
 
-  const items = await Items.findByIds(orderData.itemIds);
+  const items = await Items.findByIds(orderData.itemIds, { relations: ["shop"] });
   logger.debug(`purchasing ${JSON.stringify(items)}`);
   if (!items) {
     throw new ResourceNotFoundError("Items not found.");
   }
+  items.map(item => verifyItem(shopId, item));
+
   orderData.orderItems = items;
   const savedOrder = await getRepository(Orders).save(orderData);
+
+  await Promise.all(items.map(item => changeItemStatus(item)));
   return savedOrder;
 }; 
+
+const verifyItem = (shopId: string, item: Items): void => {
+  if (item.status != ListingStatus.NEW) {
+    throw new BadRequestError(`item ${item.id} with status=${item.status} is not valid`);
+  }
+  if (item.shop.id != shopId) {
+    throw new BadRequestError(`item ${item.id} is not in shop ${shopId}`);
+  }
+};
+
+const changeItemStatus = async (item: Items): Promise<void> => {
+  item.status = ListingStatus.SOLD;
+  await getRepository(Items).save(item);
+};
