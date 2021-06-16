@@ -3,17 +3,20 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn,
   ManyToOne,
   OneToMany,
-  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { Addresses } from "./Addresses";
 import { Items } from "./Items";
 import { Users } from "./Users";
 import { Orders } from "./Orders";
+
+// type = merchant 为 签约商家
+export enum ShopType {
+  MERCHANT = "merchant",
+  DEFAULT = "default"
+}
 
 @Entity("shops")
 export class Shops extends BaseEntity {
@@ -22,6 +25,13 @@ export class Shops extends BaseEntity {
 
   @Column()
   name: string;
+
+  @Column({
+    type: "enum",
+    enum: ShopType,
+    default: ShopType.DEFAULT
+  })
+  type: string;
 
   @Column("character varying", {nullable: true })
   introduction: string | null;
