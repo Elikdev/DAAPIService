@@ -13,6 +13,7 @@ import { Items } from "./Items";
 import { Users } from "./Users";
 import { Addresses } from "./Addresses";
 import { Shops } from "./Shops";
+import { Payments } from "./Payments";
 
 export enum OrderStatus {
   OPEN = "open",
@@ -46,6 +47,9 @@ export class Orders extends BaseEntity {
 
   @ManyToOne(() => Addresses, (addresses) => addresses.orders)
   buyerAddress: Addresses;
+
+  @ManyToOne(() => Payments, (payments) => payments.orders)
+  payment: Payments;
 
   @Column("double precision", {nullable: true })
   totalPrice: number | null;

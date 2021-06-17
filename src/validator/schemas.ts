@@ -5,7 +5,6 @@ export const signUpSchema = Joi.object().keys({
   code: Joi.string().required(),
   iv: Joi.string().required(),
   encryptedData: Joi.string().required(),
-
 });
 
 export const createItemSchema = Joi.object().keys({

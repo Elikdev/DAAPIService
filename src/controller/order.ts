@@ -5,32 +5,44 @@ import { Orders } from "../entities/Orders";
 import { logger } from "../logging/logger";
 import { RequestValidator } from "../validator/requestValidator";
 import { batchCreateOrderSchema } from "../validator/schemas";
-import { createSingleOrder } from "./helper/orderCreater";
+import { createSingleOrder, payOrder } from "./helper/orderCreater";
 import { OrderUtility } from "./helper/orderUtility";
 import { getOrderByConditions } from "./helper/orderByHelper";
+import { Payments } from "../entities/Payments";
 
 // By default latest orders first
 const DEFAULT_SORT_BY:OrderByCondition = { "orders.createdtime":"DESC" };
 
 export class OrderController {
 
-  @HandleError("createOrder")
+  @HandleError("createOrders")
   static async createOrder(req: Request, res: Response): Promise<void> {
     const userId = req.body.userId;
     const orderDataArray = req.body.data;
     const validator = new RequestValidator(batchCreateOrderSchema);
     validator.validate(orderDataArray);
     let numberOfSaves = 0;
+    let totalPrice = 0;
     const results: any[] = await Promise.all(orderDataArray.map(
       async (orderData: any) => {
         const result = await createSingleOrder(userId, orderData);
         numberOfSaves += 1;
+        totalPrice += orderData.totalPrice;
         return result;
-      }));
+      }
+    ));
     logger.info(`Created ${numberOfSaves} orders in DB.`);
+
+    const payment = new Payments();
+    payment.orders = results;
+    payment.amount = totalPrice;
+    const savedPayment = await getRepository(Payments).save(payment);
+    
+    const payResult = await payOrder(userId, savedPayment.id, totalPrice);
 
     res.send({
       data: results,
+      payResult: payResult,
       totalCount: results.length
     });
   }
