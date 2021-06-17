@@ -20,15 +20,14 @@ export class WxpayUtility {
 
     // concat API token at the end
     if (apiToken) {
-      serializedData += "&" + this.encodeValue(apiToken, encode);
+      serializedData += `&key=${apiToken}`;
     }
-
-    logger.debug("\n" +
-      "<--------------serializedData-------------->" + "\n"
-      + JSON.stringify(serializedData) + "\n"
-      + "<--------------serializedData-------------->" + "\n"
-    );
-    const encoded = this.encodeValue(serializedData, encode);
+    // logger.debug("\n" +
+    //   "<--------------serializedData-------------->" + "\n"
+    //   + JSON.stringify(serializedData) + "\n"
+    //   + "<--------------serializedData-------------->" + "\n"
+    // );
+    const encoded = this.encodeValue(serializedData, encode).toUpperCase();
 
     return encoded;
   }
@@ -46,8 +45,7 @@ export class WxpayUtility {
     return serialized;
   }
 
-
-  static generateNounceStr(length = NOUNCE_STR_LENGTH ):string {
+  static generateNonceStr(length = NOUNCE_STR_LENGTH): string {
     let result = "";
     const charactersLength = NOUNCE_CHARS.length;
     for ( let i = 0; i < length; i++ ) {

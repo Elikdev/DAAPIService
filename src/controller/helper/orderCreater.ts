@@ -7,6 +7,10 @@ import { ResourceNotFoundError } from "../../error/notfoundError";
 import { logger } from "../../logging/logger";
 import { Items, ListingStatus } from "../../entities/Items";
 import { BadRequestError } from "../../error/badRequestError";
+import { WxpayService } from "../../payment/wxpayService";
+import { Payments } from "../../entities/Payments";
+import { BaseError } from "../../error/baseError";
+import { DependencyError } from "../../error/dependencyError";
 
 export const createSingleOrder = async (userId: any, orderData: any): Promise<any> => {
   const shopId = orderData.shopId;
@@ -50,4 +54,23 @@ const verifyItem = (shopId: string, item: Items): void => {
 const changeItemStatus = async (item: Items): Promise<void> => {
   item.status = ListingStatus.SOLD;
   await getRepository(Items).save(item);
+};
+
+export const payOrder = async (userId: any, orderId: string, totalPrice: number): Promise<any> => {
+  const useSandbox = process.env.APP_ENV === "production"? false : true;
+  const payService = new WxpayService(useSandbox);
+  const user = await Users.findOne({id: userId});
+  if (!user) {
+    throw new BaseError("user not found");
+  }
+  const openId = user.openId;
+  if (!openId) {
+    throw new BaseError("openid not found");
+  }
+  // TODO: 分账
+  const payresult = await payService.prepay(totalPrice, openId, orderId, false);
+  if (payresult.xml.return_code != "SUCCESS") {
+    throw new DependencyError("Encounter error calling wx prepay api");
+  }
+  return payresult.xml;
 };

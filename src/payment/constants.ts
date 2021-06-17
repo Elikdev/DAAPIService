@@ -1,14 +1,22 @@
+
+const SERVICE_URL = process.env.SERVICE_URL;
+
 export const PaymentConstants = {
   prod: {
-    BASE_URL : "https://api.mch.weixin.qq.com/pay",
+    IP: "47.102.124.11",
+    PAY_URL : "https://api.mch.weixin.qq.com/pay/unifiedorder",
     MERCHANT_ID : "1610299103",
     STORE_ID : "301868",
-    API_TOKEN : "9495f593e5d84274b4dc0672799b9628",
+    API_TOKEN : "pandabrick140114011401pandabrick",
+    CALL_BACK_URL: SERVICE_URL + "/v1/orders/confirmpayment",
   },
   test: {
-    BASE_URL : "https://api.mch.weixin.qq.com/sandboxnew/pay",
+    IP: "139.196.93.148",
+    PAY_URL : "https://api.mch.weixin.qq.com/sandboxnew/pay/unifiedorder",
+    SB_KEY_URL: "https://api.mch.weixin.qq.com/sandboxnew/pay/getsignkey",
     MERCHANT_ID : "1610299103",
     STORE_ID : "301941",
-    API_TOKEN : "0062ad33c3ba591bba70de9c4e3cf6af", 
+    API_TOKEN : "pandabrick140114011401pandabrick",
+    CALL_BACK_URL: SERVICE_URL + "/v1/orders/confirmpayment"
   }
 };
