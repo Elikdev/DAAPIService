@@ -44,9 +44,12 @@ export class OrderController {
     const payResult = payService.generatePayResult(response);
 
     res.send({
-      data: results,
-      payResult: payResult,
-      totalCount: results.length
+      data: {
+        orders: results,
+        payResult: payResult,
+        paymentId: savedPayment.id,
+        totalCount: results.length
+      }
     });
   }
 

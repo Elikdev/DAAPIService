@@ -155,7 +155,7 @@ export class WxpayService {
   generatePayResult = (prepayResponse: any): PayResult => {
     const payResult: PayResult = {};
 
-    payResult.timeStamp = Math.floor(Date.now() / 1000);
+    payResult.timeStamp = Math.floor(Date.now() / 1000).toString();
     payResult.nonceStr = prepayResponse.nonce_str;
     payResult.package = `prepay_id=${prepayResponse.prepay_id}`;
     payResult.signType = "MD5";
