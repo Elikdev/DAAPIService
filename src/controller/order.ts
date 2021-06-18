@@ -5,7 +5,7 @@ import { Orders } from "../entities/Orders";
 import { logger } from "../logging/logger";
 import { RequestValidator } from "../validator/requestValidator";
 import { batchCreateOrderSchema } from "../validator/schemas";
-import { createSingleOrder, payOrder } from "./helper/orderCreater";
+import { createSingleOrder } from "./helper/orderCreater";
 import { OrderUtility } from "./helper/orderUtility";
 import { getOrderByConditions } from "./helper/orderByHelper";
 import { Payments } from "../entities/Payments";
