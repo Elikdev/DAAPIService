@@ -36,8 +36,7 @@ export class OrderController {
     const payment = new Payments();
     payment.orders = results;
     payment.amount = totalPrice;
-    const savedPayment = await getRepository(Payments).save(payment);
-    
+    const savedPayment = await payment.save();
     const payResult = await payOrder(userId, savedPayment.id, totalPrice);
 
     res.send({

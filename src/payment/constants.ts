@@ -8,7 +8,7 @@ export const PaymentConstants = {
     MERCHANT_ID : "1610299103",
     STORE_ID : "301868",
     API_TOKEN : "pandabrick140114011401pandabrick",
-    CALL_BACK_URL: SERVICE_URL + "/v1/orders/confirmpayment",
+    CALL_BACK_URL: SERVICE_URL + "/pay/confirm/wx",
   },
   test: {
     IP: "139.196.93.148",
@@ -17,6 +17,6 @@ export const PaymentConstants = {
     MERCHANT_ID : "1610299103",
     STORE_ID : "301941",
     API_TOKEN : "pandabrick140114011401pandabrick",
-    CALL_BACK_URL: SERVICE_URL + "/v1/orders/confirmpayment"
+    CALL_BACK_URL: SERVICE_URL + "/pay/confirm/wx"
   }
 };

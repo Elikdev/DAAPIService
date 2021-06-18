@@ -4,12 +4,12 @@ import { logger } from "./logging/logger";
 import "reflect-metadata";
 import {createConnection} from "typeorm";
 import {getDBConfig} from "./config/dbconfig";
-import bodyParser from "body-parser";
 import rTracer from "cls-rtracer";
 import { v1router } from "./v1router";
 import * as dotenv from "dotenv";
 import https from "https";
 import { getServerOptions } from "./config/serverconfig";
+import { payrouter } from "./payrouter";
 
 const PORT = 4000;
 const DBConfig = getDBConfig();
@@ -20,7 +20,6 @@ createConnection(DBConfig).then(async connection => {
   logger.debug(`DB connection established with options: ${JSON.stringify(connection.options)}`);
 
   const app = express();
-  app.use(bodyParser.json());
   app.use(rTracer.expressMiddleware());
   const router = Router();
 
@@ -34,6 +33,8 @@ createConnection(DBConfig).then(async connection => {
   app.use("/", router);
   app.get("/health", (req: Request, res: Response) => res.send("Serivce is healthy."));
   router.use("/v1", v1router);
+  router.use("/pay", payrouter);
+
 
 }).catch(error => console.log(error));
 
