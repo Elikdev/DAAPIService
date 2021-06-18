@@ -6,10 +6,16 @@ import { WxpayUtility } from "./wxpayUtility";
 import { j2xParser, parse } from "fast-xml-parser";
 import { logger } from "../logging/logger";
 import { DependencyError } from "../error/dependencyError";
+import { Users } from "../entities/Users";
+import { ResourceNotFoundError } from "../error/notfoundError";
 
 const APP_ID = "wxf3dcefa8d5e1abd3";
 
 interface PaymentRequestData {
+  [key: string]: string | number
+}
+
+interface PayResult {
   [key: string]: string | number
 }
 
@@ -91,6 +97,10 @@ export class WxpayService {
       });
   }
 
+  /**
+   * Fetch sandbox key for testing purpose
+   * https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=23_1
+   */
   static getSandboxSignedKey(): Promise<any> {
     const headers = {
       "Content-Type": "application/xml",
@@ -118,6 +128,41 @@ export class WxpayService {
         logger.debug(JSON.stringify(parse(text)));
         return parse(text).xml.sandbox_signkey;
       });
+  }
+
+  payOrder = async (userId: any, paymentId: string, totalPrice: number): Promise<any> => {
+    const user = await Users.findOne({id: userId});
+    if (!user) {
+      throw new ResourceNotFoundError("user in order not found");
+    }
+    const openId = user.openId;
+    if (!openId) {
+      throw new ResourceNotFoundError("openid for user not found");
+    }
+    // TODO: 分账
+    const payresult = await this.prepay(totalPrice, openId, paymentId, false);
+    if (payresult.xml.return_code != "SUCCESS") {
+      throw new DependencyError("Encounter error calling wx prepay api");
+    }
+    return payresult.xml;
+  };
+
+  /**
+   * Generate payment response for front end
+   * @param prepayResponse wx prepay response
+   * https://pay.weixin.qq.com/wiki/doc/api/wxa/wxa_api.php?chapter=7_7&index=5
+   */
+  generatePayResult = (prepayResponse: any): PayResult => {
+    const payResult: PayResult = {};
+
+    payResult.timeStamp = Math.floor(Date.now() / 1000);
+    payResult.nonceStr = prepayResponse.nonce_str;
+    payResult.package = `prepay_id=${prepayResponse.prepay_id}`;
+    payResult.signType = "MD5";
+    
+    const sign = WxpayUtility.generateSignature(payResult, this.apiToken);
+    payResult.paySign = sign;
+    return payResult;
   }
 }
 

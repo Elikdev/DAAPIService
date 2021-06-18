@@ -9,6 +9,7 @@ import { createSingleOrder, payOrder } from "./helper/orderCreater";
 import { OrderUtility } from "./helper/orderUtility";
 import { getOrderByConditions } from "./helper/orderByHelper";
 import { Payments } from "../entities/Payments";
+import { WxpayService } from "../payment/wxpayService";
 
 // By default latest orders first
 const DEFAULT_SORT_BY:OrderByCondition = { "orders.createdtime":"DESC" };
@@ -37,7 +38,10 @@ export class OrderController {
     payment.orders = results;
     payment.amount = totalPrice;
     const savedPayment = await payment.save();
-    const payResult = await payOrder(userId, savedPayment.id, totalPrice);
+    const useSandbox = process.env.APP_ENV === "production"? false : true;
+    const payService = new WxpayService(useSandbox);
+    const response = await payService.payOrder(userId, savedPayment.id, totalPrice);
+    const payResult = payService.generatePayResult(response);
 
     res.send({
       data: results,
