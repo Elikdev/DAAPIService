@@ -41,9 +41,6 @@ export class ItemController {
       result = await itemRepo
         .createQueryBuilder("item")
         .where("item.id IN (:...ids)", { ids: inputIds })
-        .leftJoinAndSelect("item.shop", "shops")
-        .leftJoinAndSelect("shops.owner", "users")
-        .select(["item", "shops.name", "shops.id", "shops.introduction", "shops.logoUrl", "shops.location", "users.id", "users.username"])
         .getMany();
     }
 

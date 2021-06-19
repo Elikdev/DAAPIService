@@ -126,7 +126,7 @@ export class UserRelationController {
   }
 
 
-  @HandleError("getUserFollowingItems")
+  @HandleError("getUserFollowingItems") // TODO pagination
   static async getUserFollowingItems(req: Request, res: Response): Promise<void> {
     const userId = req.params.id;
     const userRelationRepo = await getRepository(UserRelations);
@@ -144,11 +144,12 @@ export class UserRelationController {
       .getMany();
 
     const followingUserIds = followingUser.map(user => user.followee.shops[0].id); // currently one user can only has one shop
- 
     const userFollowingItems = await getRepository(Items)
       .createQueryBuilder("items")
+      .leftJoinAndSelect("items.shop", "shop")
+      .leftJoinAndSelect("shop.owner", "users")
       .where("items.shopId IN (:...ids)", { ids: followingUserIds })
-      .orderBy("items.updatedtime", "DESC")
+      .select(["items", "shop.name", "shop.id", "shop.introduction", "shop.logoUrl", "shop.location", "users.id", "users.username"])
       .getMany();
 
     res.send({
