@@ -34,8 +34,6 @@ export class FeedsController {
         ])
         .getMany();
       
-      console.log(followingUsers);
-
       if (followingUsers.length !== 0) {
         const followingUserIds = followingUsers.map(user => user.followee.shops[0].id); // currently one user can only has one shop
         feeds = await getRepository(Items)
