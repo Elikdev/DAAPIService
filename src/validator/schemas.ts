@@ -8,7 +8,6 @@ export const signUpSchema = Joi.object().keys({
 });
 
 export const createItemSchema = Joi.object().keys({
-  name: Joi.string().required(),
   price: Joi.number().required(),
   condition: Joi.number().required().valid(...Object.values(ItemCondition)),
   color: Joi.string().optional(),
