@@ -4,6 +4,8 @@ import { HandleError } from "../decorator/errorDecorator";
 import { ResourceNotFoundError } from "../error/notfoundError";
 import { Users } from "../entities/Users";
 import { UserRelations } from "../entities/UserRelations";
+import { Items } from "../entities/Items";
+
 import { logger } from "../logging/logger";
 import { ListingStatus } from "../entities/Items";
 
@@ -52,6 +54,9 @@ export class UserRelationController {
       data: result
     });
   }
+
+
+
 
   @HandleError("unfollow")
   static async unfollow(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -118,6 +123,37 @@ export class UserRelationController {
       data: isFollowed
     });
 
+  }
+
+
+  @HandleError("getUserFollowingItems")
+  static async getUserFollowingItems(req: Request, res: Response): Promise<void> {
+    const userId = req.params.id;
+    const userRelationRepo = await getRepository(UserRelations);
+
+    const followingUser = await userRelationRepo.createQueryBuilder("userRelations")
+      .leftJoinAndSelect("userRelations.follower", "follower")
+      .leftJoinAndSelect("userRelations.followee", "followee")
+      .leftJoinAndSelect("followee.shops", "shops")
+      .where("follower.id = :id", { id: userId })
+      .select([
+        "userRelations",
+        "followee", 
+        "shops"
+      ])
+      .getMany();
+
+    const followingUserIds = followingUser.map(user => user.followee.shops[0].id); // currently one user can only has one shop
+ 
+    const userFollowingItems = await getRepository(Items)
+      .createQueryBuilder("items")
+      .where("items.shopId IN (:...ids)", { ids: followingUserIds })
+      .orderBy("items.updatedtime", "DESC")
+      .getMany();
+
+    res.send({
+      data: userFollowingItems
+    });
   }
 
 
