@@ -8,6 +8,8 @@ import { UserRelationController } from "./controller/userRelation";
 import { AddressController } from "./controller/address";
 import { ShopController } from "./controller/shops";
 import { OrderController } from "./controller/order";
+import { FeedsController } from "./controller/feeds";
+
 import bodyParser from "body-parser";
 
 export const v1router = Router();
@@ -28,6 +30,9 @@ v1router.post("/items/:id/unsave", ItemSaveController.unsaveItem);
 v1router.get("/items/:id", ItemController.getItem);
 v1router.get("/items", ItemController.getItems);
 v1router.put("/items/:id", ItemController.updateItem);
+
+v1router.get("/feeds", FeedsController.getFeeds);
+
 
 v1router.post("/users/:id/follow", UserRelationController.follow);
 v1router.post("/users/:id/unfollow", UserRelationController.unfollow);

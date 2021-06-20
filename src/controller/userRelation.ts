@@ -4,6 +4,7 @@ import { HandleError } from "../decorator/errorDecorator";
 import { ResourceNotFoundError } from "../error/notfoundError";
 import { Users } from "../entities/Users";
 import { UserRelations } from "../entities/UserRelations";
+import { Items } from "../entities/Items";
 import { logger } from "../logging/logger";
 import { ListingStatus } from "../entities/Items";
 
@@ -52,6 +53,9 @@ export class UserRelationController {
       data: result
     });
   }
+
+
+
 
   @HandleError("unfollow")
   static async unfollow(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -119,7 +123,6 @@ export class UserRelationController {
     });
 
   }
-
 
   @HandleError("getUserFollowings")
   static async getUserFollowings(req: Request, res: Response): Promise<void> {
