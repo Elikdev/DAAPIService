@@ -1,9 +1,8 @@
 import { Router } from "express";
 import { PaymentController } from "./controller/payment";
-const bodyParser = require("body-parser");
-require("body-parser-xml")(bodyParser);
+const xmlparser = require("express-xml-bodyparser");
 
 export const payrouter = Router();
 
-payrouter.use(bodyParser.xml());
+payrouter.use(xmlparser());
 payrouter.post("/confirm/wx", PaymentController.confirmWxPay);
