@@ -27,7 +27,7 @@ export enum OrderStatus {
 export enum OrderCNStatus {
   OPEN = "未付款",
   PAID = "已付款",
-  CONFIRMED = "已确认",
+  CONFIRMED = "待发货",
   SHIPPED = "待收货",
   COMPLETED = "已完成",
   CANCELLED = "已取消"
