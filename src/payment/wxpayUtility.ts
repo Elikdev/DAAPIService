@@ -11,7 +11,7 @@ export class WxpayUtility {
   }
 
   // for payment confirmation
-  static isValidSignature(data:any, signature:string, apiToken:string): boolean {
+  static isValidSignature(data: any, signature:string, apiToken:string): boolean {
     return this.generateSignature(data, apiToken) === signature;
   }
 

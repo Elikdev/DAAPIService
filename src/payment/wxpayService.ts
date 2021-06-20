@@ -9,8 +9,6 @@ import { DependencyError } from "../error/dependencyError";
 import { Users } from "../entities/Users";
 import { ResourceNotFoundError } from "../error/notfoundError";
 
-const APP_ID = "wxf3dcefa8d5e1abd3";
-
 interface PaymentRequestData {
   [key: string]: string | number
 }
@@ -66,7 +64,7 @@ export class WxpayService {
       }
     }
     const data: PaymentRequestData = {};
-    data.appId = APP_ID;
+    data.appid = PaymentConstants.APP_ID;
     data.mch_id = this.merchantId;
     const nonce_str = WxpayUtility.generateNonceStr();
     data.nonce_str = nonce_str;
@@ -101,7 +99,7 @@ export class WxpayService {
    * Fetch sandbox key for testing purpose
    * https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=23_1
    */
-  static getSandboxSignedKey(): Promise<any> {
+  static getSandboxSignedKey(): Promise<string> {
     const headers = {
       "Content-Type": "application/xml",
     };
@@ -155,12 +153,13 @@ export class WxpayService {
   generatePayResult = (prepayResponse: any): PayResult => {
     const payResult: PayResult = {};
 
+    payResult.appId = PaymentConstants.APP_ID;
     payResult.timeStamp = Math.floor(Date.now() / 1000).toString();
     payResult.nonceStr = prepayResponse.nonce_str;
     payResult.package = `prepay_id=${prepayResponse.prepay_id}`;
     payResult.signType = "MD5";
     
-    const sign = WxpayUtility.generateSignature(payResult, this.apiToken);
+    const sign = WxpayUtility.generateSignature(payResult, PaymentConstants.prod.API_TOKEN);
     payResult.paySign = sign;
     return payResult;
   }

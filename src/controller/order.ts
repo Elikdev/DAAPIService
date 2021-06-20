@@ -43,6 +43,7 @@ export class OrderController {
     const response = await payService.payOrder(userId, savedPayment.id, totalPrice);
     const payResult = payService.generatePayResult(response);
 
+    logger.debug(`Generated pay result: ${JSON.stringify(payResult)}`);
     res.send({
       data: {
         orders: results,
