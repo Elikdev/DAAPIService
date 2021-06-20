@@ -10,7 +10,7 @@ export enum PaymentStatus {
 
 @Entity("payments")
 export class Payments extends BaseEntity {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn("increment")
   id: string;
 
   @ManyToOne(() => Users, (users) => users.buyerOrders)
