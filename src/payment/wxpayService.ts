@@ -75,6 +75,7 @@ export class WxpayService {
     data.trade_type = "JSAPI";
     data.profit_sharing = useProfitSharing ? "Y": "N";
     data.openid = openId;
+    data.body = "Retopia商品订单";
     
     const signature = WxpayUtility.generateSignature(data, this.apiToken);
     data.sign = signature;
