@@ -63,6 +63,7 @@ export class OrderController {
       .where("orders.id = :id", { id: orderId })
       .leftJoinAndSelect("orders.buyerAddress", "buyerAddress")
       .leftJoinAndSelect("orders.orderItems", "item")
+      .leftJoinAndSelect("orders.shop", "shop")
       .getOne();
 
     OrderUtility.transformOrderResponse(order);  
@@ -82,6 +83,7 @@ export class OrderController {
       .orderBy(orderBy)
       .leftJoinAndSelect("orders.buyer", "buyer")
       .where("buyer.id = :id", { id: userId })
+      .leftJoinAndSelect("orders.shop", "shop")
       .leftJoinAndSelect("orders.orderItems", "item")
       .getMany();
 
