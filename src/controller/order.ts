@@ -117,6 +117,8 @@ export class OrderController {
       .orderBy(orderBy)
       .getMany();
 
+    shopOrders.forEach(order => OrderUtility.transformOrderResponse(order));  
+
     res.send({
       data: shopOrders,
       totalCount: shopOrders.length
