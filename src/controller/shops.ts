@@ -135,6 +135,8 @@ export class ShopController {
       .andWhere("items.status IN (:...status)", {status: [ListingStatus.NEW, ListingStatus.SOLD, ListingStatus.DELISTED]})
       .loadRelationCountAndMap("shops.itemsCount", "shops.items")
       .select(["shops.id", "items"])
+      .orderBy(`CASE WHEN items.status='new' THEN 0 ELSE 1 END`)
+      .addOrderBy('items.createdtime', 'DESC') 
       .getOne();
 
     res.send({
