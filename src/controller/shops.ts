@@ -89,7 +89,11 @@ export class ShopController {
       .where("shops.id = :id", { id: shopId })
       .leftJoinAndSelect("shops.owner", "users")
       .leftJoinAndSelect("users.defaultAddress", "defaultAddress")
-      .select(["shops.id", "shops.name", "shops.introduction", "shops.logoUrl", "users.id", "users.username", "users.followersCount", "users.followingsCount", "defaultAddress.city", "defaultAddress.district", "defaultAddress.street"])
+      .select([
+        "shops.id", "shops.name", "shops.introduction", "shops.logoUrl", 
+        "users.id", "users.username", "users.followersCount", "users.followingsCount", 
+        "defaultAddress.city", "defaultAddress.district", "defaultAddress.street"
+      ])
       .getOne();
   
     res.send({
@@ -135,8 +139,8 @@ export class ShopController {
       .andWhere("items.status IN (:...status)", {status: [ListingStatus.NEW, ListingStatus.SOLD, ListingStatus.DELISTED]})
       .loadRelationCountAndMap("shops.itemsCount", "shops.items")
       .select(["shops.id", "items"])
-      .orderBy(`CASE WHEN items.status='new' THEN 0 ELSE 1 END`)
-      .addOrderBy('items.createdtime', 'DESC') 
+      .orderBy("CASE WHEN items.status='new' THEN 0 ELSE 1 END")
+      .addOrderBy("items.createdtime", "DESC") 
       .getOne();
 
     res.send({

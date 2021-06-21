@@ -28,11 +28,7 @@ export class UserController {
     const openId = sessionData.openid;
 
     logger.info("Decrypting user data with session_key:" + sessionData.session_key);
-
     const userInfo = encryptedDataDecoder.decryptData(encryptedData, iv);
-    
-
-
     let user = await userRepo.createQueryBuilder("user")
       .where("user.openId = :openId", { openId: openId })
       .leftJoinAndSelect("user.shops", "shops")
@@ -72,8 +68,7 @@ export class UserController {
   @HandleError("signIn")
   static async signIn(req: Request, res: Response): Promise<void> {
     const userId = req.body.userId;
-    const userRepo = getRepository(Users);
-    const user = await userRepo.findOne({id: userId});
+    const user = await Users.findOne({id: userId});
     if (!user) {
       throw new ResourceNotFoundError("User is not found.");
     }
@@ -81,7 +76,6 @@ export class UserController {
       data: user
     });
   }
-
 
   @HandleError("updateUser")
   static async updateUser(req: Request, res: Response): Promise<void> {
@@ -107,18 +101,21 @@ export class UserController {
     res.send({
       data: result
     });
-
   }
 
-
-  @HandleError("GetUser")
+  @HandleError("getUser")
   static async getUser(req: Request, res: Response): Promise<void> {
     const userId = req.params.id;
     const userRepo = await getRepository(Users);
     const result = await userRepo.createQueryBuilder("users")
       .where("users.id = :id", { id: userId })
       .leftJoinAndSelect("users.shops", "shops")
-      .select(["shops.id", "shops.name", "shops.introduction", "shops.location", "shops.logoUrl", "users.id", "users.username", "users.followersCount", "users.followingsCount", "users.avatarUrl", "users.introduction"])
+      .select([
+        "shops.id", "shops.name", "shops.introduction",
+        "shops.location", "shops.logoUrl", "users.id",
+        "users.username", "users.followersCount", "users.followingsCount",
+        "users.avatarUrl", "users.introduction"
+      ])
       .getOne();
     
     if (!result) {

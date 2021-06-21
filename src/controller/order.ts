@@ -10,6 +10,9 @@ import { OrderUtility } from "./helper/orderUtility";
 import { getOrderByConditions } from "./helper/orderByHelper";
 import { Payments } from "../entities/Payments";
 import { WxpayService } from "../payment/wxpayService";
+import { Shops } from "../entities/Shops";
+import { Users } from "../entities/Users";
+import { ResourceNotFoundError } from "../error/notfoundError";
 
 // By default latest orders first
 const DEFAULT_SORT_BY:OrderByCondition = { "orders.createdtime":"DESC" };
@@ -97,12 +100,18 @@ export class OrderController {
 
   @HandleError("getShopOrders")
   static async getShopOrders(req: Request, res: Response): Promise<void> {
+    const userId = req.body.userId;
     const shopId = req.params.id;
     const sorts = req.query.sort;
+    const user = await Users.findOne({id: userId});
+    const shop = await Shops.findOne({id: shopId, owner: user});
+    if (!shop) {
+      throw new ResourceNotFoundError("Shop not found for user.");
+    }
     const orderBy = getOrderByConditions(sorts, DEFAULT_SORT_BY, "orders.");
     const shopOrders = await getRepository(Orders)
       .createQueryBuilder("orders")
-      .leftJoinAndSelect("orders.shop", "shop")
+      .leftJoin("orders.shop", "shop")
       .where("shop.id = :id", { id: shopId })
       .leftJoinAndSelect("orders.orderItems", "item")
       .orderBy(orderBy)

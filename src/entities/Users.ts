@@ -29,6 +29,9 @@ export class Users extends BaseEntity {
   @Column()
   username: string;
 
+  @Column({default: false})
+  isSeller: boolean;
+
   @Column("character varying", {nullable: false })
   mobilePrefix: string;
 
@@ -40,7 +43,6 @@ export class Users extends BaseEntity {
 
   @Column("character varying", {nullable: true })
   introduction: string | null;
-
 
   @Column("character varying", {nullable: true })
   avatarUrl: string | null;
