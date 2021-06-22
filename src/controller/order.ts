@@ -1,18 +1,19 @@
 import { Request, Response } from "express";
 import { getRepository, OrderByCondition } from "typeorm";
 import { HandleError } from "../decorator/errorDecorator";
-import { Orders } from "../entities/Orders";
+import { Orders, OrderStatus } from "../entities/Orders";
 import { logger } from "../logging/logger";
 import { RequestValidator } from "../validator/requestValidator";
-import { batchCreateOrderSchema } from "../validator/schemas";
+import { batchCreateOrderSchema, buyerUpdateOrderSchema, sellerUpdateOrderSchema } from "../validator/schemas";
 import { createSingleOrder } from "./helper/orderCreater";
 import { OrderUtility } from "./helper/orderUtility";
 import { getOrderByConditions } from "./helper/orderByHelper";
 import { Payments } from "../entities/Payments";
 import { WxpayService } from "../payment/wxpayService";
 import { Shops } from "../entities/Shops";
-import { Users } from "../entities/Users";
+import { UserRole, Users } from "../entities/Users";
 import { ResourceNotFoundError } from "../error/notfoundError";
+import { BadRequestError } from "../error/badRequestError";
 
 // By default latest orders first
 const DEFAULT_SORT_BY:OrderByCondition = { "orders.createdtime":"DESC" };
@@ -86,6 +87,7 @@ export class OrderController {
       .orderBy(orderBy)
       .leftJoinAndSelect("orders.buyer", "buyer")
       .where("buyer.id = :id", { id: userId })
+      .where("orders.status != :status", {status: OrderStatus.CANCELLED})
       .leftJoinAndSelect("orders.shop", "shop")
       .leftJoinAndSelect("orders.orderItems", "item")
       .getMany();
@@ -124,4 +126,53 @@ export class OrderController {
       totalCount: shopOrders.length
     });
   }
+
+  @HandleError("updateOrder")
+  static async updateOrder(req: Request, res: Response): Promise<void> {
+    const userId = req.body.userId;
+    const orderId = req.params.id;
+
+    const user = await Users.findOne({id: userId});
+    if (!user) {
+      throw new ResourceNotFoundError("User not found");
+    }
+    console.log(user);
+    let order = await Orders.findOne({id: orderId, buyer: user});
+    const updateData = req.body.data;
+    let validator;
+
+    if (order) {
+      // Is buyer order
+      validator = new RequestValidator(buyerUpdateOrderSchema);
+      validator.validate(updateData);
+      OrderUtility.validateOrderForUpdate(order);
+
+      if (updateData.status === OrderStatus.CANCELLED &&
+        !OrderUtility.isUnpaidOrder(order.status)) {
+        throw new BadRequestError(`Cannot cancel order in ${order.status} status`);
+      }
+      order.status = updateData.status;
+
+    } else {
+      // Check if seller order
+      // TODO: more comprehensive check
+      order = await Orders.findOne({id: orderId});
+      if (!order || user.role != UserRole.SELLER) {
+        throw new ResourceNotFoundError("Order not found.");
+      }
+      validator = new RequestValidator(sellerUpdateOrderSchema);
+      validator.validate(updateData);
+      OrderUtility.validateOrderForUpdate(order);
+      order.trackingNum = updateData.trackingNum;
+      if (OrderUtility.isPaidOrder(order.status) ||
+        OrderUtility.isToShipOrder(order.status)) {
+        order.status = OrderStatus.SHIPPED;
+      }
+    }
+    const result = await getRepository(Orders).save(order);
+    res.send({
+      data: result
+    });
+  }
+
 }

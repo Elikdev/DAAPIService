@@ -1,5 +1,6 @@
 import Joi from "joi";
 import { ItemCondition, ShippingType } from "../entities/Items";
+import { OrderStatus } from "../entities/Orders";
 
 export const signUpSchema = Joi.object().keys({
   code: Joi.string().required(),
@@ -35,6 +36,14 @@ export const createOrderSchema = Joi.object().keys({
 });
 
 export const batchCreateOrderSchema = Joi.array().items(createOrderSchema).min(1).required();
+
+export const buyerUpdateOrderSchema = Joi.object().keys({
+  status: Joi.string().required().valid(...Object.values([OrderStatus.CANCELLED, OrderStatus.COMPLETED])),
+}).min(1);
+
+export const sellerUpdateOrderSchema = Joi.object().keys({
+  trackingNum: Joi.string().required(),
+}).min(1);
 
 export const updateItemSchema = Joi.object().keys({
   name: Joi.string().allow(null).optional(),
