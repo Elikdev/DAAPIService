@@ -1,4 +1,5 @@
-import { OrderStatus, OrderCNStatus } from "../../entities/Orders";
+import { OrderStatus, OrderCNStatus, Orders } from "../../entities/Orders";
+import { BadRequestError } from "../../error/badRequestError";
 
 export class OrderUtility {  
   static transformOrderResponse(order: any): void {
@@ -46,6 +47,12 @@ export class OrderUtility {
 
   static isCancelledOrder(orderStatus: string): boolean {
     return orderStatus === OrderStatus.CANCELLED;
+  }
+
+  static validateOrderForUpdate(order: Orders): void {
+    if (this.isCompletedOrder(order.status) || this.isCancelledOrder(order.status)) {
+      throw new BadRequestError(`Cannot update order in ${order.status} status`);
+    }
   }
 }
 

@@ -69,7 +69,7 @@ export class AddressController {
       } else {
         await userRepo.update(userId, {defaultAddress: null}); 
       }
-    }                   
+    }
 
     res.send({
       data: result
