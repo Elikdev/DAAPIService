@@ -163,6 +163,10 @@ export class OrderController {
       validator.validate(updateData);
       OrderUtility.validateOrderForUpdate(order);
       order.trackingNum = updateData.trackingNum;
+      if (OrderUtility.isPaidOrder(order.status) ||
+        OrderUtility.isToShipOrder(order.status)) {
+        order.status = OrderStatus.SHIPPED;
+      }
     }
     const result = await getRepository(Orders).save(order);
     res.send({

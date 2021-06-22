@@ -39,11 +39,11 @@ export const batchCreateOrderSchema = Joi.array().items(createOrderSchema).min(1
 
 export const buyerUpdateOrderSchema = Joi.object().keys({
   status: Joi.string().required().valid(...Object.values([OrderStatus.CANCELLED, OrderStatus.COMPLETED])),
-});
+}).min(1);
 
 export const sellerUpdateOrderSchema = Joi.object().keys({
   trackingNum: Joi.string().required(),
-});
+}).min(1);
 
 export const updateItemSchema = Joi.object().keys({
   name: Joi.string().optional(),
