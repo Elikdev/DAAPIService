@@ -35,7 +35,6 @@ export class PaymentController {
       logger.error("Encountered problem confirming payment", error);
       res.send(FAILURE_RESPONSE_STRING);
     }
-    
   }
 }
 

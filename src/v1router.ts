@@ -9,8 +9,8 @@ import { AddressController } from "./controller/address";
 import { ShopController } from "./controller/shops";
 import { OrderController } from "./controller/order";
 import { FeedsController } from "./controller/feeds";
-
 import bodyParser from "body-parser";
+import { NotificationController } from "./controller/notification";
 
 export const v1router = Router();
 
@@ -19,6 +19,7 @@ v1router.post("/signup", UserController.signUp);
 v1router.post("/signin", UserController.signIn);
 v1router.put("/users/:id", UserController.updateUser);
 v1router.get("/users/:id", UserController.getUser);
+v1router.get("/test", NotificationController.test);
 
 // Do auth filtering
 v1router.use(authMiddleWare);
