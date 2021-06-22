@@ -136,7 +136,6 @@ export class OrderController {
     if (!user) {
       throw new ResourceNotFoundError("User not found");
     }
-    console.log(user);
     let order = await Orders.findOne({id: orderId, buyer: user});
     const updateData = req.body.data;
     let validator;
