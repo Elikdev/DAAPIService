@@ -37,21 +37,23 @@ export const createOrderSchema = Joi.object().keys({
 export const batchCreateOrderSchema = Joi.array().items(createOrderSchema).min(1).required();
 
 export const updateItemSchema = Joi.object().keys({
-  name: Joi.string().optional(),
+  name: Joi.string().allow(null).optional(),
   price: Joi.number().optional(),
   condition: Joi.number().optional().valid(...Object.values(ItemCondition)),
-  color: Joi.string().optional(),
+  color: Joi.string().allow(null).optional(),
   size: Joi.string().optional(),
   imageUrls: Joi.array().optional(),
   status: Joi.string().optional(),
   factoryDate: Joi.string().optional(),
+  year: Joi.string().optional(),
   description: Joi.string().optional(),
   stock: Joi.number().optional(),
   orderId: Joi.string().optional(),
   brand: Joi.string().optional(),
-  origin: Joi.string().optional(),
+  origin: Joi.string().allow(null).optional(),
   category: Joi.string().optional(),
-  subcategory: Joi.string().optional()
+  subcategory: Joi.string().optional(),
+  shippingType: Joi.string().optional().valid(...Object.values(ShippingType))
 });
 
 export const createAddressSchema = Joi.object().keys({
