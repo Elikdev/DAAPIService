@@ -82,7 +82,7 @@ export class ItemController {
       .leftJoinAndSelect("users.defaultAddress", "defaultAddress")
       .select([
         "item", "shops.name", "shops.id", "shops.introduction", 
-        "shops.logoUrl", "users.id", "users.username", 
+        "shops.logoUrl", "shops.customerServiceUrl", "users.id", "users.username", 
         "defaultAddress.city", "defaultAddress.district"
       ])
       .getOne();

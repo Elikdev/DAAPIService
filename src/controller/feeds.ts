@@ -41,7 +41,7 @@ export class FeedsController {
           .leftJoinAndSelect("items.shop", "shop")
           .leftJoinAndSelect("shop.owner", "users")
           .where("items.shopId IN (:...ids)", { ids: followingUserIds })
-          .select(["items", "shop.name", "shop.id", "shop.introduction", "shop.logoUrl", "shop.location", "users.id", "users.username"])
+          .select(["items", "shop.name", "shop.id", "shop.introduction", "shop.logoUrl", "shop.customerServiceUrl", "shop.location", "users.id", "users.username"])
           .orderBy(orderBy)
           .skip(skipSize)
           .take(pageSize)
