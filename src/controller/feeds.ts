@@ -4,7 +4,7 @@ import { HandleError } from "../decorator/errorDecorator";
 import { ResourceNotFoundError } from "../error/notfoundError";
 import { Users } from "../entities/Users";
 import { UserRelations } from "../entities/UserRelations";
-import { Items } from "../entities/Items";
+import { Items, ListingStatus } from "../entities/Items";
 import { logger } from "../logging/logger";
 import { getOrderByConditions } from "./helper/orderByHelper";
 import { getPaginationLinks, getPaginationParams } from "./helper/paginationHelper";
@@ -41,6 +41,7 @@ export class FeedsController {
           .leftJoinAndSelect("items.shop", "shop")
           .leftJoinAndSelect("shop.owner", "users")
           .where("items.shopId IN (:...ids)", { ids: followingUserIds })
+          .andWhere("items.status = :new", { new: ListingStatus.NEW })
           .select(["items", "shop.name", "shop.id", "shop.introduction", "shop.logoUrl", "shop.customerServiceUrl", "shop.location", "users.id", "users.username"])
           .orderBy(orderBy)
           .skip(skipSize)
