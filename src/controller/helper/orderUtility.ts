@@ -4,7 +4,16 @@ import { BadRequestError } from "../../error/badRequestError";
 export class OrderUtility {  
   static transformOrderResponse(order: any): void {
     order.displayStatusCN = OrderUtility.getDisplayStatusInCN(order.status);
-    // order.display_transit_status_cn = OrderUtility.getTransitStatusInCN(order.package_status_code || order.status);
+    order.displayCreatedDate = OrderUtility.convertDateTime(order.createdtime);
+    // Getting the YYYY-MM-DD HH:MM:SS time
+    order.displayUpdatedDate = OrderUtility.convertDateTime(order.updatedtime);
+    // Getting the last few digits of ID to display
+    order.displayOrderId = order.id.split("-").pop().toUpperCase();
+  }
+
+  static convertDateTime(dateString: string): string {
+    const isoString = new Date(dateString).toISOString();
+    return isoString.replace("T", " ").substring(0, isoString.length - 5);
   }
 
   static getDisplayStatusInCN(orderStatus: string): string | undefined {
