@@ -17,6 +17,11 @@ import { ItemSaves } from "./ItemSaves";
 import { ItemLikes } from "./ItemLikes";
 import { UserRelations } from "./UserRelations";
 
+export enum UserRole {
+  SHOPPER = "shopper",
+  SELLER = "seller",
+}
+
 @Index("users_pkey", ["id"], { unique: true })
 @Entity("users")
 export class Users extends BaseEntity {
@@ -29,17 +34,18 @@ export class Users extends BaseEntity {
   @Column()
   username: string;
 
-  @Column({default: false})
-  isSeller: boolean;
-
   @Column("character varying", {nullable: false })
   mobilePrefix: string;
 
   @Column("character varying", {nullable: false })
   mobile: string;
 
-  @Column("character varying", {nullable: true })
-  role: string | null;
+  @Column({
+    type: "enum",
+    enum: UserRole,
+    default: UserRole.SHOPPER
+  })
+  role: string;
 
   @Column("character varying", {nullable: true })
   introduction: string | null;
