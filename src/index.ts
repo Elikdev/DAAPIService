@@ -30,6 +30,7 @@ createConnection(DBConfig).then(async connection => {
 
 const setConfig = ():void => {
   const APP_ENV = process.env.APP_ENV;
+  logger.info(`env is set to ${APP_ENV}.`);
   switch(APP_ENV) {
   case "development":
     dotenv.config({ path: __dirname+"/../.env" });
