@@ -42,9 +42,7 @@ export class OrderController {
     payment.orders = results;
     payment.amount = totalPrice;
     const savedPayment = await payment.save();
-    // Always use production because sandbox sucks
-    // const useSandbox = process.env.APP_ENV === "production"? false : true;
-    const payService = new WxpayService(false);
+    const payService = new WxpayService();
     const response = await payService.payOrder(userId, savedPayment.id, totalPrice);
     const payResult = payService.generatePayResult(response);
 

@@ -29,8 +29,6 @@ createConnection(DBConfig).then(async connection => {
   app.get("/health", (req: Request, res: Response) => res.send("Serivce is healthy."));
   router.use("/v1", v1router);
   router.use("/pay", payrouter);
-
-
 }).catch(error => console.log(error));
 
 const setConfig = ():void => {

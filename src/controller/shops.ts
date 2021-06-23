@@ -144,7 +144,7 @@ export class ShopController {
       .getOne();
 
     if(shopItems === undefined) { 
-       res.send({
+      res.send({
         data: {
           id: shopId,
           items: [],

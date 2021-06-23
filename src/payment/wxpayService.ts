@@ -27,19 +27,32 @@ export class WxpayService {
   ip: string
   useSandbox: boolean
 
-  constructor(useSandbox: boolean) {
-    this.useSandbox = useSandbox;
-    let constants = PaymentConstants.prod;
-    this.apiToken = constants.API_TOKEN;
-    if (useSandbox) {
+  constructor() {
+    const APP_ENV = process.env.APP_ENV;
+    let constants;
+    this.useSandbox = false;
+    switch(APP_ENV) {
+    case "development":
+      constants = PaymentConstants.sandbox;
+      this.useSandbox = true;
+      break;
+    case "test":
       constants = PaymentConstants.test;
+      break;
+    case "production":
+      constants = PaymentConstants.prod;
+      break;
+    default:
+      constants = PaymentConstants.sandbox;
+      this.useSandbox = true;
+      break;
     }
+    this.apiToken = constants.API_TOKEN;
     this.payUrl = constants.PAY_URL;
     this.merchantId = constants.MERCHANT_ID;
     this.storeId = constants.STORE_ID;
     this.callbackUrl = constants.CALL_BACK_URL;
     this.ip = constants.IP;
-
   }
 
   /**
@@ -105,10 +118,10 @@ export class WxpayService {
       "Content-Type": "application/xml",
     };
     
-    const url = PaymentConstants.test.SB_KEY_URL;
+    const url = PaymentConstants.sandbox.SB_KEY_URL;
     const nonceStr = WxpayUtility.generateNonceStr();
     const data: PaymentRequestData = {};
-    data.mch_id = PaymentConstants.test.MERCHANT_ID;
+    data.mch_id = PaymentConstants.sandbox.MERCHANT_ID;
     data.nonce_str = nonceStr;
 
     const signature = WxpayUtility.generateSignature(data, PaymentConstants.test.API_TOKEN);
