@@ -11,7 +11,7 @@ export const PaymentConstants = {
   },
   test: {
     IP: "139.196.93.148",
-    PAY_URL : "https://api.mch.weixin.qq.com/sandboxnew/pay/unifiedorder",
+    PAY_URL : "https://api.mch.weixin.qq.com/pay/unifiedorder",
     MERCHANT_ID : "1610299103",
     STORE_ID : "301941",
     API_TOKEN : "pandabrick140114011401pandabrick",
