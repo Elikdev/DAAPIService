@@ -22,12 +22,7 @@ createConnection(DBConfig).then(async connection => {
   const app = express();
   app.use(rTracer.expressMiddleware());
   const router = Router();
-
-  if (httpsOptions) {
-    https.createServer(httpsOptions, app).listen(PORT);
-  } else {
-    app.listen(PORT);
-  }
+  app.listen(PORT);
   logger.info(`>>>>> Haven't felt like this in a longtime=${PORT} <<<<<`);
   
   app.use("/", router);
