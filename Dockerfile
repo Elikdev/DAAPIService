@@ -8,7 +8,7 @@ WORKDIR /home/node/app
 # where available (npm@5+)
 COPY package*.json ./
 
-RUN npm config set registry https://registry.npm.taobao.org
+# RUN npm config set registry https://registry.npm.taobao.org
 
 RUN npm install
 
