@@ -119,6 +119,7 @@ export class OrderController {
         "shop", 
         "shop.id = :id", 
         { id: shopId })
+      .where("orders.status != :status", {status: OrderStatus.CANCELLED})
       .leftJoinAndSelect("orders.orderItems", "item")
       .orderBy(orderBy)
       .getMany();
