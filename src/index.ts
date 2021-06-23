@@ -8,12 +8,10 @@ import rTracer from "cls-rtracer";
 import { v1router } from "./v1router";
 import * as dotenv from "dotenv";
 import https from "https";
-import http from "http";
 import { getServerOptions } from "./config/serverconfig";
 import { payrouter } from "./payrouter";
 
-const HTTPS_PORT = 4001;
-const HTTP_PORT = 4000;
+const PORT = 4000;
 const DBConfig = getDBConfig();
 const httpsOptions = getServerOptions();
 
@@ -26,11 +24,11 @@ createConnection(DBConfig).then(async connection => {
   const router = Router();
 
   if (httpsOptions) {
-    https.createServer(httpsOptions, app).listen(HTTPS_PORT);
+    https.createServer(httpsOptions, app).listen(PORT);
+  } else {
+    app.listen(PORT);
   }
-  http.createServer(app).listen(HTTP_PORT);
-  
-  logger.info(`>>>>> Haven't felt like this in a longtime=${HTTPS_PORT} <<<<<`);
+  logger.info(`>>>>> Haven't felt like this in a longtime=${PORT} <<<<<`);
   
   app.use("/", router);
   app.get("/health", (req: Request, res: Response) => res.send("Serivce is healthy."));
