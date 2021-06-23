@@ -7,13 +7,10 @@ import { getDBConfig } from "./config/dbconfig";
 import rTracer from "cls-rtracer";
 import { v1router } from "./v1router";
 import * as dotenv from "dotenv";
-import https from "https";
-import { getServerOptions } from "./config/serverconfig";
 import { payrouter } from "./payrouter";
 
 const PORT = 4000;
 const DBConfig = getDBConfig();
-const httpsOptions = getServerOptions();
 
 createConnection(DBConfig).then(async connection => {
   setConfig();

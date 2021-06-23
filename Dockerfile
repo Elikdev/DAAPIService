@@ -13,8 +13,6 @@ RUN npm config set registry https://registry.npm.taobao.org
 RUN npm install
 
 COPY . .
-COPY ssl /ssl
-
 
 # FROM base as production
 
