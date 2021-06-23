@@ -27,7 +27,7 @@ export const authMiddleWare = (req: Request, res: Response, next: NextFunction):
 
     } else {
       logger.error("Getting error while decoding wechat miniprogram auth token:", err);
-      ErrorHandler.handle(res, err);
+      ErrorHandler.handle(res, new AuthError("Authorization error"));
     }
   }
 };
