@@ -1,7 +1,6 @@
 import axios from "axios";
 import qs from "qs";
 import { DependencyError } from "../error/dependencyError";
-import { logger } from "../logging/logger";
 
 export const getSessionData = async (wxCode: string): Promise<any> => {
   const params =  {

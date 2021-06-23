@@ -83,8 +83,11 @@ export class OrderController {
     const buyerOrders = await getRepository(Orders)
       .createQueryBuilder("orders")
       .orderBy(orderBy)
-      .leftJoinAndSelect("orders.buyer", "buyer")
-      .where("buyer.id = :id", { id: userId })
+      .innerJoin(
+        "orders.buyer", 
+        "buyer", 
+        "buyer.id = :id", 
+        { id: userId })
       .where("orders.status != :status", {status: OrderStatus.CANCELLED})
       .leftJoinAndSelect("orders.shop", "shop")
       .leftJoinAndSelect("orders.orderItems", "item")
@@ -111,8 +114,11 @@ export class OrderController {
     const orderBy = getOrderByConditions(sorts, DEFAULT_SORT_BY, "orders.");
     const shopOrders = await getRepository(Orders)
       .createQueryBuilder("orders")
-      .leftJoin("orders.shop", "shop")
-      .where("shop.id = :id", { id: shopId })
+      .innerJoinAndSelect(
+        "orders.shop", 
+        "shop", 
+        "shop.id = :id", 
+        { id: shopId })
       .leftJoinAndSelect("orders.orderItems", "item")
       .orderBy(orderBy)
       .getMany();
