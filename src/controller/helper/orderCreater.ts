@@ -11,9 +11,12 @@ import { BadRequestError } from "../../error/badRequestError";
 export const createSingleOrder = async (userId: any, orderData: any): Promise<any> => {
   const shopId = orderData.shopId;
   const addressId = orderData.addressId;
-  const shop = await Shops.findOne({id: shopId});
+  const shop = await Shops.findOne({id: shopId}, {relations: ["owner"]});
   if (!shop) {
     throw new ResourceNotFoundError("Shop not found.");
+  }
+  if (shop.owner.id === userId) {
+    throw new BadRequestError("Cannot purchase own item.");
   }
   const address = await Addresses.findOne({id: addressId});
   if (!address) {
