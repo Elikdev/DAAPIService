@@ -18,7 +18,7 @@ export const createItemSchema = Joi.object().keys({
   description: Joi.string().required(),
   stock: Joi.number(),
   year: Joi.string(),
-  brand: Joi.string(),
+  brand: Joi.string().allow("").allow(null).optional(),
   origin: Joi.string().optional(),
   category: Joi.string(),
   subcategory: Joi.string().optional(),
@@ -46,10 +46,10 @@ export const sellerUpdateOrderSchema = Joi.object().keys({
 }).min(1);
 
 export const updateItemSchema = Joi.object().keys({
-  name: Joi.string().allow(null).optional(),
+  name: Joi.string().allow("").allow(null).optional(),
   price: Joi.number().optional(),
   condition: Joi.number().optional().valid(...Object.values(ItemCondition)),
-  color: Joi.string().allow(null).optional(),
+  color: Joi.string().allow("").allow(null).optional(),
   size: Joi.string().optional(),
   imageUrls: Joi.array().optional(),
   status: Joi.string().optional(),
@@ -58,8 +58,8 @@ export const updateItemSchema = Joi.object().keys({
   description: Joi.string().optional(),
   stock: Joi.number().optional(),
   orderId: Joi.string().optional(),
-  brand: Joi.string().optional(),
-  origin: Joi.string().allow(null).optional(),
+  brand: Joi.string().allow("").allow(null).optional(),
+  origin: Joi.string().allow("").allow(null).optional(),
   category: Joi.string().optional(),
   subcategory: Joi.string().optional(),
   shippingType: Joi.string().optional().valid(...Object.values(ShippingType))
