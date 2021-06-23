@@ -143,8 +143,18 @@ export class ShopController {
       .addOrderBy("items.createdtime", "DESC") 
       .getOne();
 
-    res.send({
-      data: shopItems
-    });
+    if(shopItems === undefined) { 
+       res.send({
+        data: {
+          id: shopId,
+          items: [],
+          itemsCount: 0
+        }
+      });
+    } else {
+      res.send({
+        data: shopItems
+      });
+    }
   }
 }
