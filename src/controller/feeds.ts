@@ -22,20 +22,20 @@ export class FeedsController {
     
     if (userId) { // if loggin, return user following items.
       const userRelationRepo = await getRepository(UserRelations);
-      const followingUsers = await userRelationRepo.createQueryBuilder("userRelations")
+      const followingShops = await userRelationRepo.createQueryBuilder("userRelations")
         .leftJoinAndSelect("userRelations.follower", "follower")
         .leftJoinAndSelect("userRelations.followee", "followee")
         .leftJoinAndSelect("followee.shops", "shops")
         .where("follower.id = :id", { id: userId })
+        .andWhere("followee.role = :role", { role: "seller" })
         .select([
           "userRelations",
           "followee", 
           "shops"
         ])
         .getMany();
-      
-      if (followingUsers.length !== 0) {
-        const followingUserIds = followingUsers.map(user => user.followee.shops[0].id); // currently one user can only has one shop
+      if (followingShops.length !== 0) {
+        const followingUserIds = followingShops.map(user => user.followee.shops[0].id); // currently one user can only has one shop, assume every seller has one shop as well. otherwise shops[0].id will throw NPE
         feeds = await getRepository(Items)
           .createQueryBuilder("items")
           .leftJoinAndSelect("items.shop", "shop")
