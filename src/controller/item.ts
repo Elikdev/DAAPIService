@@ -83,7 +83,7 @@ export class ItemController {
       .select([
         "item", "shops.name", "shops.id", "shops.introduction", 
         "shops.logoUrl", "shops.customerServiceUrl", "users.id", "users.username", 
-        "users.openId", "defaultAddress.city", "defaultAddress.district"
+        "users.openId", "users.mobilePrefix", "users.mobile", "defaultAddress.city", "defaultAddress.district"
       ])
       .getOne();
     if (!item) {
