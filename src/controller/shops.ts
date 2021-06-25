@@ -53,9 +53,9 @@ export class ShopController {
       .getMany();
 
     const inputIds = ids.map(shop => shop.id);
-    const shops: any[] = [];
+    let shops: any[] = [];
     if(inputIds.length !== 0) {
-      const shop = await repo.createQueryBuilder("shops")
+      shops = await repo.createQueryBuilder("shops")
         .where("shops.id IN (:...ids)", { ids: inputIds })
         .leftJoin("shops.owner", "users")
         .leftJoin("shops.items", "items")
@@ -72,9 +72,7 @@ export class ShopController {
           "items.id",
           "items.imageUrls"
         ])
-        .getOne();
-
-      shops.push(shop);
+        .getMany();
     }
   
     res.send({
