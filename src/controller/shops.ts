@@ -50,6 +50,7 @@ export class ShopController {
       .orderBy(orderBy)
       .skip(skipSize)
       .take(pageSize)
+      .where("shops.isSuspended = :isSuspended", { isSuspended: false })
       .getMany();
 
     const inputIds = ids.map(shop => shop.id);
