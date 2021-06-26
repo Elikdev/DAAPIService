@@ -87,14 +87,14 @@ export const updateAddressSchema = Joi.object().keys({
 }).min(1);
 
 export const createShopSchema = Joi.object().keys({
-  name: Joi.string().max(20).required(),
+  name: Joi.string().max(100).required(),
   introduction: Joi.string().max(500),
   logoUrl: Joi.string(),
   location: Joi.string().optional()
 });
 
 export const updateUserSchema = Joi.object().keys({
-  username: Joi.string().max(20),
+  username: Joi.string().max(100),
   introduction: Joi.string().max(500),
   avatarUrl: Joi.string().max(500)
 
@@ -102,7 +102,7 @@ export const updateUserSchema = Joi.object().keys({
 
 
 export const updateShopSchema = Joi.object().keys({
-  name: Joi.string().max(20),
+  name: Joi.string().max(100),
   introduction: Joi.string().max(500),
   addressId: Joi.string().uuid(),
   logoUrl: Joi.string(),
