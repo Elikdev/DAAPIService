@@ -45,7 +45,7 @@ export class Shops extends BaseEntity {
   @Column("character varying", {nullable: true })
   logoUrl: string;
 
-  @Column("character varying", {default: false })
+  @Column("bool", {default: false })
   isSuspended: boolean;
 
   @Column("character varying", {nullable: true })

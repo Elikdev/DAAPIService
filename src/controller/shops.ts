@@ -57,10 +57,10 @@ export class ShopController {
     let shops: any[] = [];
     if(inputIds.length !== 0) {
       shops = await repo.createQueryBuilder("shops")
-        .where("shops.id IN (:...ids)", { ids: inputIds })
         .leftJoin("shops.owner", "users")
         .leftJoin("shops.items", "items")
-        .orWhere("items.status = :new", { new: ListingStatus.NEW })
+        .where("shops.id IN (:...ids)", { ids: inputIds })
+        .andWhere("items.status = :new", { new: ListingStatus.NEW }) //this will only return shosp that currentluy has new items.
         .select([
           "shops.id", 
           "shops.rating", 
