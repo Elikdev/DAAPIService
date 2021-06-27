@@ -12,7 +12,7 @@ import { createItemSchema, updateItemSchema } from "../validator/schemas";
 import { getOrderByConditions } from "./helper/orderByHelper";
 import { getPaginationLinks, getPaginationParams } from "./helper/paginationHelper";
 
-const DEFAULT_SORT_BY:OrderByCondition = { "createdtime":"DESC" };
+const DEFAULT_SORT_BY:OrderByCondition = { "score": "DESC", "createdtime":"DESC" };
 
 export class ItemController {
 
@@ -25,28 +25,16 @@ export class ItemController {
     const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
 
     logger.debug("OrderBy: " + JSON.stringify(orderBy));
-    const itemIds = await itemRepo.createQueryBuilder("item")
-      .select("item.id")
+    const items = await itemRepo
+      .createQueryBuilder("item")
       .where("item.status = :new", { new: ListingStatus.NEW })
       .orderBy(orderBy)
       .skip(skipSize)
       .take(pageSize)
       .getMany();
 
-    let result: any[] = [];
-
-    if(itemIds.length !== 0) {
-      // two query since one query with join will generate invalid query
-      const inputIds = itemIds.map(item => item.id);
-
-      result = await itemRepo
-        .createQueryBuilder("item")
-        .where("item.id IN (:...ids)", { ids: inputIds })
-        .getMany();
-    }
-
     res.send({
-      data: result,
+      data: items,
       links: getPaginationLinks(req, pageNumber, pageSize)
     });
   }

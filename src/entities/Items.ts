@@ -136,4 +136,7 @@ export class Items extends BaseEntity {
 
   @Column({default: 0})
   itemLikesCount: number;
+
+  @Column({default: 0})
+  score: number;
 }
