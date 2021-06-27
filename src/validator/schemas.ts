@@ -62,6 +62,7 @@ export const updateItemSchema = Joi.object().keys({
   origin: Joi.string().allow("").allow(null).optional(),
   category: Joi.string().optional(),
   subcategory: Joi.string().optional(),
+  score: Joi.number(),
   shippingType: Joi.string().optional().valid(...Object.values(ShippingType))
 });
 
