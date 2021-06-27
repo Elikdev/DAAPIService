@@ -19,7 +19,8 @@ export class ItemController {
   @HandleError("getItems")
   static async getItems(req: Request, res: Response): Promise<void> {
     const sorts = req.query.sort;
-    const orderBy = getOrderByConditions(sorts, DEFAULT_SORT_BY);
+    // TODO: remove front end hardcoded sorting param -id
+    const orderBy = getOrderByConditions(null, DEFAULT_SORT_BY);
     const itemRepo = getRepository(Items);
     const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
 

@@ -12,7 +12,7 @@ import { getOrderByConditions } from "./helper/orderByHelper";
 import { getPaginationLinks, getPaginationParams } from "./helper/paginationHelper";
 
 const MAX_OWNED_SHOPS = 1;
-const DEFAULT_SORT_BY:OrderByCondition = { "rating":"DESC", "createdtime":"ASC"};
+const DEFAULT_SORT_BY:OrderByCondition = { "rating":"DESC", "createdtime":"DESC"};
 
 export class ShopController {
   @HandleError("createShop")
