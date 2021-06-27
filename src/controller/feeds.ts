@@ -1,8 +1,6 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import { getRepository, OrderByCondition } from "typeorm";
 import { HandleError } from "../decorator/errorDecorator";
-import { ResourceNotFoundError } from "../error/notfoundError";
-import { Users } from "../entities/Users";
 import { UserRelations } from "../entities/UserRelations";
 import { Items, ListingStatus } from "../entities/Items";
 import { logger } from "../logging/logger";
@@ -14,7 +12,7 @@ export class FeedsController {
 
   @HandleError("getFeeds") 
   static async getFeeds(req: Request, res: Response): Promise<void> {
-    let feeds: any[] = [];
+    let feeds: Items[] = [];
     const userId = req.body.userId;
     const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
     const sorts = req.query.sort;

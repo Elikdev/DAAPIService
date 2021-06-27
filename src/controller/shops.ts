@@ -12,7 +12,7 @@ import { getOrderByConditions } from "./helper/orderByHelper";
 import { getPaginationLinks, getPaginationParams } from "./helper/paginationHelper";
 
 const MAX_OWNED_SHOPS = 1;
-const DEFAULT_SORT_BY:OrderByCondition = { "rating":"DESC", "createdtime":"DESC"};
+const DEFAULT_SORT_BY:OrderByCondition = { "shops.createdtime":"DESC" };
 
 export class ShopController {
   @HandleError("createShop")
@@ -44,38 +44,30 @@ export class ShopController {
     const orderBy = getOrderByConditions(sorts, DEFAULT_SORT_BY);
     const repo = getRepository(Shops);
     const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
-
-    const ids = await repo.createQueryBuilder("shops")
-      .select("shops.id")
+    
+    const shops: Shops[] = await repo.createQueryBuilder("shops")
+      .innerJoin("shops.owner", "users")
+      .innerJoin("shops.items", "items")
+      .where("shops.isSuspended = :isSuspended", { isSuspended: false })
+      .andWhere("items.status = :new", { new: ListingStatus.NEW }) //this will only return shosp that currentluy has new items.
+      .select([
+        "shops.id", 
+        "shops.rating", 
+        "shops.name", 
+        "shops.createdtime",
+        "shops.introduction", 
+        "shops.logoUrl", 
+        "users.id",
+        "users.username", 
+        "users.followersCount", 
+        "items.id",
+        "items.imageUrls"
+      ])
       .orderBy(orderBy)
       .skip(skipSize)
       .take(pageSize)
-      .where("shops.isSuspended = :isSuspended", { isSuspended: false })
       .getMany();
 
-    const inputIds = ids.map(shop => shop.id);
-    let shops: any[] = [];
-    if(inputIds.length !== 0) {
-      shops = await repo.createQueryBuilder("shops")
-        .leftJoin("shops.owner", "users")
-        .leftJoin("shops.items", "items")
-        .where("shops.id IN (:...ids)", { ids: inputIds })
-        .andWhere("items.status = :new", { new: ListingStatus.NEW }) //this will only return shosp that currentluy has new items.
-        .select([
-          "shops.id", 
-          "shops.rating", 
-          "shops.name", 
-          "shops.introduction", 
-          "shops.logoUrl", 
-          "users.id",
-          "users.username", 
-          "users.followersCount", 
-          "items.id",
-          "items.imageUrls"
-        ])
-        .getMany();
-    }
-  
     res.send({
       data: shops,
       links: getPaginationLinks(req, pageNumber, pageSize)
