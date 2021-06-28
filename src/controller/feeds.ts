@@ -3,9 +3,9 @@ import { getRepository, OrderByCondition } from "typeorm";
 import { HandleError } from "../decorator/errorDecorator";
 import { UserRelations } from "../entities/UserRelations";
 import { Items, ListingStatus } from "../entities/Items";
-import { logger } from "../logging/logger";
 import { getOrderByConditions } from "./helper/orderByHelper";
 import { getPaginationLinks, getPaginationParams } from "./helper/paginationHelper";
+import { logger } from "../logging/logger";
 const ITEMS_DEFAULT_SORT_BY:OrderByCondition = { "items.updatedtime":"DESC" };
 
 export class FeedsController {
@@ -20,7 +20,7 @@ export class FeedsController {
     
     if (userId) { // if loggin, return user following items.
       const userRelationRepo = await getRepository(UserRelations);
-      const followingShops = await userRelationRepo.createQueryBuilder("userRelations")
+      const followings = await userRelationRepo.createQueryBuilder("userRelations")
         .leftJoinAndSelect("userRelations.follower", "follower")
         .leftJoinAndSelect("userRelations.followee", "followee")
         .leftJoinAndSelect("followee.shops", "shops")
@@ -32,13 +32,14 @@ export class FeedsController {
           "shops"
         ])
         .getMany();
-      if (followingShops.length !== 0) {
-        const followingUserIds = followingShops.map(user => user.followee.shops[0].id); // currently one user can only has one shop, assume every seller has one shop as well. otherwise shops[0].id will throw NPE
+
+      if (followings.length !== 0) {
+        const followingShopIds = getFollowingShopIds(followings);
         feeds = await getRepository(Items)
           .createQueryBuilder("items")
           .leftJoinAndSelect("items.shop", "shop")
           .leftJoinAndSelect("shop.owner", "users")
-          .where("items.shopId IN (:...ids)", { ids: followingUserIds })
+          .where("items.shopId IN (:...ids)", { ids: followingShopIds })
           .andWhere("items.status = :new", { new: ListingStatus.NEW })
           .select(["items", "shop.name", "shop.id", "shop.introduction", "shop.logoUrl", "shop.customerServiceUrl", "shop.location", "users.id", "users.username"])
           .orderBy(orderBy)
@@ -47,10 +48,22 @@ export class FeedsController {
           .getMany();
       }
     }
-
     res.send({
       data: feeds,
       links: getPaginationLinks(req, pageNumber, pageSize)
     });
   }
 }
+
+const getFollowingShopIds = (followings: UserRelations[]): string[] => {
+  let shopIds: string[] = [];
+  followings.forEach(
+    following => {
+      if (following.followee && following.followee.shops) {
+        const shops = following.followee.shops;
+        const ids = shops.map(shop => shop.id);
+        shopIds = shopIds.concat(ids);
+      }
+    });
+  return shopIds;
+};
