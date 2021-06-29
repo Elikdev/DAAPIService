@@ -40,7 +40,7 @@ export class OrderController {
     logger.info(`Created ${numberOfSaves} orders in DB.`);
 
     const payment = new Payments();
-    payment.outTradeNo = WxpayUtility.encodeValue("md5", results[0].id);
+    payment.outTradeNo = WxpayUtility.encodeValue(results[0].id, "md5");
     payment.orders = results;
     payment.amount = totalPrice;
     const savedPayment = await payment.save();
