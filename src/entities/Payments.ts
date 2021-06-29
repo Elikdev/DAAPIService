@@ -13,6 +13,11 @@ export class Payments extends BaseEntity {
   @PrimaryGeneratedColumn("increment")
   id: string;
 
+  @Column({
+    default: 0
+  })
+  outTradeNo: string;
+
   @ManyToOne(() => Users, (users) => users.buyerOrders)
   buyer: Users;
 

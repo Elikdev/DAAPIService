@@ -11,9 +11,9 @@ export class PaymentController {
   static async confirmWxPay(req: Request, res: Response): Promise<void> {
     logger.debug(`Received payment notification: ${JSON.stringify(req.body)}`);
     try {
-      const paymentId  = req.body.xml.out_trade_no[0];
+      const outTradeNo  = req.body.xml.out_trade_no[0];
       const paymentAmount = parseInt(req.body.xml.total_fee[0]);
-      const payment = await Payments.findOne({id: paymentId}, {relations: ["orders"]});
+      const payment = await Payments.findOne({outTradeNo: outTradeNo}, {relations: ["orders"]});
       if (!payment) {
         throw new ResourceNotFoundError("Payment not found.");
       }

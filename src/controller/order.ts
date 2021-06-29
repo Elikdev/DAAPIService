@@ -14,6 +14,7 @@ import { Shops } from "../entities/Shops";
 import { UserRole, Users } from "../entities/Users";
 import { ResourceNotFoundError } from "../error/notfoundError";
 import { BadRequestError } from "../error/badRequestError";
+import { WxpayUtility } from "../payment/wxpayUtility";
 
 // By default latest orders first
 const DEFAULT_SORT_BY:OrderByCondition = { "orders.createdtime":"DESC" };
@@ -39,11 +40,12 @@ export class OrderController {
     logger.info(`Created ${numberOfSaves} orders in DB.`);
 
     const payment = new Payments();
+    payment.outTradeNo = WxpayUtility.encodeValue("md5", results[0].id);
     payment.orders = results;
     payment.amount = totalPrice;
     const savedPayment = await payment.save();
     const payService = new WxpayService();
-    const response = await payService.payOrder(userId, savedPayment.id, totalPrice);
+    const response = await payService.payOrder(userId, savedPayment.outTradeNo, totalPrice);
     const payResult = payService.generatePayResult(response);
 
     logger.debug(`Generated pay result: ${JSON.stringify(payResult)}`);
