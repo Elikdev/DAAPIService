@@ -27,11 +27,14 @@ export class ItemController {
     logger.debug("OrderBy: " + JSON.stringify(orderBy));
     const items = await itemRepo
       .createQueryBuilder("item")
-      .where("item.status = :new", { new: ListingStatus.NEW })
-      .orderBy(orderBy)
+      .innerJoin("item.shop", "shops")
+      // .leftJoin("item.shop", "Shops")
+      .where("shops.isSuspended = :isSuspended", { isSuspended: false })
+      .andWhere("item.status = :new", { new: ListingStatus.NEW })
+      // .orderBy(orderBy)
       .skip(skipSize)
       .take(pageSize)
-      .getMany();
+      .getOne();
 
     res.send({
       data: items,
