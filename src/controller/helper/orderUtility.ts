@@ -32,12 +32,19 @@ export class OrderUtility {
       return OrderCNStatus.COMPLETED;
     } else if (OrderUtility.isCancelledOrder(orderStatus)) {
       return OrderCNStatus.CANCELLED;
+    } else if (OrderUtility.isSettledOrder(orderStatus)) {
+      return OrderCNStatus.COMPLETED;
     }
   }
 
   static isUnpaidOrder(orderStatus: string): boolean {
     return orderStatus === OrderStatus.OPEN;
   }
+
+  static isSettledOrder(orderStatus: string): boolean {
+    return orderStatus === OrderStatus.SETTLED;
+  }
+
   static isPaidOrder(orderStatus: string): boolean {
     return orderStatus === OrderStatus.PAID;
   }
