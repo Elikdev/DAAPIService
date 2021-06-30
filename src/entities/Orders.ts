@@ -21,7 +21,8 @@ export enum OrderStatus {
   CONFIRMED = "confirmed",
   SHIPPED = "shipped",
   COMPLETED = "completed",
-  CANCELLED = "cancelled"
+  CANCELLED = "cancelled",
+  SETTLED = "settled"
 }
 
 export enum OrderCNStatus {
