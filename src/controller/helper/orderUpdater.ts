@@ -5,7 +5,7 @@ import { getRepository } from "typeorm";
 import { ListingStatus } from "../../entities/Items";
 
 const ORDER_AUTO_COMPLETE_DAYS = 5;
-const ORDER_AUTO_CANCEL_MINUTES = 30;
+const ORDER_AUTO_CANCEL_MINUTES = 1;
 const UPDATE_MAX = 50; // set limite to avoid hitting max connections
 
 export const autoCompleteOrders = async (): Promise<void> => {
@@ -33,6 +33,10 @@ export const autoCancelOrders = async (): Promise<void> => {
     .take(UPDATE_MAX)
     .getMany();
 
+  if (orders.length === 0) {
+    return; 
+  }
+  
   const results = orders.map(async order => {
     const orderCreateDate = new Date(order.createdtime);
     const orderCancelTime = moment(orderCreateDate).add(ORDER_AUTO_CANCEL_MINUTES, "m").toDate();
