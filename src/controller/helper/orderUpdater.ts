@@ -35,13 +35,11 @@ export const autoCancelOrders = async (): Promise<void> => {
 
   const results = orders.map(async order => {
     const orderCreateDate = new Date(order.createdtime);
-    const orderCancelTime = new Date(
-      moment(orderCreateDate).add(ORDER_AUTO_CANCEL_MINUTES, "m").toDate()
-    );
+    const orderCancelTime = moment(orderCreateDate).add(ORDER_AUTO_CANCEL_MINUTES, "m").toDate();
     if (orderCancelTime < new Date()) {
       order.status = OrderStatus.CANCELLED;
       // Relist corresponding items
-      order.orderItems.map(async item => {
+      const results = order.orderItems.map(async item => {
         // TODO: in order controller: 
         // handle concurrent order placements resulting 
         // in multiple valid/invalid orders containing the same item.
@@ -51,6 +49,7 @@ export const autoCancelOrders = async (): Promise<void> => {
           await item.save();
         }
       });
+      await Promise.all(results);
       logger.debug(`cancel order: ${order.id}`);
       return await order.save();
     }
