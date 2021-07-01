@@ -8,6 +8,7 @@ import rTracer from "cls-rtracer";
 import { v1router } from "./v1router";
 import * as dotenv from "dotenv";
 import { payrouter } from "./payrouter";
+import { createScheduledJobs } from "./scheduler/scheduler";
 
 const PORT = 4000;
 const DBConfig = getDBConfig();
@@ -15,7 +16,8 @@ const DBConfig = getDBConfig();
 createConnection(DBConfig).then(async connection => {
   setConfig();
   logger.debug(`DB connection established with options: ${JSON.stringify(connection.options)}`);
-
+  
+  createScheduledJobs();
   const app = express();
   app.use(rTracer.expressMiddleware());
   const router = Router();
@@ -26,7 +28,8 @@ createConnection(DBConfig).then(async connection => {
   app.get("/health", (req: Request, res: Response) => res.send("Serivce is healthy."));
   router.use("/v1", v1router);
   router.use("/pay", payrouter);
-}).catch(error => console.log(error));
+}).catch(error => logger.error(error));
+
 
 const setConfig = ():void => {
   const APP_ENV = process.env.APP_ENV;
