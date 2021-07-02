@@ -43,7 +43,7 @@ export const autoCancelOrders = async (): Promise<void> => {
     if (orderCancelTime < new Date()) {
       order.status = OrderStatus.CANCELLED;
       // Relist corresponding items
-      const results = order.orderItems.map(async item => {
+      const itemUpdateResults = order.orderItems.map(async item => {
         // TODO: in order controller: 
         // handle concurrent order placements resulting 
         // in multiple valid/invalid orders containing the same item.
@@ -53,7 +53,7 @@ export const autoCancelOrders = async (): Promise<void> => {
           await item.save();
         }
       });
-      await Promise.all(results);
+      await Promise.all(itemUpdateResults);
       logger.debug(`cancel order: ${order.id}`);
       return await order.save();
     }
