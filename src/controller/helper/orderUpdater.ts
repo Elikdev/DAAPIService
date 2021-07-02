@@ -11,18 +11,20 @@ const UPDATE_MAX = 50; // set limite to avoid hitting max connections
 export const autoCompleteOrders = async (): Promise<void> => {
   const orders = await Orders.find({status: OrderStatus.SHIPPED});
   
+  let count = 0;
   const results = orders.map(async order => {
     const orderUpdateDate = new Date(order.updatedtime);
-    const orderCompleteDate = new Date(orderUpdateDate.getDate() + ORDER_AUTO_COMPLETE_DAYS);
+    const orderCompleteDate = moment(orderUpdateDate).add(ORDER_AUTO_COMPLETE_DAYS, "d").toDate();
     if (orderCompleteDate < new Date()) {
       order.status = OrderStatus.COMPLETED;
       logger.debug(`Completing order: ${order.id}`);
+      count += 1;
       return await order.save();
     }
   });
 
   await Promise.all(results);
-  logger.info(`Finished completing ${results.length} orders`);
+  logger.info(`Finished completing ${count} orders`);
 };
 
 export const autoCancelOrders = async (): Promise<void> => {
@@ -37,6 +39,8 @@ export const autoCancelOrders = async (): Promise<void> => {
     return; 
   }
   
+  let cancelCount = 0;
+  let relistCount = 0;
   const results = orders.map(async order => {
     const orderCreateDate = new Date(order.createdtime);
     const orderCancelTime = moment(orderCreateDate).add(ORDER_AUTO_CANCEL_MINUTES, "m").toDate();
@@ -51,14 +55,16 @@ export const autoCancelOrders = async (): Promise<void> => {
           logger.debug(`relist item: ${item.id}`);
           item.status = ListingStatus.NEW;
           await item.save();
+          relistCount += 1;
         }
       });
       await Promise.all(itemUpdateResults);
       logger.debug(`cancel order: ${order.id}`);
+      cancelCount += 1;
       return await order.save();
     }
   });
 
   await Promise.all(results);
-  logger.info(`Finished cancelling ${results.length} orders`);
+  logger.info(`Finished cancelling ${cancelCount} orders and relisting ${relistCount} items`);
 };
