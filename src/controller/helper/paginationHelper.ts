@@ -2,7 +2,7 @@ import { Request } from "express";
 import { ParsedQs } from "qs";
 import qs from "qs";
 
-const DEFAULT_PG_SIZE = 50;
+const DEFAULT_PG_SIZE = 20;
 const STARTING_PG = 1;
 
 export const getPaginationParams = (pageObject: any): [number, number, number] => {
