@@ -24,7 +24,7 @@ export const getPaginationLinks = (req: Request, pageNumber: number, pageSize: n
   const first = getStringifyLink(req.query, STARTING_PG, pageSize);
   
   const resourcePath = req.originalUrl.split("?")[0] + "?";
-  const rootPath = "http://" + req.get("host");
+  const rootPath = "https://" + req.get("host");
   return {
     self: rootPath + req.originalUrl,
     first: rootPath + resourcePath + first,
