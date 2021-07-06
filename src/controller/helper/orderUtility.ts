@@ -33,7 +33,7 @@ export class OrderUtility {
     } else if (OrderUtility.isCancelledOrder(orderStatus)) {
       return OrderCNStatus.CANCELLED;
     } else if (OrderUtility.isSettledOrder(orderStatus)) {
-      return OrderCNStatus.COMPLETED;
+      return OrderCNStatus.SETTLED;
     }
   }
 

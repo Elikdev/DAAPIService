@@ -31,7 +31,8 @@ export enum OrderCNStatus {
   CONFIRMED = "待发货",
   SHIPPED = "待收货",
   COMPLETED = "已完成",
-  CANCELLED = "已取消"
+  CANCELLED = "已取消",
+  SETTLED = "已结算"
 }
 
 @Index("orders_pkey", ["id"], { unique: true })
@@ -63,7 +64,7 @@ export class Orders extends BaseEntity {
 
   @Column("character varying", {nullable: true })
   trackingNum: string | null;
-  
+
   @Column("character varying", {nullable: true })
   orderNotes: string | null;
 
