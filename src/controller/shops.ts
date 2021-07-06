@@ -124,7 +124,10 @@ export class ShopController {
 
   @HandleError("getShopItems")
   static async getShopItems(req: Request, res: Response): Promise<void> {
+    const sorts = req.query.sort;
+    const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
     const shopId = req.params.id;
+    
     const shopItems = await getRepository(Shops)
       .createQueryBuilder("shops")
       .leftJoinAndSelect("shops.items", "items")
@@ -134,6 +137,8 @@ export class ShopController {
       .select(["shops.id", "items"])
       .orderBy("CASE WHEN items.status='new' THEN 0 ELSE 1 END")
       .addOrderBy("items.createdtime", "DESC") 
+      .offset(skipSize)
+      .limit(pageSize)
       .getOne();
 
     if(shopItems === undefined) { 
@@ -146,7 +151,8 @@ export class ShopController {
       });
     } else {
       res.send({
-        data: shopItems
+        data: shopItems,
+        links: getPaginationLinks(req, pageNumber, pageSize)
       });
     }
   }
