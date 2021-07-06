@@ -63,6 +63,9 @@ export class Orders extends BaseEntity {
 
   @Column("character varying", {nullable: true })
   trackingNum: string | null;
+  
+  @Column("character varying", {nullable: true })
+  orderNotes: string | null;
 
   @Column({
     type: "enum",

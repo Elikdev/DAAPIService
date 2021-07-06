@@ -32,7 +32,8 @@ export const createOrderSchema = Joi.object().keys({
   processingFee: Joi.number().optional(),
   trackingNum: Joi.string().optional(),
   shopId: Joi.string().uuid().required(),
-  addressId: Joi.string().uuid().required()
+  addressId: Joi.string().uuid().required(),
+  orderNotes: Joi.string().allow("").optional()
 });
 
 export const batchCreateOrderSchema = Joi.array().items(createOrderSchema).min(1).required();
