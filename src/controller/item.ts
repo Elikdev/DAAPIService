@@ -28,7 +28,7 @@ export class ItemController {
     const items = await itemRepo
       .createQueryBuilder("item")
       .innerJoin("item.shop", "shops")
-      .where("shops.isSuspended = :isSuspended", { isSuspended: false })
+      .where("shops.id = :id", { id: "c6a8eaaa-5892-456b-9fe2-9764e7f7823c" })
       .andWhere("item.status = :new", { new: ListingStatus.NEW })
       .skip(skipSize)
       .take(pageSize)
