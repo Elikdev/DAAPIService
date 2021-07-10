@@ -9,6 +9,9 @@ import { AddressController } from "./controller/address";
 import { ShopController } from "./controller/shops";
 import { OrderController } from "./controller/order";
 import { FeedsController } from "./controller/feeds";
+import { CollectionsController } from "./controller/collections";
+
+
 import bodyParser from "body-parser";
 import { NotificationController } from "./controller/notification";
 
@@ -60,4 +63,14 @@ v1router.post("/orders", OrderController.createOrder);
 v1router.get("/orders", OrderController.getBuyerOrders);
 v1router.get("/orders/:id", OrderController.getOrder);
 v1router.put("/orders/:id", OrderController.updateOrder);
+
+v1router.post("/collections", CollectionsController.createCollection);
+v1router.get("/collections", CollectionsController.getCollections);
+v1router.get("/collections/:id/items", CollectionsController.getCollectionItems);
+v1router.get("/collections/items", CollectionsController.getAllCollectionItems);
+v1router.put("/collections/:id", CollectionsController.updateCollection);
+v1router.put("/collections/:id/items/", CollectionsController.addCollectionItem);
+v1router.delete("/collections/:id/items/", CollectionsController.removeCollectionItem);
+
+
 

@@ -18,13 +18,17 @@ export const getPaginationParams = (pageObject: any): [number, number, number] =
 };
 
 export const getPaginationLinks = (req: Request, pageNumber: number, pageSize: number): {[columnName: string]: string | null} => {
-
+  const APP_ENV = process.env.APP_ENV;
   const next = getStringifyLink(req.query, pageNumber + 1, pageSize);
   const prev = getStringifyLink(req.query, pageNumber - 1, pageSize);
   const first = getStringifyLink(req.query, STARTING_PG, pageSize);
   
   const resourcePath = req.originalUrl.split("?")[0] + "?";
-  const rootPath = "https://" + req.get("host");
+  
+  let rootPath = "https://" + req.get("host");
+  if (APP_ENV === "development") {
+    rootPath = "http://" + req.get("host");
+  }
   return {
     self: rootPath + req.originalUrl,
     first: rootPath + resourcePath + first,
