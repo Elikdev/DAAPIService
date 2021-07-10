@@ -95,6 +95,17 @@ export const createShopSchema = Joi.object().keys({
   location: Joi.string().optional()
 });
 
+export const createCollectionSchema = Joi.object().keys({
+  name: Joi.string().max(100).required(),
+  endTime: Joi.string().max(100).required(),
+});
+
+export const updateCollectionSchema = Joi.object().keys({
+  name: Joi.string().max(100).optional(),
+  endTime: Joi.string().max(100).optional(),
+  isSuspended: Joi.boolean().optional()
+});
+
 export const updateUserSchema = Joi.object().keys({
   username: Joi.string().max(100),
   introduction: Joi.string().max(500),

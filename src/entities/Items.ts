@@ -7,12 +7,14 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
-  UpdateDateColumn
+  UpdateDateColumn,
+  ManyToMany
 } from "typeorm";
 import { Orders } from "./Orders";
 import { Shops } from "./Shops";
 import { ItemSaves } from "./ItemSaves";
 import { ItemLikes } from "./ItemLikes";
+import { Collections } from "./Collections";
 
 export enum ListingStatus {
   NEW = "new",
@@ -130,6 +132,10 @@ export class Items extends BaseEntity {
 
   @OneToMany(() => ItemLikes, (itemLikes) => itemLikes.item, { cascade: true })
   itemLikes: ItemLikes[];
+
+
+  @ManyToMany(() => Collections, collections => collections.items)
+  collections: Collections[]
 
   @Column({default: 0})
   itemSavesCount: number;
