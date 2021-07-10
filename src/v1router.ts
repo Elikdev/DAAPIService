@@ -30,6 +30,9 @@ v1router.get("/items/:id", ItemController.getItem);
 v1router.get("/shops", ShopController.discoverShops);
 v1router.get("/shops/:id/items", ShopController.getShopItems);
 v1router.get("/shops/:id", ShopController.getShop);
+v1router.get("/collections", CollectionsController.getCollections);
+v1router.get("/collections/:id/items", CollectionsController.getCollectionItems);
+v1router.get("/collections/items", CollectionsController.getAllCollectionItems);
 
 // Do auth filtering for the following apis
 v1router.use(authMiddleWare);
@@ -65,9 +68,6 @@ v1router.get("/orders/:id", OrderController.getOrder);
 v1router.put("/orders/:id", OrderController.updateOrder);
 
 v1router.post("/collections", CollectionsController.createCollection);
-v1router.get("/collections", CollectionsController.getCollections);
-v1router.get("/collections/:id/items", CollectionsController.getCollectionItems);
-v1router.get("/collections/items", CollectionsController.getAllCollectionItems);
 v1router.put("/collections/:id", CollectionsController.updateCollection);
 v1router.put("/collections/:id/items/", CollectionsController.addCollectionItem);
 v1router.delete("/collections/:id/items/", CollectionsController.removeCollectionItem);
