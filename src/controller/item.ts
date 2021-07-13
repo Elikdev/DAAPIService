@@ -18,20 +18,26 @@ export class ItemController {
 
   @HandleError("getItems")
   static async getItems(req: Request, res: Response): Promise<void> {
-    const sorts = req.query.sort;
+    const sorts = req.query.sort; 
+    const category = req.query.category;
     // TODO: remove front end hardcoded sorting param -id
     const orderBy = getOrderByConditions(null, DEFAULT_SORT_BY);
     const itemRepo = getRepository(Items);
     const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
 
     logger.debug("OrderBy: " + JSON.stringify(orderBy));
-    const items = await itemRepo
+    const itemsQuery = itemRepo
       .createQueryBuilder("item")
       .where("item.status = :new", { new: ListingStatus.NEW })
       .orderBy(orderBy)
       .skip(skipSize)
       .take(pageSize)
-      .getMany();
+
+    if(category !== undefined && category !== "") {  //TODO schema validation for category
+      itemsQuery.andWhere("item.category = :category", {category: category})
+    }
+
+    const items = await itemsQuery.getMany();
 
     res.send({
       data: items,
