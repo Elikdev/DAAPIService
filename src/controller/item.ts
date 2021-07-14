@@ -81,12 +81,50 @@ export class ItemController {
         "users.openId", "users.mobilePrefix", "users.mobile", "defaultAddress.city", "defaultAddress.district"
       ])
       .getOne();
+
     if (!item) {
       throw new ResourceNotFoundError("Item not found.");
     }
 
     res.send({
       data: item
+    });
+  }
+
+  @HandleError("getSuggestItems")
+  static async getSuggestItems(req: Request, res: Response): Promise<void> {
+    const itemId = req.params.id;
+    const itemRepo = getRepository(Items);
+
+    const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
+
+    const targetItem = await itemRepo.createQueryBuilder("item")
+      .where("item.id = :id", { id: itemId })
+      .leftJoinAndSelect("item.shop", "shops")
+      .getOne();
+      
+    if (!targetItem) {
+      throw new ResourceNotFoundError("Item not found.");
+    }
+    const query = itemRepo
+      .createQueryBuilder("item")
+      .where("item.id != :id", {id: itemId})
+      .skip(skipSize)
+      .take(pageSize);
+
+    const category = targetItem.category;
+    const subcategory = targetItem.subcategory;
+
+    if(category && subcategory) {  //TODO schema validation for category
+      query.where("item.category = :category", { category: category })
+        .orWhere("item.subcategory = :subcategory", { subcategory: subcategory });
+    }
+
+    const results = await query.getMany();
+    
+    res.send({
+      data: results,
+      links: getPaginationLinks(req, pageNumber, pageSize)
     });
   }
 

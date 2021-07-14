@@ -43,6 +43,7 @@ v1router.post("/items/:id/save", ItemSaveController.saveItem);
 v1router.post("/items/:id/unlike", ItemLikeController.unlikeItem);
 v1router.post("/items/:id/unsave", ItemSaveController.unsaveItem);
 v1router.put("/items/:id", ItemController.updateItem);
+v1router.get("/items/:id/suggest", ItemController.getSuggestItems);
 
 v1router.post("/users/:id/follow", UserRelationController.follow);
 v1router.post("/users/:id/unfollow", UserRelationController.unfollow);
