@@ -109,7 +109,7 @@ export class ItemController {
     const query = itemRepo
       .createQueryBuilder("item")
       .where("item.id != :id", {id: itemId})
-      .where("item.status = :new", { new: ListingStatus.NEW })
+      .andWhere("item.status = :new", { new: ListingStatus.NEW })
       .skip(skipSize)
       .take(pageSize);
 
@@ -117,7 +117,7 @@ export class ItemController {
     const subcategory = targetItem.subcategory;
 
     if(category && subcategory) {  //TODO schema validation for category
-      query.where("item.category = :category", { category: category })
+      query.andWhere("item.category = :category", { category: category })
         .andWhere("item.subcategory = :subcategory", { subcategory: subcategory });
     }
 
