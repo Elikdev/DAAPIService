@@ -70,7 +70,7 @@ export class CollectionsController {
       .orderBy("items.score", "DESC")
       .offset(skipSize)
       .limit(pageSize)
-      .getMany()
+      .getMany();
     
     res.send({
       data: items,
@@ -80,51 +80,51 @@ export class CollectionsController {
 
 
    @HandleError("getAllCollectionItems")
-    static async getAllCollectionItems(req: Request, res: Response): Promise<void> {
-      const collectionRepo = getRepository(Collections);
-      const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
+  static async getAllCollectionItems(req: Request, res: Response): Promise<void> {
+    const collectionRepo = getRepository(Collections);
+    const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
 
-      const items = await collectionRepo.createQueryBuilder("collection").getMany();
+    const items = await collectionRepo.createQueryBuilder("collection").getMany();
 
 
-      res.send({
-        data: items,
-        links: getPaginationLinks(req, pageNumber, pageSize)
-      });
+    res.send({
+      data: items,
+      links: getPaginationLinks(req, pageNumber, pageSize)
+    });
   }
 
 
   @HandleError("removeCollectionItem")
-  static async removeCollectionItem(req: Request, res: Response): Promise<void> {
-    const collectionId = req.params.id;
-    const collectionRepo = getRepository(Collections);
-    const collectionData = req.body.data;
-    const itemId = collectionData.id;
+   static async removeCollectionItem(req: Request, res: Response): Promise<void> {
+     const collectionId = req.params.id;
+     const collectionRepo = getRepository(Collections);
+     const collectionData = req.body.data;
+     const itemId = collectionData.id;
     
-    const collection = await Collections.findOne({id: collectionId}, { relations: ["items"] });
-    const toRemoveItem = await Items.findOne({id: itemId});
+     const collection = await Collections.findOne({id: collectionId}, { relations: ["items"] });
+     const toRemoveItem = await Items.findOne({id: itemId});
     
    
-    if (!toRemoveItem) {
-      throw new ResourceNotFoundError("item not found.");
-    }
+     if (!toRemoveItem) {
+       throw new ResourceNotFoundError("item not found.");
+     }
 
-    if (!collection) {
-      throw new ResourceNotFoundError("collection not found.");
-    } else {
+     if (!collection) {
+       throw new ResourceNotFoundError("collection not found.");
+     } else {
 
-    const   newItems = collection.items.filter(item => { // this might be slow if collection is large. 
-      return item.id !== toRemoveItem.id
-    })
+       const   newItems = collection.items.filter(item => { // this might be slow if collection is large. 
+         return item.id !== toRemoveItem.id;
+       });
     
-    collection.items = newItems
-    const savedItem = await collectionRepo.save(collection)
+       collection.items = newItems;
+       const savedItem = await collectionRepo.save(collection);
 
-      res.send({
-        data: savedItem
-      });
-    }
-  }
+       res.send({
+         data: savedItem
+       });
+     }
+   }
 
   @HandleError("addCollectionItem")
   static async addCollectionItem(req: Request, res: Response): Promise<void> {
@@ -144,7 +144,7 @@ export class CollectionsController {
     if (!collection) {
       throw new ResourceNotFoundError("collection not found.");
     } else {
-      collection.items = collection.items.concat(item)
+      collection.items = collection.items.concat(item);
       const savedItem = await collectionRepo.save(collection);
       res.send({
         data: savedItem

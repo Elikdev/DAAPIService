@@ -31,10 +31,10 @@ export class ItemController {
       .where("item.status = :new", { new: ListingStatus.NEW })
       .orderBy(orderBy)
       .skip(skipSize)
-      .take(pageSize)
+      .take(pageSize);
 
     if(category !== undefined && category !== "") {  //TODO schema validation for category
-      itemsQuery.andWhere("item.category = :category", {category: category})
+      itemsQuery.andWhere("item.category = :category", {category: category});
     }
 
     const items = await itemsQuery.getMany();
