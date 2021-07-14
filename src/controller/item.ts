@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { getRepository, OrderByCondition } from "typeorm";
+import { getRepository, Not, OrderByCondition } from "typeorm";
 import { HandleError } from "../decorator/errorDecorator";
 import { Items, ListingStatus } from "../entities/Items";
 import { Shops } from "../entities/Shops";
@@ -109,6 +109,7 @@ export class ItemController {
     const query = itemRepo
       .createQueryBuilder("item")
       .where("item.id != :id", {id: itemId})
+      .where("item.status = :new", { new: ListingStatus.NEW })
       .skip(skipSize)
       .take(pageSize);
 
@@ -117,7 +118,7 @@ export class ItemController {
 
     if(category && subcategory) {  //TODO schema validation for category
       query.where("item.category = :category", { category: category })
-        .orWhere("item.subcategory = :subcategory", { subcategory: subcategory });
+        .andWhere("item.subcategory = :subcategory", { subcategory: subcategory });
     }
 
     const results = await query.getMany();
