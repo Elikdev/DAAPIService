@@ -7,10 +7,7 @@ import { logger } from "../logging/logger";
 export class MessageController {
   @HandleError("sendSubscriptionMessage")
   static async sendSubscriptionMessage(req: Request, res: Response): Promise<void> {
-    const messageData = req.body.data;
-
-    logger.debug(req.body);
-    logger.debug(req.body.openid);
+    const messageData = req.body;
 
     const data = {
       touser: messageData.openid,
