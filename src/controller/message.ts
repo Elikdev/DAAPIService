@@ -8,11 +8,13 @@ export class MessageController {
   @HandleError("sendSubscriptionMessage")
   static async sendSubscriptionMessage(req: Request, res: Response): Promise<void> {
     const messageData = req.body.data;
-    logger.debug(req.body);
+    logger.debug(JSON.stringify(req));
+    logger.debug(JSON.stringify(req.body));
+    logger.debug(JSON.stringify(req.body.data));
 
     const data = {
       touser: messageData.openid,
-      template_id: 'CM9TwYeMFeWS_vwvEoGI3adgVG3rayAy3G_BYDXeWK8',
+      template_id: "CM9TwYeMFeWS_vwvEoGI3adgVG3rayAy3G_BYDXeWK8",
       data: {
         thing1:{
           value: messageData.scene
@@ -24,7 +26,7 @@ export class MessageController {
           value: messageData.content
         }
       }
-    }
+    };
 
     const params =  {
       appid: process.env.WX_APP_ID,
