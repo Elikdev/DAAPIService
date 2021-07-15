@@ -8,6 +8,7 @@ import rTracer from "cls-rtracer";
 import { v1router } from "./v1router";
 import * as dotenv from "dotenv";
 import { payrouter } from "./payrouter";
+import { messageRouter } from "./messageRouter";
 import { createScheduledJobs } from "./scheduler/scheduler";
 
 const PORT = 4000;
@@ -28,6 +29,7 @@ createConnection(DBConfig).then(async connection => {
   app.get("/health", (req: Request, res: Response) => res.send("Serivce is healthy."));
   router.use("/v1", v1router);
   router.use("/pay", payrouter);
+  router.use("/message", messageRouter);
 }).catch(error => logger.error(error));
 
 
