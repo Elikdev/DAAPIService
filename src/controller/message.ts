@@ -9,6 +9,9 @@ export class MessageController {
   static async sendSubscriptionMessage(req: Request, res: Response): Promise<void> {
     const messageData = req.body.data;
 
+    logger.debug(req.body);
+    logger.debug(req.body.openid);
+
     const data = {
       touser: messageData.openid,
       template_id: "CM9TwYeMFeWS_vwvEoGI3adgVG3rayAy3G_BYDXeWK8",
