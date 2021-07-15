@@ -8,9 +8,6 @@ export class MessageController {
   @HandleError("sendSubscriptionMessage")
   static async sendSubscriptionMessage(req: Request, res: Response): Promise<void> {
     const messageData = req.body.data;
-    logger.debug(JSON.stringify(req));
-    logger.debug(JSON.stringify(req.body));
-    logger.debug(JSON.stringify(req.body.data));
 
     const data = {
       touser: messageData.openid,
