@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { MessageController } from "./controller/message";
-const xmlparser = require("express-xml-bodyparser");
+import bodyParser from "body-parser";
 
 export const messageRouter = Router();
 
-messageRouter.use(xmlparser());
+messageRouter.use(bodyParser.json());
 messageRouter.post("/send", MessageController.sendSubscriptionMessage);
