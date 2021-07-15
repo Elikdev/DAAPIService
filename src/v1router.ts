@@ -10,6 +10,7 @@ import { ShopController } from "./controller/shops";
 import { OrderController } from "./controller/order";
 import { FeedsController } from "./controller/feeds";
 import { CollectionsController } from "./controller/collections";
+import { MessageController } from "./controller/message";
 
 
 import bodyParser from "body-parser";
@@ -35,6 +36,7 @@ v1router.get("/collections", CollectionsController.getCollections);
 v1router.get("/collections/:id/items", CollectionsController.getCollectionItems);
 v1router.get("/collections/items", CollectionsController.getAllCollectionItems);
 
+v1router.post("/messages", MessageController.sendSubscriptionMessage);
 // Do auth filtering for the following apis
 v1router.use(authMiddleWare);
 
