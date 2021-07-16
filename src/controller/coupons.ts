@@ -23,14 +23,14 @@ export class CouponsController {
     const userId = req.body.userId;
     const couponRepo = getRepository(Coupons);
     let isValid = false;
-    let metaData = {}
+    let metaData = {};
 
     if(couponCode === "first10") {
-      isValid = await isNewAccount(userId)
+      isValid = await isNewAccount(userId);
       metaData = {  //TODO get this from db. 
         type: "percentOff",
         amount: 10
-      }
+      };
     }
 
     res.send({
@@ -42,15 +42,14 @@ export class CouponsController {
 
 
 const isNewAccount = async (ownerId: any) : Promise<any> => {
-  const orderRepo = getRepository(Orders)
+  const orderRepo = getRepository(Orders);
 
-  let order = await orderRepo.createQueryBuilder("orders")
-              .leftJoinAndSelect("orders.buyer", "buyer")
-              .where("orders.status IN (:...status)", {status: [OrderStatus.CONFIRMED, OrderStatus.SHIPPED, OrderStatus.COMPLETED, OrderStatus.SETTLED]} )
-              .andWhere("buyer.id = :id", {id: ownerId})
-              .getMany()
+  const order = await orderRepo.createQueryBuilder("orders")
+    .leftJoinAndSelect("orders.buyer", "buyer")
+    .where("orders.status IN (:...status)", {status: [OrderStatus.CONFIRMED, OrderStatus.SHIPPED, OrderStatus.COMPLETED, OrderStatus.SETTLED]} )
+    .andWhere("buyer.id = :id", {id: ownerId})
+    .getMany();
   
-  console.log(order)
   if(!order || order.length === 0) {
     return true;
   }
