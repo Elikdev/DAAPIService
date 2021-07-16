@@ -14,6 +14,7 @@ import { Orders } from "./Orders";
 import { Shops } from "./Shops";
 import { Addresses } from "./Addresses";
 import { ItemSaves } from "./ItemSaves";
+import { Coupons } from "./Coupons";
 import { ItemLikes } from "./ItemLikes";
 import { UserRelations } from "./UserRelations";
 
@@ -59,6 +60,9 @@ export class Users extends BaseEntity {
   @OneToMany(() => Shops, (shops) => shops.owner, { cascade: true })
   @JoinColumn()
   shops: Shops[];
+
+  @OneToMany(() => Coupons, coupons => coupons.owner, { cascade: true })
+  coupons: Coupons[];
 
   @OneToMany(() => Addresses, addresses => addresses.user, { cascade: true })
   addresses: Addresses[];
