@@ -28,9 +28,8 @@ export class ItemController {
     logger.debug("OrderBy: " + JSON.stringify(orderBy));
     const itemsQuery = itemRepo
       .createQueryBuilder("item")
-      .innerJoin("item.shop", "shops")
-      .where("shops.isSuspended = :isSuspended", { isSuspended: false })
-      .andWhere("item.status = :new", { new: ListingStatus.NEW })
+      .where("item.status = :new", { new: ListingStatus.NEW })
+      .orderBy(orderBy)
       .skip(skipSize)
       .take(pageSize);
 
