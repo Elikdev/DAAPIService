@@ -72,14 +72,14 @@ export class ShopController {
 
     // Sort shops by recently (in 24 hours) created items
     const oneDayAgo = new Date(new Date().getTime() - (24 * 60 * 60 * 1000));
-    const shopsWithRecentlyCreatedItems: Shops[] = await shopsQuery
+    const recentlyActiveShops: Shops[] = await shopsQuery
       .andWhere("items.createdtime > :time", { time: oneDayAgo })
       .getMany();
 
     var resultShops;
-    if (shopsWithRecentlyCreatedItems && shopsWithRecentlyCreatedItems.length > 0) {
-      const shopIds = new Set(shopsWithRecentlyCreatedItems.map(shop => shop.id));
-      const sortedShops = [...shopsWithRecentlyCreatedItems, ...shops.filter(shop => !shopIds.has(shop.id))];
+    if (recentlyActiveShops && recentlyActiveShops.length > 0) {
+      const shopIds = new Set(recentlyActiveShops.map(shop => shop.id));
+      const sortedShops = [...recentlyActiveShops, ...shops.filter(shop => !shopIds.has(shop.id))];
       resultShops = sortedShops;
     } else {
       resultShops = shops;
@@ -87,6 +87,7 @@ export class ShopController {
 
     res.send({
       data: resultShops,
+      recentlyActiveShopsCount: recentlyActiveShops.length,
       links: getPaginationLinks(req, pageNumber, pageSize)
     });
   }
