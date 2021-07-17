@@ -12,7 +12,7 @@ import { getOrderByConditions } from "./helper/orderByHelper";
 import { getPaginationLinks, getPaginationParams } from "./helper/paginationHelper";
 
 const MAX_OWNED_SHOPS = 1;
-const DEFAULT_SORT_BY:OrderByCondition = { "shops.createdtime":"DESC" };
+const DEFAULT_SORT_BY:OrderByCondition = { "users.followersCount":"DESC" };
 
 export class ShopController {
   @HandleError("createShop")
@@ -44,8 +44,9 @@ export class ShopController {
     const orderBy = getOrderByConditions(sorts, DEFAULT_SORT_BY);
     const repo = getRepository(Shops);
     const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
-    
-    const shops: Shops[] = await repo.createQueryBuilder("shops")
+     
+    // Sort shops by followersCount
+    const shopsQuery = repo.createQueryBuilder("shops")
       .innerJoin("shops.owner", "users")
       .innerJoin("shops.items", "items")
       .where("shops.isSuspended = :isSuspended", { isSuspended: false })
@@ -65,11 +66,27 @@ export class ShopController {
       ])
       .orderBy(orderBy)
       .skip(skipSize)
-      .take(pageSize)
+      .take(pageSize);
+
+    const shops: Shops[] = await shopsQuery.getMany();
+
+    // Sort shops by recently (in 24 hours) created items
+    const oneDayAgo = new Date(new Date().getTime() - (24 * 60 * 60 * 1000));
+    const shopsWithRecentlyCreatedItems: Shops[] = await shopsQuery
+      .andWhere("items.createdtime > :time", { time: oneDayAgo })
       .getMany();
 
+    var resultShops;
+    if (shopsWithRecentlyCreatedItems && shopsWithRecentlyCreatedItems.length > 0) {
+      const shopIds = new Set(shopsWithRecentlyCreatedItems.map(shop => shop.id));
+      const sortedShops = [...shopsWithRecentlyCreatedItems, ...shops.filter(shop => !shopIds.has(shop.id))];
+      resultShops = sortedShops;
+    } else {
+      resultShops = shops;
+    }
+
     res.send({
-      data: shops,
+      data: resultShops,
       links: getPaginationLinks(req, pageNumber, pageSize)
     });
   }
