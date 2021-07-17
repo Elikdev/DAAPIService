@@ -15,6 +15,7 @@ import { UserRole, Users } from "../entities/Users";
 import { ResourceNotFoundError } from "../error/notfoundError";
 import { BadRequestError } from "../error/badRequestError";
 import { WxpayUtility } from "../payment/wxpayUtility";
+import { getPaginationLinks, getPaginationParams } from "./helper/paginationHelper";
 
 // By default latest orders first
 const DEFAULT_SORT_BY:OrderByCondition = { "orders.createdtime":"DESC" };
@@ -110,19 +111,24 @@ export class OrderController {
     const userId = req.body.userId; //TODO  check if its admin
     const sorts = req.query.sort;
     const orderBy = getOrderByConditions(sorts, DEFAULT_SORT_BY, "orders.");
+    const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
+
     const allOrders = await getRepository(Orders)
       .createQueryBuilder("orders")
       .orderBy(orderBy)
       .leftJoinAndSelect("orders.buyerAddress", "buyerAddress")
       .leftJoinAndSelect("orders.shop", "shop")
       .leftJoinAndSelect("orders.orderItems", "item")
+      .skip(skipSize)
+      .take(pageSize)
       .getMany();
 
     allOrders.forEach(order => OrderUtility.transformOrderResponse(order));  
 
     res.send({
       data: allOrders,
-      totalCount: allOrders.length
+      totalCount: allOrders.length,
+      links: getPaginationLinks(req, pageNumber, pageSize)
     });
   }
 
