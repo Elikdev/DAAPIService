@@ -30,6 +30,12 @@ export enum ItemCondition {
   FAIR = 1,
 }
 
+export enum AuditStatus {
+  PENDING = "pending",
+  PASS = "pass",
+  FAIL = "fail",
+}
+
 export enum ShippingType {
   SHIPPED = "shipped",
   PAY_ON_DELIVERY = "payOnDelivery"
@@ -73,6 +79,13 @@ export class Items extends BaseEntity {
     nullable: true
   })
   year: string;
+
+  @Column({
+    type: "enum",
+    enum: AuditStatus,
+    default: AuditStatus.PENDING
+  })
+  auditStatus: string;
 
   @Column("character varying", {nullable: true })
   description: string | null;

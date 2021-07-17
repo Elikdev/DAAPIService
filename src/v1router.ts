@@ -66,6 +66,7 @@ v1router.get("/shops/:id/orders", OrderController.getShopOrders);
 
 v1router.post("/orders", OrderController.createOrder);
 v1router.get("/orders", OrderController.getBuyerOrders);
+v1router.get("/orders/all", OrderController.getAllOrders); // for admin
 v1router.get("/orders/:id", OrderController.getOrder);
 v1router.put("/orders/:id", OrderController.updateOrder);
 

@@ -103,6 +103,29 @@ export class OrderController {
     });
   }
 
+
+
+  @HandleError("getAllOrders")
+  static async getAllOrders(req: Request, res: Response): Promise<void> {
+    const userId = req.body.userId; //TODO  check if its admin
+    const sorts = req.query.sort;
+    const orderBy = getOrderByConditions(sorts, DEFAULT_SORT_BY, "orders.");
+    const allOrders = await getRepository(Orders)
+      .createQueryBuilder("orders")
+      .orderBy(orderBy)
+      .leftJoinAndSelect("orders.buyerAddress", "buyerAddress")
+      .leftJoinAndSelect("orders.shop", "shop")
+      .leftJoinAndSelect("orders.orderItems", "item")
+      .getMany();
+
+    allOrders.forEach(order => OrderUtility.transformOrderResponse(order));  
+
+    res.send({
+      data: allOrders,
+      totalCount: allOrders.length
+    });
+  }
+
   @HandleError("getShopOrders")
   static async getShopOrders(req: Request, res: Response): Promise<void> {
     const userId = req.body.userId;

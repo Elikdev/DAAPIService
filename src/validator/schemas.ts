@@ -1,5 +1,5 @@
 import Joi from "joi";
-import { ItemCondition, ShippingType } from "../entities/Items";
+import { ItemCondition, ShippingType, AuditStatus } from "../entities/Items";
 import { OrderStatus } from "../entities/Orders";
 
 export const signUpSchema = Joi.object().keys({
@@ -63,6 +63,7 @@ export const updateItemSchema = Joi.object().keys({
   origin: Joi.string().allow("").allow(null).optional(),
   category: Joi.string().optional(),
   subcategory: Joi.string().optional(),
+  auditStatus: Joi.number().optional().valid(...Object.values(AuditStatus)),
   score: Joi.number(),
   shippingType: Joi.string().optional().valid(...Object.values(ShippingType))
 });
