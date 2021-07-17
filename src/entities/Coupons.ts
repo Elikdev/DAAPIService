@@ -7,9 +7,11 @@ import {
   JoinTable,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  OneToMany,
   ManyToOne
 } from "typeorm";
 import { Users } from "./Users";
+import { Orders } from "./Orders";
 
 
 @Entity("coupons")
@@ -41,5 +43,8 @@ export class Coupons extends BaseEntity {
 
   @UpdateDateColumn({type: "timestamp"})
   updatedtime: string;
+ 
+  @OneToMany(() => Orders, (orders) => orders.coupon, { cascade: true })
+  orders: Orders[];
 
 }

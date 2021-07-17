@@ -14,6 +14,9 @@ import { Users } from "./Users";
 import { Addresses } from "./Addresses";
 import { Shops } from "./Shops";
 import { Payments } from "./Payments";
+import { Coupons } from "./Coupons";
+
+
 
 export enum OrderStatus {
   OPEN = "open",
@@ -83,4 +86,8 @@ export class Orders extends BaseEntity {
 
   @OneToMany(() => Items, (items) => items.order, { cascade: true })
   orderItems: Items[];
+
+  @ManyToOne(() => Coupons, coupons => coupons.orders)
+  coupon: Coupons;
+
 }

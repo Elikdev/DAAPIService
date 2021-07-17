@@ -29,7 +29,7 @@ export class CouponsController {
       isValid = await isNewAccount(userId);
       metaData = {  //TODO get this from db. 
         type: "percentOff",
-        amount: 10
+        value: 10
       };
     }
 
