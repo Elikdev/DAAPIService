@@ -76,10 +76,10 @@ export class ShopController {
       .andWhere("items.createdtime > :time", { time: oneDayAgo })
       .getMany();
 
-    var resultShops;
+    let resultShops;
     if (recentlyActiveShops && recentlyActiveShops.length > 0) {
       const shopIds = new Set(recentlyActiveShops.map(shop => shop.id));
-      const sortedShops = [...recentlyActiveShops, ...shops.filter(shop => !shopIds.has(shop.id))];
+      const sortedShops = [...shops.filter(shop => shopIds.has(shop.id)), ...shops.filter(shop => !shopIds.has(shop.id))];
       resultShops = sortedShops;
     } else {
       resultShops = shops;
