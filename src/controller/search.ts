@@ -48,22 +48,4 @@ export class SearchController {
     });
   }
 
-
-
-  @HandleError("save")
-  static async save(req: Request, res: Response): Promise<void> {
-    let object: any = req.query.object;
-    object.obejctID= object.id
-    
-    const result = await index.saveObjects(object)
-      .then(() => {
-        console.log();
-      });
-     
-
-    res.send({
-      result: result
-    });
-  }
-
 }
