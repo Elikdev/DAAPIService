@@ -12,6 +12,8 @@ import { FeedsController } from "./controller/feeds";
 import { CollectionsController } from "./controller/collections";
 import { CouponsController } from "./controller/coupons";
 
+import { SearchController } from "./controller/search";
+
 import bodyParser from "body-parser";
 import { NotificationController } from "./controller/notification";
 
@@ -34,6 +36,7 @@ v1router.get("/shops/:id", ShopController.getShop);
 v1router.get("/collections", CollectionsController.getCollections);
 v1router.get("/collections/:id/items", CollectionsController.getCollectionItems);
 v1router.get("/collections/items", CollectionsController.getAllCollectionItems);
+v1router.get("/search", SearchController.search);
 
 
 // Do auth filtering for the following apis
