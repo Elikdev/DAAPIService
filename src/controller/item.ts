@@ -138,7 +138,7 @@ export class ItemController {
 
     const itemId = req.params.id;
     const itemRepo = getRepository(Items);
-
+    itemData.id = itemId
     const item = await itemRepo.findOne({id: itemId}, {relations: ["shop"]});
 
     logger.debug(`updating ${JSON.stringify(item)}`);
