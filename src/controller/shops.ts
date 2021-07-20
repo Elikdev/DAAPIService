@@ -77,9 +77,14 @@ export class ShopController {
       .getMany();
 
     let resultShops;
+    let recentlyActiveShopsCount = 0;
+
     if (recentlyActiveShops && recentlyActiveShops.length > 0) {
       const shopIds = new Set(recentlyActiveShops.map(shop => shop.id));
-      const sortedShops = [...shops.filter(shop => shopIds.has(shop.id)), ...shops.filter(shop => !shopIds.has(shop.id))];
+      // promotedShops = Top 20 followers count & created items in last 24 hours
+      const promotedShops = shops.filter(shop => shopIds.has(shop.id));
+      recentlyActiveShopsCount = promotedShops.length;
+      const sortedShops = [...promotedShops, ...shops.filter(shop => !shopIds.has(shop.id))];
       resultShops = sortedShops;
     } else {
       resultShops = shops;
@@ -87,7 +92,7 @@ export class ShopController {
 
     res.send({
       data: resultShops,
-      recentlyActiveShopsCount: recentlyActiveShops.length,
+      recentlyActiveShopsCount: recentlyActiveShopsCount,
       links: getPaginationLinks(req, pageNumber, pageSize)
     });
   }
