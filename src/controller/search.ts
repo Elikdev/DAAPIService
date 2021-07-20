@@ -35,11 +35,15 @@ export class SearchController {
       published: string;
     };
 
+
+    const filters = ['status:new'];
+
     const content: AlgoliaHits = await index.search(query, {
       hitsPerPage: pageSize,
       page: pageNumber,
       offset: skipSize,
-      length: pageSize
+      length: pageSize,
+      facetFilters: filters
     });
 
     res.send({
