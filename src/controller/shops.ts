@@ -66,7 +66,8 @@ export class ShopController {
       ])
       .orderBy(orderBy)
       .skip(skipSize)
-      .take(pageSize);
+      .take(30);  // temp fix to show all shops, should revert after pagination is added.
+      //.take(pageSize);
 
     const shops: Shops[] = await shopsQuery.getMany();
 
