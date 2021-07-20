@@ -25,12 +25,23 @@ export class CouponsController {
     let isValid = false;
     let metaData = {};
 
-    if(couponCode === "first10") {
-      isValid = await isNewAccount(userId);
-      metaData = {  //TODO get this from db. 
-        type: "percentOff",
-        value: 10
-      };
+    const couponEntity = await couponRepo.createQueryBuilder("coupons")
+      .where("coupons.code = :code", {code: couponCode })
+      .andWhere("coupons.isValid = :isValid", {isValid: true })
+      .andWhere("coupons.expireTime > :time", { time: new Date() })
+      .getOne();
+
+    if (couponEntity) {
+      if(couponEntity.code === "first10") {
+        const newAccount = await isNewAccount(userId);
+        if (newAccount) {
+          isValid = couponEntity.isValid;
+          metaData = {
+            type: couponEntity.couponType,
+            value: couponEntity.value
+          };
+        }
+      }
     }
 
     res.send({

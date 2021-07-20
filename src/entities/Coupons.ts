@@ -13,6 +13,10 @@ import {
 import { Users } from "./Users";
 import { Orders } from "./Orders";
 
+export enum CouponType {
+  PERCENTOFF = "percentOff",
+  AMOUNTOFF = "amountOff"
+}
 
 @Entity("coupons")
 export class Coupons extends BaseEntity {
@@ -28,12 +32,21 @@ export class Coupons extends BaseEntity {
   @Column("bool", {default: false })
   applied: boolean;
 
-  @Column("character varying", { array: true, nullable: true})
-  metadata: string[] | null;
+  @Column({
+    type: "enum",
+    enum: CouponType,
+    default: CouponType.AMOUNTOFF
+  })
+  couponType: string;
+
+  @Column({
+    nullable: true,
+    default: 0,
+  })
+  value: number;
 
   @ManyToOne(() => Users, (users) => users.coupons)
   owner: Users;
-
 
   @Column({type: "timestamp"})
   expireTime: string;
