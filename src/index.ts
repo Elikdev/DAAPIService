@@ -10,6 +10,7 @@ import * as dotenv from "dotenv";
 import { payrouter } from "./payrouter";
 import { messageRouter } from "./messageRouter";
 import { createScheduledJobs } from "./scheduler/scheduler";
+import cors from 'cors';
 
 const PORT = 4000;
 const DBConfig = getDBConfig();
@@ -22,10 +23,27 @@ createConnection(DBConfig).then(async connection => {
   const app = express();
   app.use(rTracer.expressMiddleware());
   const router = Router();
+  const allowedOrigins = ['https://www.admin.pbrick.cn', 'http://www.admin.pbrick.cn'];
+  //options for cors midddleware
+  const options: cors.CorsOptions = {
+    allowedHeaders: [
+      'Origin',
+      'X-Requested-With',
+      'Content-Type',
+      'Accept',
+      'X-Access-Token',
+    ],
+    credentials: true,
+    methods: 'GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE',
+    origin: allowedOrigins,
+    preflightContinue: false,
+  };
+  router.use(cors(options));
   app.listen(PORT);
   logger.info(`>>>>> Haven't felt like this in a longtime=${PORT} <<<<<`);
   
   app.use("/", router);
+
   app.get("/health", (req: Request, res: Response) => res.send("Serivce is healthy."));
   router.use("/v1", v1router);
   router.use("/pay", payrouter);
