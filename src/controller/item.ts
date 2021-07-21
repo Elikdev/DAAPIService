@@ -20,22 +20,21 @@ export class ItemController {
   static async getItems(req: Request, res: Response): Promise<void> {
     const sorts = req.query.sort; 
     const category = req.query.category;
-    const shopId = req.query.shopId
-    const startDate :any = req.query.startDate
-    const endDate :any = req.query.endDate
+    const shopId = req.query.shopId;
+    const startDate :any = req.query.startDate;
+    const endDate :any = req.query.endDate;
 
-    const queryStatus = req.query.status
+    const queryStatus = req.query.status;
     // TODO: remove front end hardcoded sorting param -id
     const orderBy = getOrderByConditions(null, DEFAULT_SORT_BY);
     const itemRepo = getRepository(Items);
     const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
-    let status: any = ListingStatus.NEW
+    let status: any = ListingStatus.NEW;
     logger.debug("OrderBy: " + JSON.stringify(orderBy));
     const itemsQuery = itemRepo
       .createQueryBuilder("item")
+      .where("item.shopId = :id", { id: "c6a8eaaa-5892-456b-9fe2-9764e7f7823c" })
       .orderBy(orderBy)
-      .innerJoin("item.shop", "shops")
-      .where("shops.id = :id", { id: "c6a8eaaa-5892-456b-9fe2-9764e7f7823c" })
       .skip(skipSize)
       .take(pageSize);
 
@@ -48,10 +47,10 @@ export class ItemController {
     }
 
     if(startDate !== undefined && startDate !== "") {  
-      const today = new Date(startDate)
-      let nextDay = new Date(today.getTime() + 86400000)
+      const today = new Date(startDate);
+      let nextDay = new Date(today.getTime() + 86400000);
       if(endDate !== undefined && endDate !== "") {
-        nextDay = new Date(endDate)
+        nextDay = new Date(endDate);
       }
       itemsQuery.andWhere("item.createdtime  >= :today", {today: today});
       itemsQuery.andWhere("item.createdtime  < :nextDay", {nextDay: nextDay});
@@ -59,7 +58,7 @@ export class ItemController {
 
 
     if(queryStatus !== undefined && queryStatus !== "") {  
-      status = queryStatus
+      status = queryStatus;
     }
 
     itemsQuery.andWhere("item.status = :status", {status: status});
@@ -165,7 +164,7 @@ export class ItemController {
 
     const itemId = req.params.id;
     const itemRepo = getRepository(Items);
-    itemData.id = itemId
+    itemData.id = itemId;
     const item = await itemRepo.findOne({id: itemId}, {relations: ["shop"]});
 
     logger.debug(`updating ${JSON.stringify(item)}`);
