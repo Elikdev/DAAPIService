@@ -34,6 +34,8 @@ export class ItemController {
     const itemsQuery = itemRepo
       .createQueryBuilder("item")
       .orderBy(orderBy)
+      .innerJoin("item.shop", "shops")
+      .where("shops.id = :id", { id: "c6a8eaaa-5892-456b-9fe2-9764e7f7823c" })
       .skip(skipSize)
       .take(pageSize);
 
