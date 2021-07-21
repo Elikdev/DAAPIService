@@ -20,15 +20,19 @@ export class ItemController {
   static async getItems(req: Request, res: Response): Promise<void> {
     const sorts = req.query.sort; 
     const category = req.query.category;
+    const shopId = req.query.shopId
+    const startDate :any = req.query.startDate
+    const endDate :any = req.query.endDate
+
+    const queryStatus = req.query.status
     // TODO: remove front end hardcoded sorting param -id
     const orderBy = getOrderByConditions(null, DEFAULT_SORT_BY);
     const itemRepo = getRepository(Items);
     const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
-
+    let status: any = ListingStatus.NEW
     logger.debug("OrderBy: " + JSON.stringify(orderBy));
     const itemsQuery = itemRepo
       .createQueryBuilder("item")
-      .where("item.status = :new", { new: ListingStatus.NEW })
       .orderBy(orderBy)
       .skip(skipSize)
       .take(pageSize);
@@ -36,6 +40,27 @@ export class ItemController {
     if(category !== undefined && category !== "") {  //TODO schema validation for category
       itemsQuery.andWhere("item.category = :category", {category: category});
     }
+
+    if(shopId !== undefined && shopId !== "") {  
+      itemsQuery.andWhere("item.shopId = :shopId", {shopId: shopId});
+    }
+
+    if(startDate !== undefined && startDate !== "") {  
+      const today = new Date(startDate)
+      let nextDay = new Date(today.getTime() + 86400000)
+      if(endDate !== undefined && endDate !== "") {
+        nextDay = new Date(endDate)
+      }
+      itemsQuery.andWhere("item.createdtime  >= :today", {today: today});
+      itemsQuery.andWhere("item.createdtime  < :nextDay", {nextDay: nextDay});
+    }
+
+
+    if(queryStatus !== undefined && queryStatus !== "") {  
+      status = queryStatus
+    }
+
+    itemsQuery.andWhere("item.status = :status", {status: status});
 
     const items = await itemsQuery.getMany();
 

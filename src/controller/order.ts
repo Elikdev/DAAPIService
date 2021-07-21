@@ -112,8 +112,12 @@ export class OrderController {
     const sorts = req.query.sort;
     const orderBy = getOrderByConditions(sorts, DEFAULT_SORT_BY, "orders.");
     const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
+    const shopId = req.query.shopId
+    const startDate :any = req.query.startDate
+    const endDate :any = req.query.endDate
+    const status = req.query.status
 
-    const allOrders = await getRepository(Orders)
+    const orderQuery = await getRepository(Orders)
       .createQueryBuilder("orders")
       .orderBy(orderBy)
       .leftJoinAndSelect("orders.buyerAddress", "buyerAddress")
@@ -121,7 +125,28 @@ export class OrderController {
       .leftJoinAndSelect("orders.orderItems", "item")
       .skip(skipSize)
       .take(pageSize)
-      .getMany();
+
+    if(shopId !== undefined && shopId !== "") {  
+      orderQuery.andWhere("orders.shopId = :shopId", {shopId: shopId});
+    }
+
+    if(startDate !== undefined && startDate !== "") {  
+      const today = new Date(startDate)
+      let nextDay = new Date(today.getTime() + 86400000)
+      if(endDate !== undefined && endDate !== "") {
+        nextDay = new Date(endDate)
+      }
+      orderQuery.andWhere("orders.createdtime  >= :today", {today: today});
+      orderQuery.andWhere("orders.createdtime  < :nextDay", {nextDay: nextDay});
+    }
+
+
+    if(status !== undefined && status !== "") {  
+      orderQuery.andWhere("orders.status = :status", {status: status});
+    }
+
+    const allOrders = await orderQuery.getMany();
+
 
     allOrders.forEach(order => OrderUtility.transformOrderResponse(order));  
 
