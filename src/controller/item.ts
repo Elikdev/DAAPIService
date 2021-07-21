@@ -31,9 +31,8 @@ export class ItemController {
     const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
     let status: any = ListingStatus.NEW;
     logger.debug("OrderBy: " + JSON.stringify(orderBy));
-    const itemsQuery = itemRepo
+    const itemsQuery = itemRepo // TODO filter out suspended shops and items.
       .createQueryBuilder("item")
-      .where("item.shopId = :id", { id: "c6a8eaaa-5892-456b-9fe2-9764e7f7823c" })
       .orderBy(orderBy)
       .skip(skipSize)
       .take(pageSize);
