@@ -11,8 +11,8 @@ import { OrderController } from "./controller/order";
 import { FeedsController } from "./controller/feeds";
 import { CollectionsController } from "./controller/collections";
 import { CouponsController } from "./controller/coupons";
-
 import { SearchController } from "./controller/search";
+import { RecentlyViewedController } from "./controller/recentlyViewed";
 
 import bodyParser from "body-parser";
 import { NotificationController } from "./controller/notification";
@@ -80,4 +80,8 @@ v1router.delete("/collections/:id/items/", CollectionsController.removeCollectio
 
 
 v1router.get("/coupons/apply", CouponsController.apply);
+
+
+v1router.post("/recentlyViewed", RecentlyViewedController.add);
+v1router.get("/recentlyViewed", RecentlyViewedController.get);
 

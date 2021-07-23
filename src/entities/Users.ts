@@ -17,6 +17,7 @@ import { ItemSaves } from "./ItemSaves";
 import { Coupons } from "./Coupons";
 import { ItemLikes } from "./ItemLikes";
 import { UserRelations } from "./UserRelations";
+import { RecentlyViewed } from "./RecentlyViewed";
 
 export enum UserRole {
   SHOPPER = "shopper",
@@ -63,6 +64,9 @@ export class Users extends BaseEntity {
 
   @OneToMany(() => Coupons, coupons => coupons.owner, { cascade: true })
   coupons: Coupons[];
+
+  @OneToMany(() => RecentlyViewed, recentlyViewed => recentlyViewed.owner, { cascade: true })
+  recentlyViewed: RecentlyViewed[];
 
   @OneToMany(() => Addresses, addresses => addresses.user, { cascade: true })
   addresses: Addresses[];
