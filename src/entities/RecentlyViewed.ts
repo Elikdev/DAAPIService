@@ -14,7 +14,7 @@ import { Items } from "./Items";
 
 
 
-@Entity("RecentlyViewed")
+@Entity("recentlyViewed")
 export class RecentlyViewed extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
