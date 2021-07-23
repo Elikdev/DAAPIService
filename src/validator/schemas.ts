@@ -33,7 +33,8 @@ export const createOrderSchema = Joi.object().keys({
   trackingNum: Joi.string().optional(),
   shopId: Joi.string().uuid().required(),
   addressId: Joi.string().uuid().required(),
-  orderNotes: Joi.string().allow("").optional()
+  orderNotes: Joi.string().allow("").optional(),
+  couponId: Joi.string().uuid().allow(null).optional()
 });
 
 export const batchCreateOrderSchema = Joi.array().items(createOrderSchema).min(1).required();

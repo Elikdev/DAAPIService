@@ -6,11 +6,13 @@ import { Orders } from "../../entities/Orders";
 import { ResourceNotFoundError } from "../../error/notfoundError";
 import { logger } from "../../logging/logger";
 import { Items, ListingStatus } from "../../entities/Items";
+import { Coupons } from "../../entities/Coupons"; 
 import { BadRequestError } from "../../error/badRequestError";
 
 export const createSingleOrder = async (userId: any, orderData: any): Promise<any> => {
   const shopId = orderData.shopId;
   const addressId = orderData.addressId;
+  const couponId = orderData.couponId;
   const shop = await Shops.findOne({id: shopId}, {relations: ["owner"]});
   if (!shop) {
     throw new ResourceNotFoundError("Shop not found.");
@@ -22,7 +24,10 @@ export const createSingleOrder = async (userId: any, orderData: any): Promise<an
   if (!address) {
     throw new ResourceNotFoundError("Address not found.");
   }
+
+  const coupon = await Coupons.findOne({id: couponId});
   const user = await Users.findOne({id: userId});
+  orderData.coupon = coupon;
   orderData.buyer = user;
   orderData.buyerAddress = address;
   orderData.shop = shop;

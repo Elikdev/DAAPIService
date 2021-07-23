@@ -20,26 +20,47 @@ export class CouponsController {
   @HandleError("apply")
   static async apply(req: Request, res: Response): Promise<void> {
     const couponCode = req.query.code;
+    const itemShopId = req.query.itemShopId;
+    const itemPrice = req.query.itemPrice;
     const userId = req.body.userId;
     const couponRepo = getRepository(Coupons);
     let isValid = false;
     let metaData = {};
 
-    const couponEntity = await couponRepo.createQueryBuilder("coupons")
+    const couponQuery = couponRepo.createQueryBuilder("coupons")
+      .leftJoinAndSelect("coupons.shop", "shops")
       .where("coupons.code = :code", {code: couponCode })
       .andWhere("coupons.isValid = :isValid", {isValid: true })
-      .andWhere("coupons.expireTime > :time", { time: new Date() })
-      .getOne();
+      .andWhere("coupons.expireTime > :time", { time: new Date() });
+
+    if(itemPrice !== undefined && itemPrice !== "") {
+      couponQuery.andWhere("coupons.lowestApplicableOrderPrice <= :price", { price: itemPrice})
+    }  
+
+    const couponEntity = await couponQuery.getOne();
 
     if (couponEntity) {
-      if(couponEntity.code === "first10") {
-        const newAccount = await isNewAccount(userId);
-        if (newAccount) {
+      if (couponEntity.shop && couponEntity.shop.id === itemShopId) { // Shop Exclusive Coupon
+        const validCouponForAccount = await isValidCouponForAccount(couponEntity.id, userId);
+        if (validCouponForAccount) {
           isValid = couponEntity.isValid;
           metaData = {
+            id: couponEntity.id,
             type: couponEntity.couponType,
             value: couponEntity.value
           };
+        } 
+      } else {
+        if (couponEntity.code === "first10") {
+          const newAccount = await isNewAccount(userId);
+          if (newAccount) {
+            isValid = couponEntity.isValid;
+            metaData = {
+              id: couponEntity.id,
+              type: couponEntity.couponType,
+              value: couponEntity.value
+            };
+          }
         }
       }
     }
@@ -51,6 +72,23 @@ export class CouponsController {
   }
 }
 
+const isValidCouponForAccount = async (couponId: string, ownerId: any) : Promise<any> => {
+  const orderRepo = getRepository(Orders);
+
+  const order = await orderRepo.createQueryBuilder("orders")
+    .leftJoinAndSelect("orders.buyer", "buyer")
+    .leftJoinAndSelect("orders.coupon", "coupon")
+    .where("orders.status IN (:...status)", {status: [OrderStatus.CONFIRMED, OrderStatus.SHIPPED, OrderStatus.COMPLETED, OrderStatus.SETTLED]} )
+    .andWhere("buyer.id = :ownerId", {ownerId: ownerId})
+    .andWhere("coupon.id = :couponId", {couponId: couponId})
+    .getMany();
+  
+  if(!order || order.length === 0) {
+    return true;
+  }
+
+  return false;
+};
 
 const isNewAccount = async (ownerId: any) : Promise<any> => {
   const orderRepo = getRepository(Orders);

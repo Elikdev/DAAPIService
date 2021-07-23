@@ -11,6 +11,7 @@ import {
 import { Items } from "./Items";
 import { Users } from "./Users";
 import { Orders } from "./Orders";
+import { Coupons } from "./Coupons";
 
 // type = merchant 为 签约商家
 export enum ShopType {
@@ -59,6 +60,9 @@ export class Shops extends BaseEntity {
 
   @OneToMany(() => Items, (items) => items.shop, { cascade: true })
   items: Items[];
+
+  @OneToMany(() => Coupons, (coupons) => coupons.shop, { cascade: true })
+  coupons: Coupons[];
 
   @ManyToOne(() => Users, (users) => users.shops)
   owner: Users;
