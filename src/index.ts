@@ -32,6 +32,9 @@ createConnection(DBConfig).then(async connection => {
       'Content-Type',
       'Accept',
       'X-Access-Token',
+      'Authorization',
+      'Referer',
+      'User-Agent'
     ],
     credentials: true,
     methods: 'GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE',
