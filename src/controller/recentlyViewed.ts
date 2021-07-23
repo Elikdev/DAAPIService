@@ -33,13 +33,13 @@ export class RecentlyViewedController {
       .andWhere("recentlyViewed.itemId = :itemId", {itemId: data.itemId })
       .getOne();
     if(recentlyViewedEntity) {
-      recentlyViewedEntity.viewdCount += 1
-      console.log(recentlyViewedEntity)
+      recentlyViewedEntity.viewdCount += 1;
+      console.log(recentlyViewedEntity);
       await recentlyViewedRepo.save(recentlyViewedEntity);
     } else {
-      let entity :any = new RecentlyViewed()
-      entity.item = item
-      entity.owner = user
+      const entity :any = new RecentlyViewed();
+      entity.item = item;
+      entity.owner = user;
       recentlyViewedEntity = await recentlyViewedRepo.save(entity);
     }
 
@@ -52,16 +52,21 @@ export class RecentlyViewedController {
   static async get(req: Request, res: Response): Promise<void> {
     const recentlyViewedRepo = getRepository(RecentlyViewed);
     const userId = req.body.userId;
-    let recentlyViewed = await recentlyViewedRepo.createQueryBuilder("recentlyViewed")
+    const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
+
+    const recentlyViewed = await recentlyViewedRepo.createQueryBuilder("recentlyViewed")
       .leftJoinAndSelect("recentlyViewed.owner", "user")
       .leftJoinAndSelect("recentlyViewed.item", "item")
       .where("recentlyViewed.ownerId = :ownerId", {ownerId: userId })
       .andWhere("item.status = status", {status:ListingStatus.NEW})
       .orderBy("recentlyViewed.viewdCount", "DESC")
+      .skip(skipSize)
+      .take(pageSize)
       .getMany();  
 
     res.send({
-      data: recentlyViewed
+      data: recentlyViewed,
+      links: getPaginationLinks(req, pageNumber, pageSize)
     });
   }
 
