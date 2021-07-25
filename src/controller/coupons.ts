@@ -31,11 +31,11 @@ export class CouponsController {
       .createQueryBuilder("coupon")
       .leftJoinAndSelect("coupon.owner", "owner")
       .leftJoinAndSelect("coupon.shop", "shop")
-       .select([
-        "coupon", "owner.id", "owner.username", "shop.name"
+      .select([
+        "coupon", "owner.id", "owner.username", "shop.name", "shop.id"
       ])
       .skip(skipSize)
-      .take(pageSize)
+      .take(pageSize);
 
 
     if(shopId !== undefined && shopId !== "") {  
