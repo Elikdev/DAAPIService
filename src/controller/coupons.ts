@@ -21,16 +21,28 @@ export class CouponsController {
   @HandleError("get")
   static async get(req: Request, res: Response): Promise<void> {
     const sorts = req.query.sort;
+    const shopId = req.query.shopId;
     const orderBy = getOrderByConditions(null, DEFAULT_SORT_BY);
     const couponRepo = getRepository(Coupons);
     const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
     logger.debug("OrderBy: " + JSON.stringify(orderBy));
 
-    const coupons = await couponRepo
+    const couponQuery = await couponRepo
       .createQueryBuilder("coupon")
+      .leftJoinAndSelect("coupon.owner", "owner")
+      .leftJoinAndSelect("coupon.shop", "shop")
+       .select([
+        "coupon", "owner.id", "owner.username", "shop.name"
+      ])
       .skip(skipSize)
       .take(pageSize)
-      .getMany();
+
+
+    if(shopId !== undefined && shopId !== "") {  
+      couponQuery.andWhere("coupon.shopId = :shopId", {shopId: shopId});
+    }
+
+    const coupons = await couponQuery.getMany();
 
     res.send({
       data: coupons,
@@ -46,15 +58,15 @@ export class CouponsController {
     validator.validate(couponData);
     const couponId = req.params.id;
     const couponRepo = getRepository(Coupons);
-    const ownerId = couponData.ownerId
-    const shopId = couponData.shopId
+    const ownerId = couponData.ownerId;
+    const shopId = couponData.shopId;
     
     if(ownerId !== undefined && ownerId !== "") {
       const user = await getRepository(Users).findOne({id: ownerId});
       if (!user) {
         throw new ResourceNotFoundError("User not found.");
       }
-      couponData.owner = user
+      couponData.owner = user;
       delete couponData.ownerId;
 
     }
@@ -63,9 +75,9 @@ export class CouponsController {
       if (!shop) {
         throw new ResourceNotFoundError("Shop not found.");
       }
-      couponData.shop = shop
+      couponData.shop = shop;
       delete couponData.shopId;
-     }
+    }
 
     const result = await couponRepo.createQueryBuilder()
       .update(Coupons, couponData)
@@ -88,15 +100,15 @@ export class CouponsController {
     const validator = new RequestValidator(createCouponSchema);
     validator.validate(couponData);
     const couponRepo = getRepository(Coupons);
-    const ownerId = couponData.ownerId
-    const shopId = couponData.shopId
+    const ownerId = couponData.ownerId;
+    const shopId = couponData.shopId;
     
     if(ownerId !== undefined && ownerId !== "") {
       const user = await getRepository(Users).findOne({id: ownerId});
       if (!user) {
         throw new ResourceNotFoundError("User not found.");
       }
-      couponData.owner = user
+      couponData.owner = user;
       delete couponData.ownerId;
 
     }
@@ -105,11 +117,11 @@ export class CouponsController {
       if (!shop) {
         throw new ResourceNotFoundError("Shop not found.");
       }
-      couponData.shop = shop
+      couponData.shop = shop;
       delete couponData.shopId;
-     }
+    }
 
-    const couponEntity = await couponRepo.save(couponData)
+    const couponEntity = await couponRepo.save(couponData);
 
     res.send({
       data: couponEntity
@@ -134,7 +146,7 @@ export class CouponsController {
       .andWhere("coupons.expireTime > :time", { time: new Date() });
 
     if(itemPrice !== undefined && itemPrice !== "") {
-      couponQuery.andWhere("coupons.lowestApplicableOrderPrice <= :price", { price: itemPrice})
+      couponQuery.andWhere("coupons.lowestApplicableOrderPrice <= :price", { price: itemPrice});
     }  
 
     const couponEntity = await couponQuery.getOne();
