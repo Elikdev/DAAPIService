@@ -1,5 +1,7 @@
 import Joi from "joi";
 import { ItemCondition, ShippingType, AuditStatus } from "../entities/Items";
+import { CouponType } from "../entities/Coupons";
+
 import { OrderStatus } from "../entities/Orders";
 
 export const signUpSchema = Joi.object().keys({
@@ -106,6 +108,29 @@ export const updateCollectionSchema = Joi.object().keys({
   name: Joi.string().max(100).optional(),
   endTime: Joi.string().max(100).optional(),
   isSuspended: Joi.boolean().optional()
+});
+
+
+export const updateCouponSchema = Joi.object().keys({
+  code: Joi.string().max(100).optional(),
+  expireTime: Joi.string().max(100).optional(),
+  applied: Joi.boolean().optional(),
+  isValid: Joi.boolean().optional(),
+  ownerId: Joi.number().optional(),
+  couponType: Joi.string().optional().valid(...Object.values(CouponType)),
+  value: Joi.number().optional(),
+  lowestApplicableOrderPrice: Joi.number().optional(),
+  shopId: Joi.string().uuid().optional()
+});
+
+export const createCouponSchema = Joi.object().keys({
+  code: Joi.string().max(100),
+  expireTime: Joi.string().max(100),
+  ownerId: Joi.number().optional(),
+  couponType: Joi.string().valid(...Object.values(CouponType)),
+  value: Joi.number(),
+  lowestApplicableOrderPrice: Joi.number(),
+  shopId: Joi.string().uuid().optional()
 });
 
 export const updateUserSchema = Joi.object().keys({

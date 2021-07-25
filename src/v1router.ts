@@ -36,8 +36,12 @@ v1router.get("/shops/:id", ShopController.getShop);
 v1router.get("/collections", CollectionsController.getCollections);
 v1router.get("/collections/:id/items", CollectionsController.getCollectionItems);
 v1router.get("/collections/items", CollectionsController.getAllCollectionItems);
-v1router.get("/search", SearchController.search);
+v1router.get("/collections/all", CollectionsController.getAllCollections); // admin
 
+v1router.get("/search", SearchController.search);
+v1router.get("/coupons", CouponsController.get); // TODO access control
+v1router.put("/coupons/:id", CouponsController.update);
+v1router.post("/coupons", CouponsController.create);
 
 // Do auth filtering for the following apis
 v1router.use(authMiddleWare);

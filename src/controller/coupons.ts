@@ -5,17 +5,117 @@ import { Items, ListingStatus } from "../entities/Items";
 import { Coupons } from "../entities/Coupons";
 import { Orders, OrderStatus } from "../entities/Orders";
 import { Users } from "../entities/Users";
+import { Shops } from "../entities/Shops";
 import { BadRequestError } from "../error/badRequestError";
 import { ResourceNotFoundError } from "../error/notfoundError";
 import { logger } from "../logging/logger";
 import { RequestValidator } from "../validator/requestValidator";
-import { createCollectionSchema, updateCollectionSchema } from "../validator/schemas";
+import { updateCouponSchema, createCouponSchema } from "../validator/schemas";
 import { getOrderByConditions } from "./helper/orderByHelper";
 import { getPaginationLinks, getPaginationParams } from "./helper/paginationHelper";
 
 const DEFAULT_SORT_BY:OrderByCondition = { "createdtime":"DESC" };
 
 export class CouponsController {
+
+  @HandleError("get")
+  static async get(req: Request, res: Response): Promise<void> {
+    const sorts = req.query.sort;
+    const orderBy = getOrderByConditions(null, DEFAULT_SORT_BY);
+    const couponRepo = getRepository(Coupons);
+    const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
+    logger.debug("OrderBy: " + JSON.stringify(orderBy));
+
+    const coupons = await couponRepo
+      .createQueryBuilder("coupon")
+      .skip(skipSize)
+      .take(pageSize)
+      .getMany();
+
+    res.send({
+      data: coupons,
+      links: getPaginationLinks(req, pageNumber, pageSize)
+    });
+  }
+
+  @HandleError("update")
+  static async update(req: Request, res: Response): Promise<void> {
+    const userId = req.body.userId;
+    const couponData = req.body.data;
+    const validator = new RequestValidator(updateCouponSchema);
+    validator.validate(couponData);
+    const couponId = req.params.id;
+    const couponRepo = getRepository(Coupons);
+    const ownerId = couponData.ownerId
+    const shopId = couponData.shopId
+    
+    if(ownerId !== undefined && ownerId !== "") {
+      const user = await getRepository(Users).findOne({id: ownerId});
+      if (!user) {
+        throw new ResourceNotFoundError("User not found.");
+      }
+      couponData.owner = user
+      delete couponData.ownerId;
+
+    }
+    if(shopId !== undefined && shopId !== "") {
+      const shop = await getRepository(Shops).findOne({id: shopId});
+      if (!shop) {
+        throw new ResourceNotFoundError("Shop not found.");
+      }
+      couponData.shop = shop
+      delete couponData.shopId;
+     }
+
+    const result = await couponRepo.createQueryBuilder()
+      .update(Coupons, couponData)
+      .where("id = :id", { id: couponId })
+      .returning("*")
+      .updateEntity(true)
+      .execute()
+      .then(response => response.raw[0]);
+
+    res.send({
+      data: result
+    });
+  }
+
+
+  @HandleError("create")
+  static async create(req: Request, res: Response): Promise<void> {
+    const userId = req.body.userId;
+    const couponData = req.body.data;
+    const validator = new RequestValidator(createCouponSchema);
+    validator.validate(couponData);
+    const couponRepo = getRepository(Coupons);
+    const ownerId = couponData.ownerId
+    const shopId = couponData.shopId
+    
+    if(ownerId !== undefined && ownerId !== "") {
+      const user = await getRepository(Users).findOne({id: ownerId});
+      if (!user) {
+        throw new ResourceNotFoundError("User not found.");
+      }
+      couponData.owner = user
+      delete couponData.ownerId;
+
+    }
+    if(shopId !== undefined && shopId !== "") {
+      const shop = await getRepository(Shops).findOne({id: shopId});
+      if (!shop) {
+        throw new ResourceNotFoundError("Shop not found.");
+      }
+      couponData.shop = shop
+      delete couponData.shopId;
+     }
+
+    const couponEntity = await couponRepo.save(couponData)
+
+    res.send({
+      data: couponEntity
+    });
+  }
+
 
   @HandleError("apply")
   static async apply(req: Request, res: Response): Promise<void> {

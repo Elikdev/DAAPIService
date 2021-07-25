@@ -22,12 +22,34 @@ export class CollectionsController {
     const orderBy = getOrderByConditions(null, DEFAULT_SORT_BY);
     const collectionRepo = getRepository(Collections);
     const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
-
     logger.debug("OrderBy: " + JSON.stringify(orderBy));
+
     const collections = await collectionRepo
       .createQueryBuilder("collection")
       .where("collection.isSuspended = :isSuspended", { isSuspended: false })
       .andWhere("collection.endTime > :current", {current:  new Date()})
+      .orderBy("collection.order", "ASC")
+      .skip(skipSize)
+      .take(pageSize)
+      .getMany();
+
+    res.send({
+      data: collections,
+      links: getPaginationLinks(req, pageNumber, pageSize)
+    });
+  }
+
+
+  @HandleError("getAllCollections")
+  static async getAllCollections(req: Request, res: Response): Promise<void> {
+    const sorts = req.query.sort;
+    const orderBy = getOrderByConditions(null, DEFAULT_SORT_BY);
+    const collectionRepo = getRepository(Collections);
+    const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
+    logger.debug("OrderBy: " + JSON.stringify(orderBy));
+
+    const collections = await collectionRepo
+      .createQueryBuilder("collection")
       .orderBy("collection.order", "ASC")
       .skip(skipSize)
       .take(pageSize)
