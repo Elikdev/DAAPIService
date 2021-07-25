@@ -37,6 +37,15 @@ export enum AuditStatus {
   FAIL = "fail",
 }
 
+export enum AuditReasonCode {
+  PENDING = "pending",
+  INCOMPLETE_DESCRIPTION = "incomplete_description",
+  INAPPROPRIATE_DESCRIPTION = "inappropriate_description",
+  INVALID_ITEM_PRICE = "invalid_item_price",
+  INAPPROPRIATE_IMAGE_CONTENT = "inappropriate_image_content",
+  UNQUALIFIED_IMAGES = "unqualified_images"
+}
+
 export enum ShippingType {
   SHIPPED = "shipped",
   PAY_ON_DELIVERY = "payOnDelivery"
@@ -87,6 +96,15 @@ export class Items extends BaseEntity {
     default: AuditStatus.PENDING
   })
   auditStatus: string;
+
+
+   @Column({
+    type: "enum",
+    enum: AuditReasonCode,
+    default: AuditReasonCode.PENDING
+  })
+  auditReasonCode: string;
+
 
   @Column("character varying", {nullable: true })
   description: string | null;
