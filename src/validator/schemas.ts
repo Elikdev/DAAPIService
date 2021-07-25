@@ -108,7 +108,8 @@ export const createCollectionSchema = Joi.object().keys({
 export const updateCollectionSchema = Joi.object().keys({
   name: Joi.string().max(100).optional(),
   endTime: Joi.string().max(100).optional(),
-  isSuspended: Joi.boolean().optional()
+  isSuspended: Joi.boolean().optional(),
+  order: Joi.number().optional()
 });
 
 
