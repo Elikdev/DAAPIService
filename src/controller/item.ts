@@ -23,7 +23,7 @@ export class ItemController {
     const shopId = req.query.shopId;
     const startDate :any = req.query.startDate;
     const endDate :any = req.query.endDate;
-
+    const auditStatus = req.query.audsitStatus;
     const queryStatus = req.query.status;
     // TODO: remove front end hardcoded sorting param -id
     const orderBy = getOrderByConditions(null, DEFAULT_SORT_BY);
@@ -39,6 +39,10 @@ export class ItemController {
 
     if(category !== undefined && category !== "") {  //TODO schema validation for category
       itemsQuery.andWhere("item.category = :category", {category: category});
+    }
+
+    if(auditStatus !== undefined && auditStatus !== "") {  
+      itemsQuery.andWhere("item.auditStatus = :auditStatus", {auditStatus: auditStatus});
     }
 
     if(shopId !== undefined && shopId !== "") {  
@@ -173,6 +177,7 @@ export class ItemController {
     }
     verifyItem(item);
     const user = await Users.findOne({id: userId});
+    
     const shop = await Shops.findOne({id: item.shop.id, owner: user});
     if (!shop) {
       throw new ResourceNotFoundError("Shop not found.");
