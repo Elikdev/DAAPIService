@@ -11,8 +11,8 @@ import { RequestValidator } from "../validator/requestValidator";
 import { createItemSchema, updateItemSchema } from "../validator/schemas";
 import { getOrderByConditions } from "./helper/orderByHelper";
 import { getPaginationLinks, getPaginationParams } from "./helper/paginationHelper";
-
 const DEFAULT_SORT_BY:OrderByCondition = { "score": "DESC", "createdtime":"DESC" };
+const ADMIN_USER_ID = 3;
 
 export class ItemController {
 
@@ -178,9 +178,11 @@ export class ItemController {
     verifyItem(item);
     const user = await Users.findOne({id: userId});
     
-    const shop = await Shops.findOne({id: item.shop.id, owner: user});
-    if (!shop) {
-      throw new ResourceNotFoundError("Shop not found.");
+    if(userId !== ADMIN_USER_ID) { // TEMP SOLN skip ownership verification for admin.
+      const shop = await Shops.findOne({id: item.shop.id, owner: user}); 
+      if (!shop) {
+        throw new ResourceNotFoundError("Shop not found.");
+      }
     }
 
     const result = await itemRepo.createQueryBuilder()
