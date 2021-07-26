@@ -77,6 +77,8 @@ export class ItemController {
   @HandleError("discoverItems")
   static async discoverItems(req: Request, res: Response): Promise<void> {
     const sorts = req.query.sort; 
+    const category = req.query.category;
+
     // TODO: remove front end hardcoded sorting param -id
     const orderBy = getOrderByConditions(null, DEFAULT_SORT_BY);
     const itemRepo = getRepository(Items);
@@ -88,8 +90,12 @@ export class ItemController {
       .skip(skipSize)
       .take(pageSize);
 
+    if(category !== undefined && category !== "") {  //TODO schema validation for category
+      itemsQuery.andWhere("item.category = :category", {category: category});
+    }
+    
     itemsQuery.andWhere("item.status = :status", {status: ListingStatus.NEW});
-    itemsQuery.andWhere("item.auditStatus IN (:...auditStatus)", {auditStatus: [AuditStatus.PASS, AuditStatus.PENDING]})
+    itemsQuery.andWhere("item.auditStatus IN (:...auditStatus)", {auditStatus: [AuditStatus.PASS, AuditStatus.PENDING]});
 
     const items = await itemsQuery.getMany();
 
