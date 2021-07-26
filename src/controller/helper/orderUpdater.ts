@@ -64,13 +64,12 @@ export const resetItems = async (items: Items[]): Promise<void> => {
     // handle concurrent order placements resulting 
     // in multiple valid/invalid orders containing the same item.
     if (item.status === ListingStatus.SOLD) {
-      logger.debug(`relist item: ${item.id}`);
+      logger.debug(`Relist item: ${item.id}`);
       item.status = ListingStatus.NEW;
       await item.save();
       relistCount += 1;
     }
   });
-
-  logger.info(`Finished relisting ${relistCount} items`);
   await Promise.all(itemUpdateResults);
+  logger.info(`Finished relisting ${relistCount} items`);
 };
