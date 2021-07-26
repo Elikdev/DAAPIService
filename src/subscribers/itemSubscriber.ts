@@ -44,7 +44,7 @@ export class ItemsSubscriber implements EntitySubscriberInterface<Items> {
           console.log("success");
           delete object.objectID;
         });
-     }
+    }
 
   }
 
