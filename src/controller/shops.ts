@@ -7,7 +7,7 @@ import { BadRequestError } from "../error/badRequestError";
 import { RequestValidator } from "../validator/requestValidator";
 import { createShopSchema, updateShopSchema } from "../validator/schemas";
 import { ResourceNotFoundError } from "../error/notfoundError";
-import { ListingStatus } from "../entities/Items";
+import { ListingStatus, AuditStatus } from "../entities/Items";
 import { getOrderByConditions } from "./helper/orderByHelper";
 import { getPaginationLinks, getPaginationParams } from "./helper/paginationHelper";
 
@@ -151,8 +151,9 @@ export class ShopController {
     const sorts = req.query.sort;
     const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
     const shopId = req.params.id;
+    const from = req.query.from; // distinguish if the request comes from myprofie or seller dp.
     
-    const shopItems = await getRepository(Shops)
+    const shopItemsQeury = getRepository(Shops)
       .createQueryBuilder("shops")
       .leftJoinAndSelect("shops.items", "items")
       .where("shops.id = :id", { id: shopId })
@@ -162,8 +163,13 @@ export class ShopController {
       .orderBy("CASE WHEN items.status='new' THEN 0 ELSE 1 END")
       .addOrderBy("items.createdtime", "DESC") 
       .offset(skipSize)
-      .limit(pageSize)
-      .getOne();
+      .limit(pageSize);
+    
+    if(from === "shopper") {
+      shopItemsQeury.andWhere("items.auditStatus IN (:...auditStatus)", {auditStatus: [AuditStatus.PASS, AuditStatus.PENDING]})
+    }
+
+    const shopItems = await shopItemsQeury.getOne();
 
     if(shopItems === undefined) { 
       res.send({
