@@ -54,7 +54,7 @@ export const autoCancelOrders = async (): Promise<void> => {
   });
 
   await Promise.all(results);
-  logger.info(`Finished cancelling ${cancelCount} orders and relisting ${relistCount} items`);
+  logger.info(`Finished cancelling ${cancelCount} orders.`);
 };
 
 export const resetItems = async (items: Items[]): Promise<void> => {

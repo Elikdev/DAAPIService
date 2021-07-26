@@ -4,6 +4,8 @@ import { logger } from "../logging/logger";
 
 // Function for scheduling timed jobs
 export const createScheduledJobs = ():void => {
+  // for testing
+  // scheduleFunction("*/5 * * * * *", autoCompleteOrders);
   scheduleFunction("0 0 * * */1", autoCompleteOrders);
   scheduleFunction("*/5 * * * *", autoCancelOrders);
 };
