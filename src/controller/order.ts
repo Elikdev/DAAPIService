@@ -16,6 +16,7 @@ import { ResourceNotFoundError } from "../error/notfoundError";
 import { BadRequestError } from "../error/badRequestError";
 import { WxpayUtility } from "../payment/wxpayUtility";
 import { getPaginationLinks, getPaginationParams } from "./helper/paginationHelper";
+import { resetItems } from "./helper/orderUpdater";
 
 // By default latest orders first
 const DEFAULT_SORT_BY:OrderByCondition = { "orders.createdtime":"DESC" };
@@ -104,18 +105,16 @@ export class OrderController {
     });
   }
 
-
-
   @HandleError("getAllOrders")
   static async getAllOrders(req: Request, res: Response): Promise<void> {
     const userId = req.body.userId; //TODO  check if its admin
     const sorts = req.query.sort;
     const orderBy = getOrderByConditions(sorts, DEFAULT_SORT_BY, "orders.");
     const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
-    const shopId = req.query.shopId
-    const startDate :any = req.query.startDate
-    const endDate :any = req.query.endDate
-    const status = req.query.status
+    const shopId = req.query.shopId;
+    const startDate :any = req.query.startDate;
+    const endDate :any = req.query.endDate;
+    const status = req.query.status;
 
     const orderQuery = await getRepository(Orders)
       .createQueryBuilder("orders")
@@ -124,17 +123,17 @@ export class OrderController {
       .leftJoinAndSelect("orders.shop", "shop")
       .leftJoinAndSelect("orders.orderItems", "item")
       .skip(skipSize)
-      .take(pageSize)
+      .take(pageSize);
 
     if(shopId !== undefined && shopId !== "") {  
       orderQuery.andWhere("orders.shopId = :shopId", {shopId: shopId});
     }
 
     if(startDate !== undefined && startDate !== "") {  
-      const today = new Date(startDate)
-      let nextDay = new Date(today.getTime() + 86400000)
+      const today = new Date(startDate);
+      let nextDay = new Date(today.getTime() + 86400000);
       if(endDate !== undefined && endDate !== "") {
-        nextDay = new Date(endDate)
+        nextDay = new Date(endDate);
       }
       orderQuery.andWhere("orders.createdtime  >= :today", {today: today});
       orderQuery.andWhere("orders.createdtime  < :nextDay", {nextDay: nextDay});
@@ -197,7 +196,12 @@ export class OrderController {
     if (!user) {
       throw new ResourceNotFoundError("User not found");
     }
-    let order = await Orders.findOne({id: orderId, buyer: user});
+    let order = await getRepository(Orders)
+      .createQueryBuilder("orders")
+      .leftJoinAndSelect("orders.orderItems", "items")
+      .where({id: orderId, buyer: user})
+      .getOne();
+    
     const updateData = req.body.data;
     let validator;
 
@@ -207,9 +211,13 @@ export class OrderController {
       validator.validate(updateData);
       OrderUtility.validateOrderForUpdate(order);
 
-      if (updateData.status === OrderStatus.CANCELLED &&
-        !OrderUtility.isUnpaidOrder(order.status)) {
-        throw new BadRequestError(`Cannot cancel order in ${order.status} status`);
+      if (updateData.status === OrderStatus.CANCELLED) {
+        if (!OrderUtility.isUnpaidOrder(order.status)) {
+        // can only cancel open order
+          throw new BadRequestError(`Cannot cancel order in ${order.status} status`);
+        }
+        // relist items
+        await resetItems(order.orderItems);
       }
       order.status = updateData.status;
 
