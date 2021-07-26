@@ -10,7 +10,7 @@ import * as dotenv from "dotenv";
 import { payrouter } from "./payrouter";
 import { messageRouter } from "./messageRouter";
 import { createScheduledJobs } from "./scheduler/scheduler";
-import cors from 'cors';
+import cors from "cors";
 
 const PORT = 4000;
 const DBConfig = getDBConfig();
@@ -23,21 +23,21 @@ createConnection(DBConfig).then(async connection => {
   const app = express();
   app.use(rTracer.expressMiddleware());
   const router = Router();
-  const allowedOrigins = ['https://www.admin.pbrick.cn', 'http://www.admin.pbrick.cn'];
+  const allowedOrigins = ["https://www.admin.pbrick.cn", "http://www.admin.pbrick.cn"];
   //options for cors midddleware
   const options: cors.CorsOptions = {
     allowedHeaders: [
-      'Origin',
-      'X-Requested-With',
-      'Content-Type',
-      'Accept',
-      'X-Access-Token',
-      'Authorization',
-      'Referer',
-      'User-Agent'
+      "Origin",
+      "X-Requested-With",
+      "Content-Type",
+      "Accept",
+      "X-Access-Token",
+      "Authorization",
+      "Referer",
+      "User-Agent"
     ],
     credentials: true,
-    methods: 'GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE',
+    methods: "GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE",
     origin: allowedOrigins,
     preflightContinue: false,
   };

@@ -7,14 +7,14 @@ import { getOrderByConditions } from "./helper/orderByHelper";
 import { ResourceNotFoundError } from "../error/notfoundError";
 import { BadRequestError } from "../error/badRequestError";
 import { getPaginationLinks, getPaginationParams } from "./helper/paginationHelper";
-const algoliasearch = require('algoliasearch');
+const algoliasearch = require("algoliasearch");
 
 // By default latest orders first
 const DEFAULT_SORT_BY:OrderByCondition = { "orders.createdtime":"DESC" };
 
 
-const client = algoliasearch('NUW4UGCBN5', 'b3d50a0c9f8ed7b4a9d44ca93b10cf26');
-const index = client.initIndex('retopia_prod_products');
+const client = algoliasearch("NUW4UGCBN5", "b3d50a0c9f8ed7b4a9d44ca93b10cf26");
+const index = client.initIndex("retopia_prod_products");
 export class SearchController {
 
 
@@ -36,7 +36,7 @@ export class SearchController {
     };
 
 
-    const filters = ['status:new'];
+    const filters = ["status:new"];
 
     const content: AlgoliaHits = await index.search(query, {
       hitsPerPage: pageSize,

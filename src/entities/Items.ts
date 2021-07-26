@@ -99,10 +99,10 @@ export class Items extends BaseEntity {
 
 
    @Column({
-    type: "enum",
-    enum: AuditReasonCode,
-    default: AuditReasonCode.PENDING
-  })
+     type: "enum",
+     enum: AuditReasonCode,
+     default: AuditReasonCode.PENDING
+   })
   auditReasonCode: string;
 
 
