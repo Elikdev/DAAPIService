@@ -23,7 +23,7 @@ export class ItemController {
     const shopId = req.query.shopId;
     const startDate :any = req.query.startDate;
     const endDate :any = req.query.endDate;
-    const auditStatus = req.query.audsitStatus;
+    const auditStatus = req.query.auditStatus;
     const queryStatus = req.query.status;
     // TODO: remove front end hardcoded sorting param -id
     const orderBy = getOrderByConditions(null, DEFAULT_SORT_BY);
