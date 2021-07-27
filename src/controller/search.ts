@@ -36,7 +36,7 @@ export class SearchController {
     };
 
 
-    const filters = ["status:new"];
+    const filters = ["status:new", ["auditStatus:pending", "auditStatus:pass"]];
 
     const content: AlgoliaHits = await index.search(query, {
       hitsPerPage: pageSize,

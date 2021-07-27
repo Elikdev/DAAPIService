@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { getRepository, OrderByCondition } from "typeorm";
 import { HandleError } from "../decorator/errorDecorator";
-import { Items, ListingStatus } from "../entities/Items";
+import { Items, ListingStatus, AuditStatus } from "../entities/Items";
 import { Collections } from "../entities/Collections";
 
 import { BadRequestError } from "../error/badRequestError";
@@ -87,6 +87,7 @@ export class CollectionsController {
       .leftJoin("items.collections", "collections")
       .where("collections.id = :id", { id: collectionId })
       .andWhere("items.status NOT IN (:...status)", {status: [ListingStatus.SOLD, ListingStatus.DELISTED]})
+      .andWhere("items.auditStatus = :pass", {pass: AuditStatus.PASS})
       .select(["items"])
       .orderBy("items.score", "DESC")
       .offset(skipSize)

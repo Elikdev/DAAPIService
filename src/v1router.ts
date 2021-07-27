@@ -27,6 +27,7 @@ v1router.get("/users/:id", UserController.getUser);
 v1router.get("/test", NotificationController.test);
 
 v1router.get("/items", ItemController.getItems);
+v1router.get("/discoverItems", ItemController.discoverItems);
 v1router.get("/items/:id", ItemController.getItem);
 v1router.get("/items/:id/suggest", ItemController.getSuggestItems);
 
