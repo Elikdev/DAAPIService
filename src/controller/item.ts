@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { getRepository, Not, OrderByCondition } from "typeorm";
 import { HandleError } from "../decorator/errorDecorator";
 import { Items, ListingStatus, AuditStatus } from "../entities/Items";
+import { RecentlyViewed } from "../entities/RecentlyViewed";
 import { Shops } from "../entities/Shops";
 import { Users } from "../entities/Users";
 import { BadRequestError } from "../error/badRequestError";
@@ -78,29 +79,58 @@ export class ItemController {
   static async discoverItems(req: Request, res: Response): Promise<void> {
     const sorts = req.query.sort; 
     const category = req.query.category;
-
+    let recentlyViewed: RecentlyViewed[] = []
+    const userId = req.body.userId;
     // TODO: remove front end hardcoded sorting param -id
     const orderBy = getOrderByConditions(null, DEFAULT_SORT_BY);
     const itemRepo = getRepository(Items);
     const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
     logger.debug("OrderBy: " + JSON.stringify(orderBy));
+    
+
     const itemsQuery = itemRepo // TODO filter out suspended shops and items.
       .createQueryBuilder("item")
       .orderBy(orderBy)
       .skip(skipSize)
       .take(pageSize);
 
+    if(userId) {
+      const recentlyViewedRepo = getRepository(RecentlyViewed);
+      recentlyViewed = await recentlyViewedRepo.createQueryBuilder("recentlyViewed")
+        .leftJoinAndSelect("recentlyViewed.owner", "user")
+        .leftJoinAndSelect("recentlyViewed.item", "item")
+        .where("recentlyViewed.ownerId = :ownerId", {ownerId: userId })
+        .andWhere("item.status = status", {status:ListingStatus.NEW})
+        .orderBy("recentlyViewed.viewdCount", "DESC")
+        .take(2)
+        .getMany();  
+
+     if (recentlyViewed.length > 0) {
+        const recentlyViewedItemsId = recentlyViewed.map(element => element.item.id);
+        itemsQuery.andWhere("item.id NOT IN (:...recentlyViewedItemsId)", {recentlyViewedItemsId: recentlyViewedItemsId});
+     }
+    }
+
     if(category !== undefined && category !== "") {  //TODO schema validation for category
       itemsQuery.andWhere("item.category = :category", {category: category});
     }
-    
+
     itemsQuery.andWhere("item.status = :status", {status: ListingStatus.NEW});
     itemsQuery.andWhere("item.auditStatus IN (:...auditStatus)", {auditStatus: [AuditStatus.PASS, AuditStatus.PENDING]});
 
-    const items = await itemsQuery.getMany();
+    const discoverItems = await itemsQuery.getMany();    
+
+    let insertIndex = 0;
+
+    if(pageNumber === 1) { // insert two recently viewed items to discoverItems only to page 1.
+      recentlyViewed.forEach((recentlyViewed: any, index: any) => {
+        discoverItems.splice(insertIndex, 0, recentlyViewed.item)
+        insertIndex = 2
+      })
+     }
 
     res.send({
-      data: items,
+      data: discoverItems,
       links: getPaginationLinks(req, pageNumber, pageSize)
     });
   }
