@@ -80,7 +80,7 @@ export class ItemController {
   static async discoverItems(req: Request, res: Response): Promise<void> {
     const sorts = req.query.sort; 
     const category = req.query.category;
-    let recentlyViewed: RecentlyViewed[] = []
+    let recentlyViewed: RecentlyViewed[] = [];
     const userId = req.body.userId;
     // TODO: remove front end hardcoded sorting param -id
     const orderBy = getOrderByConditions(null, DEFAULT_SORT_BY);
@@ -91,8 +91,7 @@ export class ItemController {
 
     const itemsQuery = itemRepo // TODO filter out suspended shops and items.
       .createQueryBuilder("item")
-      .innerJoin("item.shop", "shops")
-      .where("shops.id = :id", { id: "c6a8eaaa-5892-456b-9fe2-9764e7f7823c" })
+      .where("item.id = :shopId", { shopId: "c6a8eaaa-5892-456b-9fe2-9764e7f7823c" })
       .orderBy(orderBy)
       .skip(skipSize)
       .take(pageSize);
@@ -108,10 +107,10 @@ export class ItemController {
         .take(2)
         .getMany();  
 
-     if (recentlyViewed.length > 0) {
+      if (recentlyViewed.length > 0) {
         const recentlyViewedItemsId = recentlyViewed.map(element => element.item.id);
         itemsQuery.andWhere("item.id NOT IN (:...recentlyViewedItemsId)", {recentlyViewedItemsId: recentlyViewedItemsId});
-     }
+      }
     }
 
     if(category !== undefined && category !== "") {  //TODO schema validation for category
@@ -127,10 +126,10 @@ export class ItemController {
 
     if(pageNumber === 1) { // insert two recently viewed items to discoverItems only to page 1.
       recentlyViewed.forEach((recentlyViewed: any, index: any) => {
-        discoverItems.splice(insertIndex, 0, recentlyViewed.item)
-        insertIndex = 2
-      })
-     }
+        discoverItems.splice(insertIndex, 0, recentlyViewed.item);
+        insertIndex = 2;
+      });
+    }
 
     res.send({
       data: discoverItems,
