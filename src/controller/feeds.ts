@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { getRepository, OrderByCondition } from "typeorm";
 import { HandleError } from "../decorator/errorDecorator";
 import { UserRelations } from "../entities/UserRelations";
-import { Items, ListingStatus } from "../entities/Items";
+import { Items, ListingStatus, AuditStatus } from "../entities/Items";
 import { getOrderByConditions } from "./helper/orderByHelper";
 import { getPaginationLinks, getPaginationParams } from "./helper/paginationHelper";
 import { logger } from "../logging/logger";
@@ -41,6 +41,7 @@ export class FeedsController {
           .leftJoinAndSelect("shop.owner", "users")
           .where("items.shopId IN (:...ids)", { ids: ["c6a8eaaa-5892-456b-9fe2-9764e7f7823c"] })
           .andWhere("items.status = :new", { new: ListingStatus.NEW })
+          .andWhere("items.auditStatus IN (:...auditStatus)", { auditStatus: [AuditStatus.PENDING, AuditStatus.PASS]})
           .select(["items", "shop.name", "shop.id", "shop.introduction", "shop.logoUrl", "shop.customerServiceUrl", "shop.location", "users.id", "users.username"])
           .orderBy(orderBy)
           .skip(skipSize)
