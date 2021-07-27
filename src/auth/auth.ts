@@ -5,6 +5,7 @@ import { logger } from "../logging/logger";
 import { JwtHelper } from "./jwt";
 
 const TEST_CUSTOMER_ID = 1;
+const BYPASS_AUTH_PATH = ["/discoverItems"]
 
 export const authMiddleWare = (req: Request, res: Response, next: NextFunction): void => {
   const authorization = req.headers.authorization;
@@ -20,7 +21,7 @@ export const authMiddleWare = (req: Request, res: Response, next: NextFunction):
     return next();
     
   } catch (err) {
-    if (shouldBypassAuth()) {
+    if (shouldBypassAuth(req.path)) {
       logger.info("Override is true, bypassing auth. Setting customerId to test customerId: " + TEST_CUSTOMER_ID);
       req.body.userId = TEST_CUSTOMER_ID;
       return next();
@@ -32,6 +33,14 @@ export const authMiddleWare = (req: Request, res: Response, next: NextFunction):
   }
 };
 
-export const shouldBypassAuth = () : boolean => {
-  return "true" === process.env.AUTH_OVERRIDE;
+export const shouldBypassAuth = (path: string) : boolean => {
+ 
+  if ("true" === process.env.AUTH_OVERRIDE) {
+    return true;
+  } else {
+    if (BYPASS_AUTH_PATH.includes(path)) {
+      return true;
+    }
+  }
+  return false;
 };
