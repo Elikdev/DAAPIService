@@ -100,7 +100,7 @@ export class ItemController {
         .leftJoinAndSelect("recentlyViewed.owner", "user")
         .leftJoinAndSelect("recentlyViewed.item", "item")
         .where("recentlyViewed.ownerId = :ownerId", {ownerId: userId })
-        .andWhere("item.status = status", {status:ListingStatus.NEW})
+        .andWhere("item.status = :status", {status:ListingStatus.NEW})
         .orderBy("recentlyViewed.viewdCount", "DESC")
         .take(2)
         .getMany();  
