@@ -159,7 +159,7 @@ export class ShopController {
       .andWhere("items.status IN (:...status)", {status: [ListingStatus.NEW, ListingStatus.SOLD, ListingStatus.DELISTED]})
       .loadRelationCountAndMap("shops.itemsCount", "shops.items")
       .select(["shops.id", "items"])
-      .orderBy("CASE WHEN items.status='new' THEN 0 ELSE 1 END")
+      .orderBy("CASE WHEN items.auditStatus='fail' THEN 0 WHEN items.status='new' THEN 1 ELSE 2 END")
       .addOrderBy("items.createdtime", "DESC") 
       .offset(skipSize)
       .limit(pageSize);

@@ -94,7 +94,7 @@ export class ItemController {
       .skip(skipSize)
       .take(pageSize);
 
-    if(userId) {
+    if(userId && (category === undefined || category === "")) { // no recently viewed insertion for collecton items. 
       const recentlyViewedRepo = getRepository(RecentlyViewed);
       recentlyViewed = await recentlyViewedRepo.createQueryBuilder("recentlyViewed")
         .leftJoinAndSelect("recentlyViewed.owner", "user")
@@ -113,7 +113,7 @@ export class ItemController {
 
     if(category !== undefined && category !== "") {  //TODO schema validation for category
       itemsQuery.andWhere("item.category = :category", {category: category});
-    }
+    } 
 
     itemsQuery.andWhere("item.status = :status", {status: ListingStatus.NEW});
     itemsQuery.andWhere("item.auditStatus IN (:...auditStatus)", {auditStatus: [AuditStatus.PASS, AuditStatus.PENDING]});
