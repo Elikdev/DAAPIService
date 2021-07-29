@@ -40,6 +40,7 @@ export class UserController {
       .loadRelationCountAndMap("user.itemSavesCount", "user.itemSaves")
       .getOne();
 
+    let newUser = false;
     if (!user) {
       logger.info("Creating new user record.");
       userData.openId = openId;
@@ -51,6 +52,7 @@ export class UserController {
       if (!user) {
         throw new AuthError("Failed to create user.");
       }
+      newUser = true;
     }
     const payload = {
       customerId: user.id
@@ -60,7 +62,8 @@ export class UserController {
 
     res.send({
       loginToken: accessToken,
-      userInfo: user
+      userInfo: user,
+      newUser: newUser
     });
 
   }
