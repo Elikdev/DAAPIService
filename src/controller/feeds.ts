@@ -39,7 +39,7 @@ export class FeedsController {
           .createQueryBuilder("items")
           .leftJoinAndSelect("items.shop", "shop")
           .leftJoinAndSelect("shop.owner", "users")
-          .where("items.shopId IN (:...ids)", { ids: followingShopIds })
+          .where("items.shopId IN (:...ids)", { ids: ["c6a8eaaa-5892-456b-9fe2-9764e7f7823c"] })
           .andWhere("items.status = :new", { new: ListingStatus.NEW })
           .andWhere("items.auditStatus IN (:...auditStatus)", { auditStatus: [AuditStatus.PENDING, AuditStatus.PASS]})
           .select(["items", "shop.name", "shop.id", "shop.introduction", "shop.logoUrl", "shop.customerServiceUrl", "shop.location", "users.id", "users.username"])
