@@ -218,7 +218,7 @@ export class ItemController {
     const results = await query.getMany();
     
     res.send({
-      data: results,
+      data: [],
       links: getPaginationLinks(req, pageNumber, pageSize)
     });
   }
