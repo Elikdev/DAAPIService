@@ -166,27 +166,14 @@ export class CouponsController {
         if (couponEntity.code === "first10") {
           const newAccount = await isNewAccount(userId);
           if (newAccount) {
+            const value = firstTenCapValue(Number(itemPrice), couponEntity.value);
             isValid = couponEntity.isValid;
             metaData = {
               id: couponEntity.id,
               type: couponEntity.couponType,
-              value: couponEntity.value
+              value: value
             };
           }
-        }
-
-
-        // Support Savvy, remove after the event
-        if (couponEntity.code === "savvy247") {
-          const validCouponForAccount = await isValidCouponForAccount(couponEntity.id, userId);
-          if (validCouponForAccount) {
-            isValid = couponEntity.isValid;
-            metaData = {
-              id: couponEntity.id,
-              type: couponEntity.couponType,
-              value: couponEntity.value
-            };
-          } 
         }
       }
     }
@@ -230,4 +217,9 @@ const isNewAccount = async (ownerId: any) : Promise<any> => {
   }
 
   return false;
+};
+
+const firstTenCapValue = (itemPrice: number, couponValue: number): number => {
+  // Maximum amount off: 50rmb
+  return Math.min(50 * 100 / itemPrice, couponValue);
 };
