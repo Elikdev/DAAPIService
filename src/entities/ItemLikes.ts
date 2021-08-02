@@ -13,10 +13,10 @@ export class ItemLikes extends BaseEntity {
   @UpdateDateColumn({type: "timestamp"})
   updatedAt: string;
 
-  @ManyToOne(() => Items, (items) => items.itemLikes, {eager: true})
+  @ManyToOne(() => Items, (items) => items.itemLikes, {eager: true, onDelete: "CASCADE"})
   item: Items;
 
-  @ManyToOne(() => Users, (users) => users.itemLikes)
+  @ManyToOne(() => Users, (users) => users.itemLikes, {onDelete: "CASCADE"})
   user: Users;
 
   @AfterInsert()

@@ -13,10 +13,10 @@ export class ItemSaves extends BaseEntity {
   @UpdateDateColumn({type: "timestamp"})
   updatedAt: string;
 
-  @ManyToOne(() => Items, (items) => items.itemSaves, {eager: true})
+  @ManyToOne(() => Items, (items) => items.itemSaves, {eager: true, onDelete: "CASCADE"})
   item: Items;
 
-  @ManyToOne(() => Users, (users) => users.itemSaves)
+  @ManyToOne(() => Users, (users) => users.itemSaves, {onDelete: "CASCADE"})
   user: Users;
 
   @AfterInsert()

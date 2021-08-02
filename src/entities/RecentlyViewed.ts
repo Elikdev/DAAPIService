@@ -20,10 +20,10 @@ export class RecentlyViewed extends BaseEntity {
   id: string;
 
 
-  @ManyToOne(() => Users, (users) => users.recentlyViewed, {onDelete: 'CASCADE'})
+  @ManyToOne(() => Users, (users) => users.recentlyViewed, {onDelete: "CASCADE"})
   owner: Users;
 
-  @ManyToOne(() => Items, (items) => items.recentlyViewed, {onDelete: 'CASCADE'})
+  @ManyToOne(() => Items, (items) => items.recentlyViewed, {onDelete: "CASCADE"})
   item: Items;
 
   @CreateDateColumn({type: "timestamp"})
