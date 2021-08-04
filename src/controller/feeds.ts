@@ -42,7 +42,7 @@ export class FeedsController {
           .where("items.shopId IN (:...ids)", { ids: followingShopIds })
           .andWhere("items.status = :new", { new: ListingStatus.NEW })
           .andWhere("items.auditStatus IN (:...auditStatus)", { auditStatus: [AuditStatus.PENDING, AuditStatus.PASS]})
-          .select(["items", "shop.name", "shop.id", "shop.introduction", "shop.logoUrl", "shop.customerServiceUrl", "shop.location", "users.id", "users.username"])
+          .select(["items", "shop.name", "shop.id", "shop.introduction", "shop.logoUrl", "shop.customerServiceUrl", "shops.commissionRate", "shop.location", "users.id", "users.username"])
           .orderBy(orderBy)
           .skip(skipSize)
           .take(pageSize)
