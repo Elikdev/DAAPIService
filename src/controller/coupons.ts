@@ -175,6 +175,19 @@ export class CouponsController {
             };
           }
         }
+
+        // Support Dawa, remove after the event
+        if (couponEntity.code === "dawa08") {
+          const validCouponForAccount = await isValidCouponForAccount(couponEntity.id, userId);
+          if (validCouponForAccount) {
+            isValid = couponEntity.isValid;
+            metaData = {
+              id: couponEntity.id,
+              type: couponEntity.couponType,
+              value: couponEntity.value
+            };
+          } 
+        }
       }
     }
 
