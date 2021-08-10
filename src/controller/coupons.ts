@@ -133,6 +133,7 @@ export class CouponsController {
   static async apply(req: Request, res: Response): Promise<void> {
     const couponCode = req.query.code;
     const itemShopId = req.query.itemShopId;
+    const itemId = req.query.itemId;
     const itemPrice = req.query.itemPrice;
     const userId = req.body.userId;
     const couponRepo = getRepository(Coupons);
@@ -176,16 +177,20 @@ export class CouponsController {
           }
         }
 
-        // Support Dawa, remove after the event
-        if (couponEntity.code === "dawa08") {
+        // Collection Items Exclusive Coupon
+        if (couponEntity.code === "qixi777") {
           const validCouponForAccount = await isValidCouponForAccount(couponEntity.id, userId);
           if (validCouponForAccount) {
-            isValid = couponEntity.isValid;
-            metaData = {
-              id: couponEntity.id,
-              type: couponEntity.couponType,
-              value: couponEntity.value
-            };
+            const qiXiCollectionId = '6e0a7cef-ed33-4299-8d3d-e3b06f026d37';
+            const validCouponForCollectionItem = await isValidCouponForCollectionItem(qiXiCollectionId, itemId);
+            if (validCouponForCollectionItem) {
+              isValid = couponEntity.isValid;
+              metaData = {
+                id: couponEntity.id,
+                type: couponEntity.couponType,
+                value: couponEntity.value
+              };
+            }
           } 
         }
       }
@@ -197,6 +202,24 @@ export class CouponsController {
     });
   }
 }
+
+const isValidCouponForCollectionItem = async (collectionId: string, itemId: any) : Promise<any> => {
+  const itemsRepo = getRepository(Items);
+  const item = await itemsRepo
+      .createQueryBuilder("items")
+      .leftJoinAndSelect("items.collections", "collections")
+      .where("collections.id = :id", { id: collectionId })
+      .andWhere("collections.isSuspended = :isSuspended", { isSuspended: false })
+      .andWhere("collections.endTime > :current", {current:  new Date()})
+      .andWhere("items.id = :itemId", { itemId: itemId })
+      .getOne();
+
+  if(!item) {
+    return false;
+  }
+
+  return true;
+};
 
 const isValidCouponForAccount = async (couponId: string, ownerId: any) : Promise<any> => {
   const orderRepo = getRepository(Orders);
