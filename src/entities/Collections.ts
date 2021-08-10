@@ -4,11 +4,13 @@ import {
   CreateDateColumn,
   Entity,
   ManyToMany,
+  OneToMany,
   JoinTable,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
 import { Items } from "./Items";
+import { Coupons } from "./Coupons";
 
 
 @Entity("collections")
@@ -41,4 +43,7 @@ export class Collections extends BaseEntity {
   @ManyToMany(() => Items, items => items.collections)
   @JoinTable()
   items: Items[];
+
+  @OneToMany(() => Coupons, (coupons) => coupons.collection, { cascade: true })
+  coupons: Coupons[];
 }

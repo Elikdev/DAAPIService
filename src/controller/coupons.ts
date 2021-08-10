@@ -142,6 +142,7 @@ export class CouponsController {
 
     const couponQuery = couponRepo.createQueryBuilder("coupons")
       .leftJoinAndSelect("coupons.shop", "shops")
+      .leftJoinAndSelect("coupons.collection", "collections")
       .where("coupons.code = :code", {code: couponCode })
       .andWhere("coupons.isValid = :isValid", {isValid: true })
       .andWhere("coupons.expireTime > :time", { time: new Date() });
@@ -163,6 +164,23 @@ export class CouponsController {
             value: couponEntity.value
           };
         } 
+      } else if (couponEntity.collection) { // Collection Items Exclusive Coupon
+        const validCouponForAccount = await isValidCouponForAccount(couponEntity.id, userId);
+        if (validCouponForAccount) {
+
+          // Qixi coupon code
+          if (couponEntity.code === "qixi777") {
+            const validCouponForCollectionItem = await isValidCouponForCollectionItem(couponEntity.collection.id, itemId);
+            if (validCouponForCollectionItem) {
+              isValid = couponEntity.isValid;
+              metaData = {
+                id: couponEntity.id,
+                type: couponEntity.couponType,
+                value: couponEntity.value
+              };
+            }
+          }
+        }
       } else {
         if (couponEntity.code === "first10") {
           const newAccount = await isNewAccount(userId);
@@ -175,23 +193,6 @@ export class CouponsController {
               value: value
             };
           }
-        }
-
-        // Collection Items Exclusive Coupon
-        if (couponEntity.code === "qixi777") {
-          const validCouponForAccount = await isValidCouponForAccount(couponEntity.id, userId);
-          if (validCouponForAccount) {
-            const qiXiCollectionId = '6e0a7cef-ed33-4299-8d3d-e3b06f026d37';
-            const validCouponForCollectionItem = await isValidCouponForCollectionItem(qiXiCollectionId, itemId);
-            if (validCouponForCollectionItem) {
-              isValid = couponEntity.isValid;
-              metaData = {
-                id: couponEntity.id,
-                type: couponEntity.couponType,
-                value: couponEntity.value
-              };
-            }
-          } 
         }
       }
     }
@@ -206,13 +207,13 @@ export class CouponsController {
 const isValidCouponForCollectionItem = async (collectionId: string, itemId: any) : Promise<any> => {
   const itemsRepo = getRepository(Items);
   const item = await itemsRepo
-      .createQueryBuilder("items")
-      .leftJoinAndSelect("items.collections", "collections")
-      .where("collections.id = :id", { id: collectionId })
-      .andWhere("collections.isSuspended = :isSuspended", { isSuspended: false })
-      .andWhere("collections.endTime > :current", {current:  new Date()})
-      .andWhere("items.id = :itemId", { itemId: itemId })
-      .getOne();
+    .createQueryBuilder("items")
+    .leftJoinAndSelect("items.collections", "collections")
+    .where("collections.id = :id", { id: collectionId })
+    .andWhere("collections.isSuspended = :isSuspended", { isSuspended: false })
+    .andWhere("collections.endTime > :current", {current:  new Date()})
+    .andWhere("items.id = :itemId", { itemId: itemId })
+    .getOne();
 
   if(!item) {
     return false;

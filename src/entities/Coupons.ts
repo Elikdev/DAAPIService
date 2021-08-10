@@ -13,6 +13,7 @@ import {
 import { Users } from "./Users";
 import { Orders } from "./Orders";
 import { Shops } from "./Shops";
+import { Collections } from "./Collections";
 
 export enum CouponType {
   PERCENTOFF = "percentOff",
@@ -57,6 +58,9 @@ export class Coupons extends BaseEntity {
 
   @ManyToOne(() => Shops, (shops) => shops.coupons, { nullable: true })
   shop: Shops;
+
+  @ManyToOne(() => Collections, (collections) => collections.coupons, { nullable: true })
+  collection: Collections;
 
   @Column({type: "timestamp"})
   expireTime: string;
