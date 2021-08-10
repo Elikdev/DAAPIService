@@ -5,7 +5,7 @@ import { logger } from "../logging/logger";
 import { JwtHelper } from "./jwt";
 
 const TEST_CUSTOMER_ID = 1;
-const BYPASS_AUTH_PATH = ["/discoverItems"]
+const BYPASS_AUTH_PATH = ["/discoverItems"];
 
 export const authMiddleWare = (req: Request, res: Response, next: NextFunction): void => {
   const authorization = req.headers.authorization;

@@ -13,10 +13,13 @@ import { getPaginationLinks, getPaginationParams } from "./helper/paginationHelp
 
 const MAX_OWNED_SHOPS = 1;
 const DEFAULT_SORT_BY:OrderByCondition = { "users.followersCount":"DESC" };
+const ADMIN_USER_ID = 3;
+
 
 export class ShopController {
   @HandleError("createShop")
   static async createShop(req: Request, res: Response): Promise<void> {
+    //TODO added back owener verification after self creating shop is enabled.
     // const userId = req.body.userId;
     const shopData = req.body.data;
     const validator = new RequestValidator(createShopSchema);
@@ -123,19 +126,26 @@ export class ShopController {
     const shopId = req.params.id;
     const shopData = req.body.data;
 
+
     const validator = new RequestValidator(updateShopSchema);
     validator.validate(shopData);
 
+
+    shopData.id = shopId; // for update sync to algolia
+
     const shopRepo = await getRepository(Shops);
-    const result = await shopRepo.createQueryBuilder()
+    let resultQuery = shopRepo.createQueryBuilder()
       .update(Shops, shopData)
       .where("id = :id", { id: shopId })
-      .andWhere("ownerId = :userId", {userId: userId})
       .returning("*")
-      .updateEntity(true)
-      .execute()
-      .then(response => response.raw[0]);
-    
+      .updateEntity(true);
+
+    if(userId !== ADMIN_USER_ID) { // TEMP SOLN skip ownership verification for admin.
+      resultQuery.andWhere("ownerId = :userId", {userId: userId})
+    }
+
+    const result = await resultQuery.execute().then(response => response.raw[0]);
+
     if (!result) {
       throw new ResourceNotFoundError("Shop not found.");
     }
@@ -165,7 +175,7 @@ export class ShopController {
       .limit(pageSize);
     
     if(from === "shopper") {
-      shopItemsQeury.andWhere("items.auditStatus IN (:...auditStatus)", {auditStatus: [AuditStatus.PASS, AuditStatus.PENDING]})
+      shopItemsQeury.andWhere("items.auditStatus IN (:...auditStatus)", {auditStatus: [AuditStatus.PASS, AuditStatus.PENDING]});
     }
 
     const shopItems = await shopItemsQeury.getOne();

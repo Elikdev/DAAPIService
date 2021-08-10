@@ -35,7 +35,7 @@ export class ItemController {
     const itemsQuery = itemRepo // TODO filter out suspended shops and items.
       .createQueryBuilder("item")
       .leftJoinAndSelect("item.shop", "shops")
-            .select([
+      .select([
         "item", "shops.name"
       ])
       .orderBy(orderBy)
