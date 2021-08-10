@@ -41,8 +41,8 @@ export class ItemsSubscriber implements EntitySubscriberInterface<Shops> {
       object.objectID = object.id;
       const result = await index.partialUpdateObject(object)
         .then(() => {
-          console.log("success");
           delete object.objectID;
+          delete object.ownerId;
         });
     }
 

@@ -120,7 +120,7 @@ export class ShopController {
     });
   }
 
-  @HandleError("updateShop")
+  @HandleError("updateShop") 
   static async updateShop(req: Request, res: Response): Promise<void> {
     const userId = req.body.userId;
     const shopId = req.params.id;
@@ -130,25 +130,30 @@ export class ShopController {
     const validator = new RequestValidator(updateShopSchema);
     validator.validate(shopData);
 
-
     shopData.id = shopId; // for update sync to algolia
 
-    const shopRepo = await getRepository(Shops);
-    let resultQuery = shopRepo.createQueryBuilder()
-      .update(Shops, shopData)
-      .where("id = :id", { id: shopId })
-      .returning("*")
-      .updateEntity(true);
 
-    if(userId !== ADMIN_USER_ID) { // TEMP SOLN skip ownership verification for admin.
-      resultQuery.andWhere("ownerId = :userId", {userId: userId})
+    if(userId === ADMIN_USER_ID) {
+      const ownerId = shopData.ownerId;
+      if(ownerId !== undefined) {
+        const user = await Users.findOne({id: ownerId});
+        if (!user) {
+          throw new ResourceNotFoundError("User doesn't exist.");
+        }
+        const ownedShops = await Shops.find({owner: user});
+        if (ownedShops.length >= MAX_OWNED_SHOPS) {
+          throw new BadRequestError(`No more than ${MAX_OWNED_SHOPS} shops is allowed.`);
+        }
+        shopData.owner = user;
+      }
     }
 
-    const result = await resultQuery.execute().then(response => response.raw[0]);
+    delete shopData.ownerId;
 
-    if (!result) {
-      throw new ResourceNotFoundError("Shop not found.");
-    }
+    const shopRepo = await getRepository(Shops); 
+    const result = await shopRepo.save(shopData); // TODO ownership verification
+
+
     res.send({
       data: result
     });

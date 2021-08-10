@@ -39,6 +39,8 @@ v1router.get("/collections/items", CollectionsController.getAllCollectionItems);
 v1router.get("/collections/all", CollectionsController.getAllCollections); // admin
 
 v1router.get("/search", SearchController.search);
+v1router.get("/querySug", SearchController.querySuggestion);
+
 v1router.get("/coupons", CouponsController.get); // TODO access control
 v1router.put("/coupons/:id", CouponsController.update);
 v1router.post("/coupons", CouponsController.create);
