@@ -17,20 +17,20 @@ const DEFAULT_SORT_BY:OrderByCondition = { "users.followersCount":"DESC" };
 export class ShopController {
   @HandleError("createShop")
   static async createShop(req: Request, res: Response): Promise<void> {
-    const userId = req.body.userId;
+    // const userId = req.body.userId;
     const shopData = req.body.data;
     const validator = new RequestValidator(createShopSchema);
     validator.validate(shopData);
     const shopRepo = getRepository(Shops);
-    const user = await Users.findOne({id: userId});
-    if (!user) {
-      throw new ResourceNotFoundError("User doesn't exist.");
-    }
-    const ownedShops = await Shops.find({owner: user});
-    if (ownedShops.length >= MAX_OWNED_SHOPS) {
-      throw new BadRequestError(`No more than ${MAX_OWNED_SHOPS} shops is allowed.`);
-    }
-    shopData.owner = user;
+    // const user = await Users.findOne({id: userId});
+    // if (!user) {
+    //   throw new ResourceNotFoundError("User doesn't exist.");
+    // }
+    // const ownedShops = await Shops.find({owner: user});
+    // if (ownedShops.length >= MAX_OWNED_SHOPS) {
+    //   throw new BadRequestError(`No more than ${MAX_OWNED_SHOPS} shops is allowed.`);
+    // }
+    // shopData.owner = user;
     const createdShop = await shopRepo.save(shopData);
 
     res.send({

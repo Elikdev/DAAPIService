@@ -12,7 +12,7 @@ import { RequestValidator } from "../validator/requestValidator";
 import { createItemSchema, updateItemSchema } from "../validator/schemas";
 import { getOrderByConditions } from "./helper/orderByHelper";
 import { getPaginationLinks, getPaginationParams } from "./helper/paginationHelper";
-const DEFAULT_SORT_BY:OrderByCondition = { "score": "DESC", "createdtime":"DESC" };
+const DEFAULT_SORT_BY:OrderByCondition = { "item.score": "DESC", "item.createdtime":"DESC" };
 const ADMIN_USER_ID = 3;
 
 export class ItemController {
@@ -34,6 +34,10 @@ export class ItemController {
     logger.debug("OrderBy: " + JSON.stringify(orderBy));
     const itemsQuery = itemRepo // TODO filter out suspended shops and items.
       .createQueryBuilder("item")
+      .leftJoinAndSelect("item.shop", "shops")
+            .select([
+        "item", "shops.name"
+      ])
       .orderBy(orderBy)
       .skip(skipSize)
       .take(pageSize);
