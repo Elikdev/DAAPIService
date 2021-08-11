@@ -122,7 +122,7 @@ export const updateCouponSchema = Joi.object().keys({
   couponType: Joi.string().optional().valid(...Object.values(CouponType)),
   value: Joi.number().optional(),
   lowestApplicableOrderPrice: Joi.number().optional(),
-  shopId: Joi.string().uuid().optional()
+  shopId: Joi.string().uuid().allow("").allow(null).optional()
 });
 
 export const createCouponSchema = Joi.object().keys({
