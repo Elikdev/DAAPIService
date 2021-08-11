@@ -67,8 +67,6 @@ export class CouponsController {
         throw new ResourceNotFoundError("User not found.");
       }
       couponData.owner = user;
-      delete couponData.ownerId;
-
     }
     if(shopId !== undefined && shopId !== "") {
       const shop = await getRepository(Shops).findOne({id: shopId});
@@ -76,8 +74,10 @@ export class CouponsController {
         throw new ResourceNotFoundError("Shop not found.");
       }
       couponData.shop = shop;
-      delete couponData.shopId;
     }
+    
+    delete couponData.shopId;
+    delete couponData.ownerId;
 
     const result = await couponRepo.createQueryBuilder()
       .update(Coupons, couponData)
