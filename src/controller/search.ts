@@ -37,7 +37,7 @@ export class SearchController {
     };
 
 
-    const filters = ["status:new", ["auditStatus:pending", "auditStatus:pass"]];
+    const filters = ["status:new", "shop.isSuspended: false", ["auditStatus:pending", "auditStatus:pass"]];
 
     const content: AlgoliaHits = await productIndex.search(query, {
       hitsPerPage: pageSize,

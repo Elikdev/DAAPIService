@@ -40,6 +40,7 @@ export class FeedsController {
           .leftJoinAndSelect("items.shop", "shops")
           .leftJoinAndSelect("shops.owner", "users")
           .where("items.shopId IN (:...ids)", { ids: followingShopIds })
+          .andWhere("shops.isSuspended = :isSuspended", { isSuspended: false })
           .andWhere("items.status = :new", { new: ListingStatus.NEW })
           .andWhere("items.auditStatus IN (:...auditStatus)", { auditStatus: [AuditStatus.PENDING, AuditStatus.PASS]})
           .select(["items", "shops.name", "shops.id", "shops.introduction", "shops.logoUrl", "shops.customerServiceUrl", "shops.commissionRate","shops.location", "users.id", "users.username"])

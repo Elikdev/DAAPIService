@@ -70,6 +70,7 @@ export class ItemController {
     }
 
     itemsQuery.andWhere("item.status = :status", {status: status});
+    itemsQuery.andWhere("shops.isSuspended = :isSuspended", {isSuspended: false});
 
     const items = await itemsQuery.getMany();
 
@@ -94,6 +95,7 @@ export class ItemController {
 
     const itemsQuery = itemRepo // TODO filter out suspended shops and items.
       .createQueryBuilder("item")
+      .leftJoin("item.shop", "shops")
       .orderBy(orderBy)
       .skip(skipSize)
       .take(pageSize);
@@ -119,6 +121,7 @@ export class ItemController {
       itemsQuery.andWhere("item.category = :category", {category: category});
     } 
 
+    itemsQuery.andWhere("shops.isSuspended = :isSuspended", {isSuspended: false});
     itemsQuery.andWhere("item.status = :status", {status: ListingStatus.NEW});
     itemsQuery.andWhere("item.auditStatus IN (:...auditStatus)", {auditStatus: [AuditStatus.PASS, AuditStatus.PENDING]});
 
@@ -203,8 +206,10 @@ export class ItemController {
     }
     const query = itemRepo
       .createQueryBuilder("item")
+      .leftJoin("item.shop", "shops")
       .where("item.id != :id", {id: itemId})
       .andWhere("item.status = :new", { new: ListingStatus.NEW })
+      .andWhere("shops.isSuspended = :isSuspended", { isSuspended: false })
       .andWhere("item.auditStatus IN (:...auditStatus)", { auditStatus: [AuditStatus.PENDING, AuditStatus.PASS]})
       .skip(skipSize)
       .take(pageSize);
