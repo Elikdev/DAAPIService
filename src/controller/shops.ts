@@ -141,7 +141,7 @@ export class ShopController {
           throw new ResourceNotFoundError("User doesn't exist.");
         }
         const ownedShops = await Shops.find({owner: user});
-        if (ownedShops.length >= MAX_OWNED_SHOPS) {
+        if (ownedShops.length === MAX_OWNED_SHOPS && ownedShops[0].id !== shopId) {
           throw new BadRequestError(`No more than ${MAX_OWNED_SHOPS} shops is allowed.`);
         }
         shopData.owner = user;
