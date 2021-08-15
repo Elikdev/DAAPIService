@@ -150,4 +150,5 @@ export const updateShopSchema = Joi.object().keys({
   logoUrl: Joi.string(),
   location: Joi.string().max(500),
   ownerId: Joi.number().optional(),
+  rating: Joi.number().optional(),
 });
