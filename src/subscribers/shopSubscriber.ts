@@ -11,7 +11,7 @@ const index = client.initIndex("retopia_prod_shops");
 const APP_ENV = process.env.APP_ENV;
 
 @EventSubscriber()
-export class ItemsSubscriber implements EntitySubscriberInterface<Shops> {
+export class ShopsSubscriber implements EntitySubscriberInterface<Shops> {
 
 
   /**
@@ -35,17 +35,15 @@ export class ItemsSubscriber implements EntitySubscriberInterface<Shops> {
     }
   }
 
-  async beforeUpdate(event: UpdateEvent<Shops>) { // to do change to afterUpdate after https://github.com/typeorm/typeorm/commits/master checks into major version.
+  async afterUpdate(event: UpdateEvent<Shops>) {
     if (APP_ENV === "production") {
       const object: any = event.entity;
       object.objectID = object.id;
-      const result = await index.partialUpdateObject(object)
+      const result = await index.saveObject(object)
         .then(() => {
-          delete object.objectID;
-          delete object.ownerId;
+          console.log("success");
         });
     }
-
   }
 
 }
