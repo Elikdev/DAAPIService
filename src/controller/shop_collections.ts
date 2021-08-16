@@ -87,8 +87,8 @@ export class ShopCollectionsController {
     const shops = await shopsRepo
       .createQueryBuilder("shops")
       .leftJoin("shops.shopCollections", "shopCollections")
-      .innerJoin("shops.owner", "users")
-      .innerJoin("shops.items", "items")
+      .leftJoin("shops.owner", "users")
+      .leftJoin("shops.items", "items")
       .where("shopCollections.id = :id", { id: collectionId })
       .andWhere("shops.isSuspended = :isSuspended", {isSuspended: false})
       .andWhere("items.status = :new", { new: ListingStatus.NEW })
@@ -106,7 +106,7 @@ export class ShopCollectionsController {
         "items.imageUrls"
       ])      
       .offset(skipSize)
-      .limit(pageSize)
+      .take(pageSize)
       .getMany();
     
     res.send({
