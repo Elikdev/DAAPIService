@@ -4,6 +4,7 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -12,6 +13,8 @@ import { Items } from "./Items";
 import { Users } from "./Users";
 import { Orders } from "./Orders";
 import { Coupons } from "./Coupons";
+
+import { ShopCollections } from "./ShopCollections";
 
 // type = merchant 为 签约商家
 export enum ShopType {
@@ -66,6 +69,9 @@ export class Shops extends BaseEntity {
 
   @ManyToOne(() => Users, (users) => users.shops)
   owner: Users;
+
+  @ManyToMany(() => ShopCollections, shopCollections => shopCollections.shops)
+  shopCollections: ShopCollections[]
 
   @CreateDateColumn({type: "timestamp"})
   createdtime: string;

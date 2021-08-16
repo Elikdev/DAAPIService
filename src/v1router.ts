@@ -10,6 +10,8 @@ import { ShopController } from "./controller/shops";
 import { OrderController } from "./controller/order";
 import { FeedsController } from "./controller/feeds";
 import { CollectionsController } from "./controller/collections";
+import { ShopCollectionsController } from "./controller/shop_collections";
+
 import { CouponsController } from "./controller/coupons";
 import { SearchController } from "./controller/search";
 import { RecentlyViewedController } from "./controller/recentlyViewed";
@@ -37,6 +39,12 @@ v1router.get("/collections", CollectionsController.getCollections);
 v1router.get("/collections/:id/items", CollectionsController.getCollectionItems);
 v1router.get("/collections/items", CollectionsController.getAllCollectionItems);
 v1router.get("/collections/all", CollectionsController.getAllCollections); // admin
+
+
+v1router.get("/shopCollections", ShopCollectionsController.getShopCollections);
+v1router.get("/shopCollections/:id/shops", ShopCollectionsController.getShopCollectionShops);
+v1router.get("/shopCollections/shops", ShopCollectionsController.getAllShopCollectionShops);
+v1router.get("/shopCollections/all", ShopCollectionsController.getAllShopCollections); // admin
 
 v1router.get("/search", SearchController.search);
 v1router.get("/querySug", SearchController.querySuggestion);
@@ -84,6 +92,13 @@ v1router.post("/collections", CollectionsController.createCollection);
 v1router.put("/collections/:id", CollectionsController.updateCollection);
 v1router.put("/collections/:id/items/", CollectionsController.addCollectionItem);
 v1router.delete("/collections/:id/items/", CollectionsController.removeCollectionItem);
+
+v1router.post("/shopCollections", ShopCollectionsController.createShopCollection);
+v1router.put("/shopCollections/:id", ShopCollectionsController.updateShopCollection);
+v1router.put("/shopCollections/:id/shops/", ShopCollectionsController.addShopCollectionItem);
+v1router.delete("/shopCollections/:id/shops/", ShopCollectionsController.removeShopCollectionItem);
+
+
 
 
 v1router.get("/coupons/apply", CouponsController.apply);
