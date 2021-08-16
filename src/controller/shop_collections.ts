@@ -105,7 +105,7 @@ export class ShopCollectionsController {
         "items.id",
         "items.imageUrls"
       ])      
-      .offset(skipSize)
+      .skip(skipSize)
       .take(pageSize)
       .getMany();
     
