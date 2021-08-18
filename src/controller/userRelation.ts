@@ -139,6 +139,7 @@ export class UserRelationController {
         "users.id",
         "followings", 
         "followee.id", 
+        "followee.role",
         "followee.username", 
         "followee.followersCount", 
         "followee.avatarUrl",
@@ -150,7 +151,8 @@ export class UserRelationController {
         "items.id",
         "items.imageUrls",
       ])
-      .getOne();
+      .orderBy("followee.role", "DESC")
+      .getOne(); 
 
     res.send({
       data: userFollowings
@@ -172,6 +174,7 @@ export class UserRelationController {
         "users.id",
         "followers", 
         "follower.id", 
+        "follower.role",
         "follower.username", 
         "follower.followersCount", 
         "follower.avatarUrl", 
@@ -183,6 +186,7 @@ export class UserRelationController {
         "items.id",
         "items.imageUrls",
       ])
+      .orderBy("follower.role", "DESC")
       .getOne();
 
     res.send({
