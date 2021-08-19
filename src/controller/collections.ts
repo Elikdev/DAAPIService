@@ -81,21 +81,45 @@ export class CollectionsController {
     const itmesRepo = getRepository(Items);
     const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
 
-
-    const items = await itmesRepo
+    const itemsQuery = await itmesRepo
       .createQueryBuilder("items")
       .leftJoin("items.collections", "collections")
       .where("collections.id = :id", { id: collectionId })
       .andWhere("items.status NOT IN (:...status)", {status: [ListingStatus.SOLD, ListingStatus.DELISTED]})
       .andWhere("items.auditStatus = :pass", {pass: AuditStatus.PASS})
       .select(["items"])
-      .orderBy("items.score", "DESC")
+      .orderBy({"items.updatedtime": "DESC"}) // Get top20 recently updated items
       .offset(skipSize)
-      .limit(pageSize)
+      .limit(pageSize);
+
+    const items: Items[] = await itemsQuery.getMany();
+
+    // Sort items by recently (in 72 hours) updated items
+    const threeDaysAgo = new Date(new Date().getTime() - (72 * 60 * 60 * 1000));
+    const recentlyUpdatedItems: Items[] = await itemsQuery
+      .andWhere("items.updatedtime > :time", { time: threeDaysAgo })
       .getMany();
+
+    let resultItems;
+    let recentlyUpdatedItemsCount = 0;
+
+    const sortItemsByHeat = (a: Items, b: Items): number => {
+      return a.itemLikesCount + a.itemSavesCount < b.itemLikesCount + b.itemSavesCount ? 1 : -1;
+    }
+
+    if (recentlyUpdatedItems && recentlyUpdatedItems.length > 0) {
+      const itemsId = new Set(recentlyUpdatedItems.map(item => item.id));
+      const promotedItems = items.filter(item => itemsId.has(item.id));
+      recentlyUpdatedItemsCount = promotedItems.length;
+      // Part1: items updated in 72 hours, Part2: items sort by heat
+      const sortedItems = [...promotedItems, ...items.filter(item => !itemsId.has(item.id)).sort(sortItemsByHeat)];
+      resultItems = sortedItems;
+    } else {
+      resultItems = items.sort(sortItemsByHeat);
+    }  
     
     res.send({
-      data: items,
+      data: resultItems,
       links: getPaginationLinks(req, pageNumber, pageSize)
     });
   }
@@ -107,7 +131,6 @@ export class CollectionsController {
     const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
 
     const items = await collectionRepo.createQueryBuilder("collection").getMany();
-
 
     res.send({
       data: items,
