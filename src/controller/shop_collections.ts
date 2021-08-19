@@ -84,7 +84,7 @@ export class ShopCollectionsController {
     const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
 
 
-    const shops = await shopsRepo
+    const shopsQuery = await shopsRepo
       .createQueryBuilder("shops")
       .leftJoin("shops.shopCollections", "shopCollections")
       .leftJoin("shops.owner", "users")
@@ -104,13 +104,38 @@ export class ShopCollectionsController {
         "users.followersCount", 
         "items.id",
         "items.imageUrls"
-      ])      
+      ])
+      .orderBy("users.followersCount", "DESC")      
       .skip(skipSize)
-      .take(pageSize)
+      .take(pageSize);
+
+    const shops: Shops[] = await shopsQuery.getMany();
+
+    // Sort shops by recently (in 24 hours) created items
+    const oneDayAgo = new Date(new Date().getTime() - (24 * 60 * 60 * 1000));
+    const recentlyActiveShops: Shops[] = await shopsQuery
+      .andWhere("items.createdtime > :time", { time: oneDayAgo })
       .getMany();
+
+    let resultShops;
+    let recentlyActiveShopsCount = 0;
+
+    if (recentlyActiveShops && recentlyActiveShops.length > 0) {
+      const shopIds = new Set(recentlyActiveShops.map(shop => shop.id));
+      // promotedShops = Top 20 followers count & created items in last 24 hours
+      const promotedShops = shops.filter(shop => shopIds.has(shop.id));
+      recentlyActiveShopsCount = promotedShops.length;
+      const sortedShops = [...promotedShops, ...shops.filter(shop => !shopIds.has(shop.id))];
+      resultShops = sortedShops;
+    } else {
+      resultShops = shops;
+    }
+    
+      
     
     res.send({
-      data: shops,
+      data: resultShops,
+      recentlyActiveShopsCount: recentlyActiveShopsCount,
       links: getPaginationLinks(req, pageNumber, pageSize)
     });
   }
