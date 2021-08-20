@@ -42,7 +42,7 @@ export class FeedsController {
           .where("items.shopId IN (:...ids)", { ids: followingShopIds })
           .andWhere("shops.isSuspended = :isSuspended", { isSuspended: false })
           .andWhere("items.status = :new", { new: ListingStatus.NEW })
-          .andWhere("items.auditStatus IN (:...auditStatus)", { auditStatus: [AuditStatus.PENDING, AuditStatus.PASS]})
+          .andWhere("items.auditStatus = :pass", {pass: AuditStatus.PASS})
           .select(["items", "shops.name", "shops.id", "shops.introduction", "shops.logoUrl", "shops.customerServiceUrl", "shops.commissionRate","shops.location", "users.id", "users.username"])
           .orderBy(orderBy)
           .skip(skipSize)
