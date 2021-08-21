@@ -101,11 +101,13 @@ export class ItemController {
       .take(pageSize);
 
     if(userId && (category === undefined || category === "")) { // no recently viewed insertion for collecton items. 
+      const sevenDayAgo = new Date(new Date().getTime() - (7 * 24 * 60 * 60 * 1000));
       const recentlyViewedRepo = getRepository(RecentlyViewed);
       recentlyViewed = await recentlyViewedRepo.createQueryBuilder("recentlyViewed")
         .leftJoinAndSelect("recentlyViewed.owner", "user")
         .leftJoinAndSelect("recentlyViewed.item", "item")
         .where("recentlyViewed.ownerId = :ownerId", {ownerId: userId })
+        .andWhere("recentlyViewed.createdtime > :time", { time: sevenDayAgo })
         .andWhere("item.status = :status", {status:ListingStatus.NEW})
         .orderBy("recentlyViewed.viewdCount", "DESC")
         .take(2)
