@@ -109,7 +109,7 @@ export class ShopController {
       .leftJoinAndSelect("shops.owner", "users")
       .leftJoinAndSelect("users.defaultAddress", "defaultAddress")
       .select([
-        "shops.id", "shops.name", "shops.introduction", "shops.logoUrl", 
+        "shops.id", "shops.name", "shops.introduction", "shops.logoUrl", "shops.location",
         "users.id", "users.username", "users.followersCount", "users.followingsCount", 
         "defaultAddress.city", "defaultAddress.district", "defaultAddress.street"
       ])
