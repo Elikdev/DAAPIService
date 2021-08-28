@@ -1,11 +1,11 @@
 {
-	"applinks": {
-		"apps": [],
-		"details": [
-			{
-				"appIDs": [ "35JTL42RVZ.com.retopia.vintage" ],
+    "applinks": {
+        "apps": [],
+        "details": [
+            {
+                "appID": "35JTL42RVZ.com.retopia.vintage",
 				"paths": [ "/app/*" ]
-			}
-		]
-	}
+            }
+        ]
+    }
 }
