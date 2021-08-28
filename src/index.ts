@@ -47,6 +47,10 @@ createConnection(DBConfig).then(async connection => {
   
   app.use("/", router);
 
+  app.get("/.well-known/apple-app-site-association", (req: Request, res: Response) => {
+    res.set('Content-Type', 'application/json');
+    res.status(200).sendFile(__dirname +  '/apple-app-site-association')});
+
   app.get("/health", (req: Request, res: Response) => res.send("Serivce is healthy."));
   router.use("/v1", v1router);
   router.use("/pay", payrouter);
