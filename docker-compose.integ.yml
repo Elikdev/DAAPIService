@@ -19,6 +19,26 @@ services:
       APP_ENV: test
     networks:
       - daapi
+  aliyunsts:
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: base
+    working_dir: /home/node/app/script/sts-app-server-node
+    volumes:
+      - ./script/sts-app-server-node:/home/node/app/script/sts-app-server-node
+    container_name: aliyunsts
+    expose:
+      - '9000'
+    ports:
+      - '9000:9000'
+    command: 
+       node index.js
+    environment:
+      APP_ENV: development
+    networks:
+      - daapi
   
 networks:
   daapi:

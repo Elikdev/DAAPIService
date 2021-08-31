@@ -5,7 +5,14 @@ var fs = require('fs');
 var app = express();
 
 app.get('/', function (req, res) {
-  var conf = JSON.parse(fs.readFileSync('./config.json'));
+  var conf = {
+    "AccessKeyId" : "LTAI5t8wUwnRmW544wQTnFHP",
+    "AccessKeySecret" : "zNvSIC2s2w1A6eqIdmwGEpx9tAkU6T",
+    "RoleArn" : "acs:ram::1391519769809187:role/aliyunosstokengeneratorrole",
+    "TokenExpireTime" : "3600",
+    "PolicyFile": "policy/all_policy.txt"
+  }
+
   var policy;
   if (conf.PolicyFile) {
     policy = fs.readFileSync(conf.PolicyFile).toString('utf-8');
