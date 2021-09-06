@@ -18,6 +18,7 @@ import { Coupons } from "./Coupons";
 import { ItemLikes } from "./ItemLikes";
 import { UserRelations } from "./UserRelations";
 import { RecentlyViewed } from "./RecentlyViewed";
+import { Carts } from "./Cart";
 
 export enum UserRole {
   SHOPPER = "shopper",
@@ -74,6 +75,9 @@ export class Users extends BaseEntity {
   @OneToOne(() => Addresses, {nullable: true })
   @JoinColumn()
   defaultAddress: Addresses | null;
+
+  @OneToOne(() => Carts, cart => cart.owner, {nullable: true })
+  cart: Carts;
 
   @OneToMany(() => ItemSaves, (itemSaves) => itemSaves.user, { cascade: true })
   itemSaves: ItemSaves[];

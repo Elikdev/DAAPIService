@@ -105,7 +105,7 @@ export class CollectionsController {
 
     const sortItemsByHeat = (a: Items, b: Items): number => {
       return a.itemLikesCount + a.itemSavesCount < b.itemLikesCount + b.itemSavesCount ? 1 : -1;
-    }
+    };
 
     if (recentlyUpdatedItems && recentlyUpdatedItems.length > 0) {
       const itemsId = new Set(recentlyUpdatedItems.map(item => item.id));
@@ -158,7 +158,7 @@ export class CollectionsController {
        throw new ResourceNotFoundError("collection not found.");
      } else {
 
-       const   newItems = collection.items.filter(item => { // this might be slow if collection is large. 
+       const newItems = collection.items.filter(item => { // this might be slow if collection is large. 
          return item.id !== toRemoveItem.id;
        });
     

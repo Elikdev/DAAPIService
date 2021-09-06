@@ -12,13 +12,10 @@ import {
 import { Users } from "./Users";
 import { Items } from "./Items";
 
-
-
 @Entity("recentlyViewed")
 export class RecentlyViewed extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
-
 
   @ManyToOne(() => Users, (users) => users.recentlyViewed, {onDelete: "CASCADE"})
   owner: Users;
@@ -31,7 +28,6 @@ export class RecentlyViewed extends BaseEntity {
 
   @UpdateDateColumn({type: "timestamp"})
   updatedtime: string;
-
 
   @Column({default: 0})
   viewdCount: number;
