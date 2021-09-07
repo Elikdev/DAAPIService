@@ -30,7 +30,6 @@ export class Collections extends BaseEntity {
   @Column({default: 0})
   order: number;
 
-
   @Column({type: "timestamp"})
   endTime: string;
 

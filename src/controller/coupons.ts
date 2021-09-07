@@ -195,7 +195,7 @@ export class CouponsController {
           }
         }
 
-         // Support Savvy, remove after the event
+        // Support Savvy, remove after the event
         if (couponEntity.code === "savvy828") {
           const validCouponForAccount = await isValidCouponForAccount(couponEntity.id, userId);
           if (validCouponForAccount) {

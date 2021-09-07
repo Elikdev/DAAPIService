@@ -16,6 +16,7 @@ import { ItemSaves } from "./ItemSaves";
 import { ItemLikes } from "./ItemLikes";
 import { Collections } from "./Collections";
 import { RecentlyViewed } from "./RecentlyViewed";
+import { Carts } from "./Cart";
 
 export enum ListingStatus {
   NEW = "new",
@@ -168,9 +169,11 @@ export class Items extends BaseEntity {
   @OneToMany(() => RecentlyViewed, (recentViewed) => recentViewed.item, { cascade: true })
   recentlyViewed: RecentlyViewed[];
 
-
   @ManyToMany(() => Collections, collections => collections.items)
   collections: Collections[]
+
+  @ManyToMany(() => Carts, carts => carts.items)
+  carts: Carts[]
 
   @Column({default: 0})
   itemSavesCount: number;

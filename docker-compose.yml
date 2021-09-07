@@ -1,4 +1,4 @@
-version: '3.7'
+version: "3.7"
 
 services:
   tsnodedocker:
@@ -12,36 +12,16 @@ services:
       - ./nodemon.json:/home/node/app/nodemon.json
     container_name: tsnodedocker
     expose:
-      - '4000'
+      - "4000"
     ports:
-      - '4000:4000'
+      - "4000:4000"
     command: >
       bash -c "/home/node/app/bin/run-web.sh"
     environment:
       APP_ENV: development
     networks:
       - daapi
-  aliyunsts:
-    restart: always
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: base
-    working_dir: /home/node/app/script/sts-app-server-node
-    volumes:
-      - ./script/sts-app-server-node:/home/node/app/script/sts-app-server-node
-    container_name: aliyunsts
-    expose:
-      - '9000'
-    ports:
-      - '9000:9000'
-    command: 
-       node index.js
-    environment:
-      APP_ENV: development
-    networks:
-      - daapi
-  
+
 networks:
   daapi:
     driver: bridge

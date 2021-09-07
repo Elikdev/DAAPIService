@@ -18,6 +18,7 @@ import { RecentlyViewedController } from "./controller/recentlyViewed";
 
 import bodyParser from "body-parser";
 import { NotificationController } from "./controller/notification";
+import { ShoppingCartController } from "./controller/shoppingCart";
 
 export const v1router = Router();
 
@@ -98,8 +99,9 @@ v1router.put("/shopCollections/:id", ShopCollectionsController.updateShopCollect
 v1router.put("/shopCollections/:id/shops/", ShopCollectionsController.addShopCollectionItem);
 v1router.delete("/shopCollections/:id/shops/", ShopCollectionsController.removeShopCollectionItem);
 
-
-
+v1router.get("/cart", ShoppingCartController.getCart);
+v1router.post("/cart/:id", ShoppingCartController.addCartItem);
+v1router.delete("/cart/:id", ShoppingCartController.removeCartItem);
 
 v1router.get("/coupons/apply", CouponsController.apply);
 
