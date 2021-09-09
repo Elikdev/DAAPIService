@@ -96,6 +96,8 @@ export class ItemController {
     const itemsQuery = itemRepo // TODO filter out suspended shops and items.
       .createQueryBuilder("item")
       .leftJoin("item.shop", "shops")
+      .leftJoinAndSelect("item.itemLikes", "itemLikes")
+      .leftJoinAndSelect("itemLikes.user", "user")
       .orderBy(orderBy)
       .skip(skipSize)
       .take(pageSize);
@@ -128,6 +130,20 @@ export class ItemController {
     itemsQuery.andWhere("item.auditStatus IN (:...auditStatus)", {auditStatus: [AuditStatus.PASS, AuditStatus.PENDING]});
 
     const discoverItems = await itemsQuery.getMany();    
+    
+    if (userId) { //check if items liked by requester 
+      discoverItems.map(function (element: any) {
+        const likedUserIds = element.itemLikes.map(function(likes:any) { 
+          return likes.user.id
+        })
+        element.likedByUser = false
+        if(likedUserIds.includes(userId)) {
+          element.likedByUser = true
+        } 
+        delete element.itemLikes
+        return element
+      })
+    }
 
     let insertIndex = 0;
 
