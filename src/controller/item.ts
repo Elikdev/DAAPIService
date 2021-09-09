@@ -134,15 +134,15 @@ export class ItemController {
     if (userId) { //check if items liked by requester 
       discoverItems.map(function (element: any) {
         const likedUserIds = element.itemLikes.map(function(likes:any) { 
-          return likes.user.id
-        })
-        element.likedByUser = false
+          return likes.user.id;
+        });
+        element.likedByUser = false;
         if(likedUserIds.includes(userId)) {
-          element.likedByUser = true
+          element.likedByUser = true;
         } 
-        delete element.itemLikes
-        return element
-      })
+        delete element.itemLikes;
+        return element;
+      });
     }
 
     let insertIndex = 0;
@@ -211,6 +211,7 @@ export class ItemController {
   static async getSuggestItems(req: Request, res: Response): Promise<void> {
     const itemId = req.params.id;
     const itemRepo = getRepository(Items);
+    const userId = req.body.userId;
 
     const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
 
@@ -225,6 +226,8 @@ export class ItemController {
     const query = itemRepo
       .createQueryBuilder("item")
       .leftJoin("item.shop", "shops")
+      .leftJoinAndSelect("item.itemLikes", "itemLikes")
+      .leftJoinAndSelect("itemLikes.user", "user")
       .where("item.id != :id", {id: itemId})
       .andWhere("item.status = :new", { new: ListingStatus.NEW })
       .andWhere("shops.isSuspended = :isSuspended", { isSuspended: false })
@@ -241,6 +244,21 @@ export class ItemController {
     }
 
     const results = await query.getMany();
+
+
+    if (userId) { //check if items liked by requester 
+      results.map(function (element: any) {
+        const likedUserIds = element.itemLikes.map(function(likes:any) { 
+          return likes.user.id;
+        });
+        element.likedByUser = false;
+        if(likedUserIds.includes(userId)) {
+          element.likedByUser = true;
+        } 
+        delete element.itemLikes;
+        return element;
+      });
+    }
     
     res.send({
       data: results,
