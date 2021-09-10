@@ -37,18 +37,31 @@ export class FeedsController {
         const followingShopIds = getFollowingShopIds(followings);
         feeds = await getRepository(Items)
           .createQueryBuilder("items")
+          .leftJoinAndSelect("items.itemLikes", "itemLikes")
+          .leftJoinAndSelect("itemLikes.user", "user")
           .leftJoinAndSelect("items.shop", "shops")
           .leftJoinAndSelect("shops.owner", "users")
           .where("items.shopId IN (:...ids)", { ids: followingShopIds })
           .andWhere("shops.isSuspended = :isSuspended", { isSuspended: false })
           .andWhere("items.status = :new", { new: ListingStatus.NEW })
           .andWhere("items.auditStatus = :pass", {pass: AuditStatus.PASS})
-          .select(["items", "shops.name", "shops.id", "shops.introduction", "shops.logoUrl", "shops.customerServiceUrl", "shops.commissionRate","shops.location", "users.id", "users.username"])
+          .select(["items", "itemLikes", "user", "shops.name", "shops.id", "shops.introduction", "shops.logoUrl", "shops.customerServiceUrl", "shops.commissionRate","shops.location", "users.id", "users.username"])
           .orderBy(orderBy)
           .skip(skipSize)
           .take(pageSize)
           .getMany();
       }
+      feeds.map(function (element: any) {
+        const likedUserIds = element.itemLikes.map(function(likes:any) { 
+          return likes.user.id;
+        });
+        element.likedByUser = false;
+        if(likedUserIds.includes(userId)) {
+          element.likedByUser = true;
+        } 
+        delete element.itemLikes;
+        return element;
+      });
     }
     res.send({
       data: feeds,
