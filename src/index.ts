@@ -11,9 +11,12 @@ import { payrouter } from "./payrouter";
 import { messageRouter } from "./messageRouter";
 import { createScheduledJobs } from "./scheduler/scheduler";
 import cors from "cors";
+import https from "https";
+import { getServerOptions } from "./config/serverconfig";
 
 const PORT = 4000;
 const DBConfig = getDBConfig();
+const httpsOptions = getServerOptions();
 
 createConnection(DBConfig).then(async connection => {
   setConfig();
@@ -41,8 +44,15 @@ createConnection(DBConfig).then(async connection => {
     origin: allowedOrigins,
     preflightContinue: false,
   };
+
+  if (httpsOptions) {
+    // use https on the host for test environment
+    https.createServer(httpsOptions, app).listen(PORT);
+  } else {
+    app.listen(PORT);
+  }
+
   router.use(cors(options));
-  app.listen(PORT);
   logger.info(`>>>>> Haven't felt like this in a longtime=${PORT} <<<<<`);
   
   app.use("/", router);
