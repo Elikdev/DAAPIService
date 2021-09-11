@@ -15,6 +15,7 @@ import https from "https";
 import { getServerOptions } from "./config/serverconfig";
 
 const PORT = 4000;
+const HTTPS_PORT = 443;
 const DBConfig = getDBConfig();
 const httpsOptions = getServerOptions();
 
@@ -47,7 +48,7 @@ createConnection(DBConfig).then(async connection => {
 
   if (httpsOptions) {
     // use https on the host for test environment
-    https.createServer(httpsOptions, app).listen(PORT);
+    https.createServer(httpsOptions, app).listen(HTTPS_PORT);
   } else {
     app.listen(PORT);
   }
