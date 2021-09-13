@@ -8,8 +8,9 @@ import { logger } from "../../logging/logger";
 import { Items, ListingStatus } from "../../entities/Items";
 import { Coupons } from "../../entities/Coupons"; 
 import { BadRequestError } from "../../error/badRequestError";
+import { Carts } from "../../entities/Cart";
 
-export const createSingleOrder = async (userId: any, orderData: any): Promise<any> => {
+export const createSingleOrder = async (userId: number, orderData: any): Promise<any> => {
   const shopId = orderData.shopId;
   const addressId = orderData.addressId;
   const couponId = orderData.couponId;
@@ -27,6 +28,12 @@ export const createSingleOrder = async (userId: any, orderData: any): Promise<an
 
   const coupon = await Coupons.findOne({id: couponId});
   const user = await Users.findOne({id: userId});
+
+  if (!user) {
+    throw new ResourceNotFoundError("User not found.");
+  }
+  // 清空购物车，目前只支持一次购买所有物品
+  await clearUserCart(user);
   orderData.coupon = coupon;
   orderData.buyer = user;
   orderData.buyerAddress = address;
@@ -58,4 +65,16 @@ const verifyItem = (shopId: string, item: Items): void => {
 const changeItemStatus = async (item: Items): Promise<void> => {
   item.status = ListingStatus.SOLD;
   await getRepository(Items).save(item);
+};
+
+const clearUserCart = async (user: Users): Promise<void> => {
+  const cartRepo =  await getRepository(Carts);
+  const cart = await cartRepo.findOne({owner: user});
+
+  if (!cart) {
+    console.error("Cart is not found");
+    return;
+  }
+  cart.items = [];
+  await cartRepo.save(cart);
 };
