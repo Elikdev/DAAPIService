@@ -43,8 +43,9 @@ export class Users extends BaseEntity {
 
   @Column({
     type: "enum",
-    enum: Platform
-  })
+    enum: Platform,
+    default: Platform.MINIPROGRAM
+  }, {nullable: true })
   platform: string;
 
   @Column("character varying", {nullable: true })
