@@ -10,6 +10,11 @@ export const signUpSchema = Joi.object().keys({
   encryptedData: Joi.string().required(),
 });
 
+export const appSignUpSchema = Joi.object().keys({
+  code: Joi.string().required(),
+  platform: Joi.string().required(),
+});
+
 export const createItemSchema = Joi.object().keys({
   name: Joi.string(),
   price: Joi.number().required(),

@@ -25,6 +25,13 @@ export enum UserRole {
   SELLER = "seller",
 }
 
+export enum Platform {
+  APP = "app",
+  MINIPROGRAM = "miniprogram",
+}
+
+
+
 @Index("users_pkey", ["id"], { unique: true })
 @Entity("users")
 export class Users extends BaseEntity {
@@ -34,13 +41,25 @@ export class Users extends BaseEntity {
   @Column("character varying", {nullable: true })
   openId: string;
 
+  @Column({
+    type: "enum",
+    enum: Platform
+  })
+  platform: string;
+
+  @Column("character varying", {nullable: true })
+  unionId: string;
+  
+  @Column("double precision", {nullable: true})
+  sex: number;
+
   @Column()
   username: string;
 
-  @Column("character varying", {nullable: false })
+  @Column("character varying", {nullable: true })
   mobilePrefix: string;
 
-  @Column("character varying", {nullable: false })
+  @Column("character varying", {nullable: true })
   mobile: string;
 
   @Column({
