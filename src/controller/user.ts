@@ -18,14 +18,14 @@ export class UserController {
   @HandleError("signUp")
   static async signUp(req: Request, res: Response): Promise<void> {
     const userData = req.body.data;
-    const platform = userData.platform
+    const platform = userData.platform;
     const userRepo = getRepository(Users);
 
     if (platform === Platform.APP) { // login from app
       const validator = new RequestValidator(appSignUpSchema);
       validator.validate(userData);
-      const code = userData.code
-      const userInfo = await getUserInfo(code)
+      const code = userData.code;
+      const userInfo = await getUserInfo(code);
       let user = await userRepo.createQueryBuilder("user")
         .where("user.unionId = :unionId", { unionId: userInfo.unionid })
         .leftJoinAndSelect("user.shops", "shops")
@@ -94,15 +94,15 @@ export class UserController {
       let newUser = false;
       if (!user) { 
         user = await userRepo.createQueryBuilder("user")
-        .where("user.openId = :openId", { openId: openId })
-        .leftJoinAndSelect("user.shops", "shops")
-        .leftJoinAndSelect("user.itemLikes", "itemLikes")
-        .leftJoinAndSelect("itemLikes.item", "likedItem")
-        .leftJoinAndSelect("user.itemSaves", "itemSaves")
-        .leftJoinAndSelect("itemSaves.item", "savedItem")
-        .loadRelationCountAndMap("user.itemLikesCount", "user.itemLikes")
-        .loadRelationCountAndMap("user.itemSavesCount", "user.itemSaves")
-        .getOne();
+          .where("user.openId = :openId", { openId: openId })
+          .leftJoinAndSelect("user.shops", "shops")
+          .leftJoinAndSelect("user.itemLikes", "itemLikes")
+          .leftJoinAndSelect("itemLikes.item", "likedItem")
+          .leftJoinAndSelect("user.itemSaves", "itemSaves")
+          .leftJoinAndSelect("itemSaves.item", "savedItem")
+          .loadRelationCountAndMap("user.itemLikesCount", "user.itemLikes")
+          .loadRelationCountAndMap("user.itemSavesCount", "user.itemSaves")
+          .getOne();
         if (!user) {
           logger.info("Creating new user record.");
           userData.openId = openId;
@@ -120,7 +120,7 @@ export class UserController {
       }
       user.unionId = unionId;
       user.platform = Platform.MINIPROGRAM;
-      await user.save() // back fill union Id
+      await user.save(); // back fill union Id
       const payload = {
         customerId: user.id
       };

@@ -38,13 +38,13 @@ export const getUserInfo = async (wxCode: string): Promise<any> => {
       access_token: res.data.access_token,
       openid: res.data.openid,
       lang: "zh_CN"
-    }
+    };
     const userInfoQueryString = qs.stringify(userParams);
     const uerinfoUrl = `https://api.weixin.qq.com/sns/userinfo?${userInfoQueryString}`;
     const userInfoResponse = await axios.get(uerinfoUrl).then(function (res) {
       return res.data;
     });
-    return userInfoResponse
+    return userInfoResponse;
 
   }).catch(function (err) {
     console.error(err);

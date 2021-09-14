@@ -87,7 +87,7 @@ export class ItemLikeController {
       .leftJoinAndSelect("itemLikes.item", "item")
       .where("users.id = :id", { id: userId })
       .loadRelationCountAndMap("users.itemLikesCount", "users.itemLikes")
-      .select(["users.id", "itemLikes.id", "item.id", "item.imageUrls"])
+      .select(["users.id", "itemLikes.id", "item.id", "item.imageUrls", "item.status"])
       .getOne();
 
     res.send({
