@@ -6,6 +6,7 @@ import { Users } from "../entities/Users";
 import { ResourceNotFoundError } from "../error/notfoundError";
 import { logger } from "../logging/logger";
 import { Carts } from "../entities/Cart";
+import { verifyItemToBuy } from "./helper/itemHelper";
 
 export class ShoppingCartController {
   @HandleError("getCart")
@@ -38,13 +39,17 @@ export class ShoppingCartController {
     if (!item) {
       throw new ResourceNotFoundError("Item not found.");
     }
+    verifyItemToBuy(item);
     const user = await getRepository(Users).findOne({ id: userId });
     if (!user) {
       throw new ResourceNotFoundError("User is not found.");
     }
-
     const cartRepo = await getRepository(Carts);
-    const cart = await cartRepo.findOne({ owner: user });
+    const cart = await cartRepo
+      .createQueryBuilder("cart")
+      .leftJoinAndSelect("cart.items", "items")
+      .where("cart.ownerId = :userId", { userId: user.id })
+      .getOne();
 
     if (cart) {
       const cartItems = cart.items;
@@ -52,9 +57,7 @@ export class ShoppingCartController {
         // if already in cart, just return
         cartItems.forEach((item) => {
           if (item.id === itemId) {
-            res.send({
-              data: cart,
-            });
+            return;
           }
         });
 
@@ -94,15 +97,19 @@ export class ShoppingCartController {
     }
 
     const cartRepo = await getRepository(Carts);
-    const cart = await cartRepo.findOne({ owner: user });
-
+    const cart = await cartRepo
+      .createQueryBuilder("cart")
+      .leftJoinAndSelect("cart.items", "items")
+      .where("cart.ownerId = :userId", { userId: user.id })
+      .getOne();
+    
     if (!cart) {
       throw new ResourceNotFoundError("User's cart is not found.");
     }
     const cartItems = cart.items;
     if (cartItems) {
       cart.items = cartItems.filter((item) => item.id !== itemId);
-      await cartRepo.save(cart);
+      await cart.save();
     }
 
     res.send({
