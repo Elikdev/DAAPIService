@@ -102,7 +102,7 @@ export class ShoppingCartController {
       .leftJoinAndSelect("cart.items", "items")
       .where("cart.ownerId = :userId", { userId: user.id })
       .getOne();
-    
+
     if (!cart) {
       throw new ResourceNotFoundError("User's cart is not found.");
     }
