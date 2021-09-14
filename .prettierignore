@@ -1,0 +1,16 @@
+.cache
+package.json
+package-lock.json
+public
+out
+node_modules
+.next
+__generated__
+*.graphql
+ios
+android
+script
+kubernetes
+build
+.vscode
+.husky

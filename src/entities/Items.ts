@@ -8,7 +8,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-  ManyToMany
+  ManyToMany,
 } from "typeorm";
 import { Orders } from "./Orders";
 import { Shops } from "./Shops";
@@ -44,12 +44,12 @@ export enum AuditReasonCode {
   INAPPROPRIATE_DESCRIPTION = "inappropriate_description",
   INVALID_ITEM_PRICE = "invalid_item_price",
   INAPPROPRIATE_IMAGE_CONTENT = "inappropriate_image_content",
-  UNQUALIFIED_IMAGES = "unqualified_images"
+  UNQUALIFIED_IMAGES = "unqualified_images",
 }
 
 export enum ShippingType {
   SHIPPED = "shipped",
-  PAY_ON_DELIVERY = "payOnDelivery"
+  PAY_ON_DELIVERY = "payOnDelivery",
 }
 
 @Index("items_pkey", ["id"], { unique: true })
@@ -58,26 +58,26 @@ export class Items extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @Column("character varying", {nullable: true })
+  @Column("character varying", { nullable: true })
   name: string | null;
 
-  @Column("double precision", {nullable: false})
+  @Column("double precision", { nullable: false })
   price: number;
 
   @Column({
     type: "enum",
     enum: ItemCondition,
-    default: ItemCondition.EXCELLENT
+    default: ItemCondition.EXCELLENT,
   })
   condition: number;
 
-  @Column("character varying", {nullable: true })
+  @Column("character varying", { nullable: true })
   color: string | null;
 
-  @Column("character varying", {nullable: true })
+  @Column("character varying", { nullable: true })
   size: string | null;
 
-  @Column("character varying", { array: true, nullable: true})
+  @Column("character varying", { array: true, nullable: true })
   imageUrls: string[] | null;
 
   @Column({
@@ -87,33 +87,31 @@ export class Items extends BaseEntity {
   stock: number;
 
   @Column({
-    nullable: true
+    nullable: true,
   })
   year: string;
 
   @Column({
     type: "enum",
     enum: AuditStatus,
-    default: AuditStatus.PENDING
+    default: AuditStatus.PENDING,
   })
   auditStatus: string;
 
-
-   @Column({
-     type: "enum",
-     enum: AuditReasonCode,
-     default: AuditReasonCode.PENDING
-   })
+  @Column({
+    type: "enum",
+    enum: AuditReasonCode,
+    default: AuditReasonCode.PENDING,
+  })
   auditReasonCode: string;
 
-
-  @Column("character varying", {nullable: true })
+  @Column("character varying", { nullable: true })
   description: string | null;
 
   @Column({
     type: "enum",
     enum: ListingStatus,
-    default: ListingStatus.NEW
+    default: ListingStatus.NEW,
   })
   status: string;
 
@@ -126,7 +124,7 @@ export class Items extends BaseEntity {
   @Column({
     type: "enum",
     enum: ShippingType,
-    default: ShippingType.SHIPPED
+    default: ShippingType.SHIPPED,
   })
   shippingType: string;
 
@@ -134,7 +132,7 @@ export class Items extends BaseEntity {
     nullable: true,
     length: 50,
   })
-  origin: string
+  origin: string;
 
   @Column({
     nullable: true,
@@ -148,16 +146,16 @@ export class Items extends BaseEntity {
   })
   subcategory: string;
 
-  @CreateDateColumn({type: "timestamp"})
+  @CreateDateColumn({ type: "timestamp" })
   createdtime: string;
 
-  @UpdateDateColumn({type: "timestamp"})
+  @UpdateDateColumn({ type: "timestamp" })
   updatedtime: string;
 
-  @ManyToOne(() => Orders, orders => orders.orderItems)
+  @ManyToOne(() => Orders, (orders) => orders.orderItems)
   order: Orders;
 
-  @ManyToOne(() => Shops, shops => shops.items)
+  @ManyToOne(() => Shops, (shops) => shops.items)
   shop: Shops;
 
   @OneToMany(() => ItemSaves, (itemSaves) => itemSaves.item, { cascade: true })
@@ -166,21 +164,23 @@ export class Items extends BaseEntity {
   @OneToMany(() => ItemLikes, (itemLikes) => itemLikes.item, { cascade: true })
   itemLikes: ItemLikes[];
 
-  @OneToMany(() => RecentlyViewed, (recentViewed) => recentViewed.item, { cascade: true })
+  @OneToMany(() => RecentlyViewed, (recentViewed) => recentViewed.item, {
+    cascade: true,
+  })
   recentlyViewed: RecentlyViewed[];
 
-  @ManyToMany(() => Collections, collections => collections.items)
-  collections: Collections[]
+  @ManyToMany(() => Collections, (collections) => collections.items)
+  collections: Collections[];
 
-  @ManyToMany(() => Carts, carts => carts.items)
-  carts: Carts[]
+  @ManyToMany(() => Carts, (carts) => carts.items)
+  carts: Carts[];
 
-  @Column({default: 0})
+  @Column({ default: 0 })
   itemSavesCount: number;
 
-  @Column({default: 0})
+  @Column({ default: 0 })
   itemLikesCount: number;
 
-  @Column({default: 0})
+  @Column({ default: 0 })
   score: number;
 }

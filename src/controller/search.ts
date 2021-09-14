@@ -6,24 +6,29 @@ import { RequestValidator } from "../validator/requestValidator";
 import { getOrderByConditions } from "./helper/orderByHelper";
 import { ResourceNotFoundError } from "../error/notfoundError";
 import { BadRequestError } from "../error/badRequestError";
-import { getPaginationLinks, getPaginationParams } from "./helper/paginationHelper";
+import {
+  getPaginationLinks,
+  getPaginationParams,
+} from "./helper/paginationHelper";
 const algoliasearch = require("algoliasearch");
 
 // By default latest orders first
-const DEFAULT_SORT_BY:OrderByCondition = { "orders.createdtime":"DESC" };
-
+const DEFAULT_SORT_BY: OrderByCondition = { "orders.createdtime": "DESC" };
 
 const client = algoliasearch("NUW4UGCBN5", "b3d50a0c9f8ed7b4a9d44ca93b10cf26");
 const productIndex = client.initIndex("retopia_prod_products");
 const shopIndex = client.initIndex("retopia_prod_shops");
-const itemSugIndex = client.initIndex("retopia_prod_products_query_suggestions");
+const itemSugIndex = client.initIndex(
+  "retopia_prod_products_query_suggestions",
+);
 
 export class SearchController {
-
   @HandleError("search")
   static async search(req: Request, res: Response): Promise<void> {
     const query = req.query.query;
-    const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
+    const [pageNumber, skipSize, pageSize] = getPaginationParams(
+      req.query.page,
+    );
 
     type AlgoliaHits = {
       hits: AlgoliaHit[];
@@ -36,33 +41,36 @@ export class SearchController {
       published: string;
     };
 
-
-    const filters = ["status:new", "shop.isSuspended: false", ["auditStatus:pending", "auditStatus:pass"]];
+    const filters = [
+      "status:new",
+      "shop.isSuspended: false",
+      ["auditStatus:pending", "auditStatus:pass"],
+    ];
 
     const content: AlgoliaHits = await productIndex.search(query, {
       hitsPerPage: pageSize,
       page: pageNumber,
       offset: skipSize,
       length: pageSize,
-      facetFilters: filters
+      facetFilters: filters,
     });
 
     res.send({
       content: content,
-      links: getPaginationLinks(req, pageNumber, pageSize)
+      links: getPaginationLinks(req, pageNumber, pageSize),
     });
   }
-
 
   @HandleError("querySuggestion")
   static async querySuggestion(req: Request, res: Response): Promise<void> {
     const query = req.query.query;
-    const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
+    const [pageNumber, skipSize, pageSize] = getPaginationParams(
+      req.query.page,
+    );
 
     type AlgoliaHits = {
       hits: AlgoliaHit[];
     };
-
 
     type AlgoliaHit = {
       identifier: string;
@@ -70,7 +78,6 @@ export class SearchController {
       title: string;
       published: string;
     };
-
 
     const filters = ["isSuspended:false"];
 
@@ -79,7 +86,7 @@ export class SearchController {
       page: pageNumber,
       offset: skipSize,
       length: pageSize,
-      facetFilters: filters
+      facetFilters: filters,
     });
 
     const itemSug: AlgoliaHits = await itemSugIndex.search(query, {
@@ -92,9 +99,7 @@ export class SearchController {
     res.send({
       shopSug: shopSug,
       itemSug: itemSug,
-      links: getPaginationLinks(req, pageNumber, pageSize)
+      links: getPaginationLinks(req, pageNumber, pageSize),
     });
   }
-
-
 }

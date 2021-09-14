@@ -1,4 +1,3 @@
-
 import {
   BaseEntity,
   CreateDateColumn,
@@ -19,17 +18,17 @@ export class Carts extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @ManyToMany(() => Items, items => items.carts)
+  @ManyToMany(() => Items, (items) => items.carts)
   @JoinTable()
   items: Items[];
 
-  @OneToOne(() => Users, owner => owner.cart)
+  @OneToOne(() => Users, (owner) => owner.cart)
   @JoinColumn()
   owner: Users;
-  
-  @CreateDateColumn({type: "timestamp"})
+
+  @CreateDateColumn({ type: "timestamp" })
   createdtime: string;
 
-  @UpdateDateColumn({type: "timestamp"})
+  @UpdateDateColumn({ type: "timestamp" })
   updatedtime: string;
 }

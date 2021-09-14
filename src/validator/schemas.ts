@@ -1,5 +1,10 @@
 import Joi from "joi";
-import { ItemCondition, ShippingType, AuditStatus, AuditReasonCode } from "../entities/Items";
+import {
+  ItemCondition,
+  ShippingType,
+  AuditStatus,
+  AuditReasonCode,
+} from "../entities/Items";
 import { CouponType } from "../entities/Coupons";
 
 import { OrderStatus } from "../entities/Orders";
@@ -18,7 +23,9 @@ export const appSignUpSchema = Joi.object().keys({
 export const createItemSchema = Joi.object().keys({
   name: Joi.string(),
   price: Joi.number().required(),
-  condition: Joi.number().required().valid(...Object.values(ItemCondition)),
+  condition: Joi.number()
+    .required()
+    .valid(...Object.values(ItemCondition)),
   color: Joi.string().optional(),
   size: Joi.string().required(),
   imageUrls: Joi.array().required(),
@@ -29,7 +36,9 @@ export const createItemSchema = Joi.object().keys({
   origin: Joi.string().optional(),
   category: Joi.string(),
   subcategory: Joi.string().optional(),
-  shippingType: Joi.string().required().valid(...Object.values(ShippingType)),
+  shippingType: Joi.string()
+    .required()
+    .valid(...Object.values(ShippingType)),
 });
 
 export const createOrderSchema = Joi.object().keys({
@@ -41,23 +50,34 @@ export const createOrderSchema = Joi.object().keys({
   shopId: Joi.string().uuid().required(),
   addressId: Joi.string().uuid().required(),
   orderNotes: Joi.string().allow("").optional(),
-  couponId: Joi.string().uuid().allow(null).optional()
+  couponId: Joi.string().uuid().allow(null).optional(),
 });
 
-export const batchCreateOrderSchema = Joi.array().items(createOrderSchema).min(1).required();
+export const batchCreateOrderSchema = Joi.array()
+  .items(createOrderSchema)
+  .min(1)
+  .required();
 
-export const buyerUpdateOrderSchema = Joi.object().keys({
-  status: Joi.string().required().valid(...Object.values([OrderStatus.CANCELLED, OrderStatus.COMPLETED])),
-}).min(1);
+export const buyerUpdateOrderSchema = Joi.object()
+  .keys({
+    status: Joi.string()
+      .required()
+      .valid(...Object.values([OrderStatus.CANCELLED, OrderStatus.COMPLETED])),
+  })
+  .min(1);
 
-export const sellerUpdateOrderSchema = Joi.object().keys({
-  trackingNum: Joi.string().required(),
-}).min(1);
+export const sellerUpdateOrderSchema = Joi.object()
+  .keys({
+    trackingNum: Joi.string().required(),
+  })
+  .min(1);
 
 export const updateItemSchema = Joi.object().keys({
   name: Joi.string().allow("").allow(null).optional(),
   price: Joi.number().optional(),
-  condition: Joi.number().optional().valid(...Object.values(ItemCondition)),
+  condition: Joi.number()
+    .optional()
+    .valid(...Object.values(ItemCondition)),
   color: Joi.string().allow("").allow(null).optional(),
   size: Joi.string().optional(),
   imageUrls: Joi.array().optional(),
@@ -71,10 +91,16 @@ export const updateItemSchema = Joi.object().keys({
   origin: Joi.string().allow("").allow(null).optional(),
   category: Joi.string().optional(),
   subcategory: Joi.string().optional(),
-  auditStatus: Joi.number().optional().valid(...Object.values(AuditStatus)),
+  auditStatus: Joi.number()
+    .optional()
+    .valid(...Object.values(AuditStatus)),
   score: Joi.number(),
-  shippingType: Joi.string().optional().valid(...Object.values(ShippingType)),
-  auditReasonCode: Joi.string().optional().valid(...Object.values(AuditReasonCode)),
+  shippingType: Joi.string()
+    .optional()
+    .valid(...Object.values(ShippingType)),
+  auditReasonCode: Joi.string()
+    .optional()
+    .valid(...Object.values(AuditReasonCode)),
 });
 
 export const createAddressSchema = Joi.object().keys({
@@ -83,26 +109,30 @@ export const createAddressSchema = Joi.object().keys({
   city: Joi.string().required(),
   district: Joi.string().required(),
   street: Joi.string().required(),
-  phoneNumber: Joi.string().pattern(/^[0-9]+$/).required(),
-  isDefault: Joi.boolean().optional()
+  phoneNumber: Joi.string()
+    .pattern(/^[0-9]+$/)
+    .required(),
+  isDefault: Joi.boolean().optional(),
 });
 
-export const updateAddressSchema = Joi.object().keys({
-  fullName: Joi.string().optional(),
-  province: Joi.string().optional(),
-  city: Joi.string().optional(),
-  district: Joi.string().optional(),
-  phoneNumber: Joi.string().optional(),
-  street: Joi.string().optional(),
-  isDefault: Joi.boolean().optional(),
-  isDefaultBeforeUpdate: Joi.boolean().optional()
-}).min(1);
+export const updateAddressSchema = Joi.object()
+  .keys({
+    fullName: Joi.string().optional(),
+    province: Joi.string().optional(),
+    city: Joi.string().optional(),
+    district: Joi.string().optional(),
+    phoneNumber: Joi.string().optional(),
+    street: Joi.string().optional(),
+    isDefault: Joi.boolean().optional(),
+    isDefaultBeforeUpdate: Joi.boolean().optional(),
+  })
+  .min(1);
 
 export const createShopSchema = Joi.object().keys({
   name: Joi.string().max(100).required(),
   introduction: Joi.string().max(500),
   logoUrl: Joi.string(),
-  location: Joi.string().optional()
+  location: Joi.string().optional(),
 });
 
 export const createCollectionSchema = Joi.object().keys({
@@ -113,14 +143,14 @@ export const createCollectionSchema = Joi.object().keys({
 export const createShopCollectionSchema = Joi.object().keys({
   name: Joi.string().max(100).required(),
   endTime: Joi.string().max(100).required(),
-  coverImageUrl: Joi.string().max(200).required()
+  coverImageUrl: Joi.string().max(200).required(),
 });
 
 export const updateCollectionSchema = Joi.object().keys({
   name: Joi.string().max(100).optional(),
   endTime: Joi.string().max(100).optional(),
   isSuspended: Joi.boolean().optional(),
-  order: Joi.number().optional()
+  order: Joi.number().optional(),
 });
 
 export const updateShopCollectionSchema = Joi.object().keys({
@@ -128,9 +158,8 @@ export const updateShopCollectionSchema = Joi.object().keys({
   endTime: Joi.string().max(100).optional(),
   isSuspended: Joi.boolean().optional(),
   order: Joi.number().optional(),
-  coverImageUrl: Joi.string().max(200).optional()
+  coverImageUrl: Joi.string().max(200).optional(),
 });
-
 
 export const updateCouponSchema = Joi.object().keys({
   code: Joi.string().max(100).optional(),
@@ -138,10 +167,12 @@ export const updateCouponSchema = Joi.object().keys({
   applied: Joi.boolean().optional(),
   isValid: Joi.boolean().optional(),
   ownerId: Joi.number().optional(),
-  couponType: Joi.string().optional().valid(...Object.values(CouponType)),
+  couponType: Joi.string()
+    .optional()
+    .valid(...Object.values(CouponType)),
   value: Joi.number().optional(),
   lowestApplicableOrderPrice: Joi.number().optional(),
-  shopId: Joi.string().uuid().allow("").allow(null).optional()
+  shopId: Joi.string().uuid().allow("").allow(null).optional(),
 });
 
 export const createCouponSchema = Joi.object().keys({
@@ -151,16 +182,14 @@ export const createCouponSchema = Joi.object().keys({
   couponType: Joi.string().valid(...Object.values(CouponType)),
   value: Joi.number(),
   lowestApplicableOrderPrice: Joi.number(),
-  shopId: Joi.string().uuid().optional()
+  shopId: Joi.string().uuid().optional(),
 });
 
 export const updateUserSchema = Joi.object().keys({
   username: Joi.string().max(100),
   introduction: Joi.string().max(500),
-  avatarUrl: Joi.string().max(500)
-
+  avatarUrl: Joi.string().max(500),
 });
-
 
 export const updateShopSchema = Joi.object().keys({
   name: Joi.string().max(100),

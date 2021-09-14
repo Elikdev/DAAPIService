@@ -1,4 +1,15 @@
-import { AfterInsert, AfterRemove, BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import {
+  AfterInsert,
+  AfterRemove,
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from "typeorm";
 import { Items } from "./Items";
 import { Users } from "./Users";
 
@@ -7,30 +18,35 @@ export class ItemSaves extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string | null;
 
-  @CreateDateColumn({type: "timestamp"})
+  @CreateDateColumn({ type: "timestamp" })
   createdAt: string;
 
-  @UpdateDateColumn({type: "timestamp"})
+  @UpdateDateColumn({ type: "timestamp" })
   updatedAt: string;
 
-  @ManyToOne(() => Items, (items) => items.itemSaves, {eager: true, onDelete: "CASCADE"})
+  @ManyToOne(() => Items, (items) => items.itemSaves, {
+    eager: true,
+    onDelete: "CASCADE",
+  })
   item: Items;
 
-  @ManyToOne(() => Users, (users) => users.itemSaves, {onDelete: "CASCADE"})
+  @ManyToOne(() => Users, (users) => users.itemSaves, { onDelete: "CASCADE" })
   user: Users;
 
   @AfterInsert()
-  async afterInsertOperations(): Promise<void>  {
-    Items.createQueryBuilder().update(Items)
-      .set({itemSavesCount: this.item.itemSavesCount + 1})
+  async afterInsertOperations(): Promise<void> {
+    Items.createQueryBuilder()
+      .update(Items)
+      .set({ itemSavesCount: this.item.itemSavesCount + 1 })
       .where("id = :id", { id: this.item.id })
       .execute();
   }
 
   @AfterRemove()
   async afterRemoveOperations(): Promise<void> {
-    Items.createQueryBuilder().update(Items)
-      .set({itemSavesCount: this.item.itemSavesCount - 1})
+    Items.createQueryBuilder()
+      .update(Items)
+      .set({ itemSavesCount: this.item.itemSavesCount - 1 })
       .where("id = :id", { id: this.item.id })
       .execute();
   }

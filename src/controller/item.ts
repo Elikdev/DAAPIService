@@ -11,87 +11,97 @@ import { logger } from "../logging/logger";
 import { RequestValidator } from "../validator/requestValidator";
 import { createItemSchema, updateItemSchema } from "../validator/schemas";
 import { getOrderByConditions } from "./helper/orderByHelper";
-import { getPaginationLinks, getPaginationParams } from "./helper/paginationHelper";
-const DEFAULT_SORT_BY:OrderByCondition = { "item.score": "DESC", "item.createdtime":"DESC" };
+import {
+  getPaginationLinks,
+  getPaginationParams,
+} from "./helper/paginationHelper";
+const DEFAULT_SORT_BY: OrderByCondition = {
+  "item.score": "DESC",
+  "item.createdtime": "DESC",
+};
 const ADMIN_USER_ID = 3;
 
 export class ItemController {
-
   @HandleError("getItems")
   static async getItems(req: Request, res: Response): Promise<void> {
-    const sorts = req.query.sort; 
+    const sorts = req.query.sort;
     const category = req.query.category;
     const shopId = req.query.shopId;
-    const startDate :any = req.query.startDate;
-    const endDate :any = req.query.endDate;
+    const startDate: any = req.query.startDate;
+    const endDate: any = req.query.endDate;
     const auditStatus = req.query.auditStatus;
     const queryStatus = req.query.status;
     // TODO: remove front end hardcoded sorting param -id
     const orderBy = getOrderByConditions(null, DEFAULT_SORT_BY);
     const itemRepo = getRepository(Items);
-    const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
+    const [pageNumber, skipSize, pageSize] = getPaginationParams(
+      req.query.page,
+    );
     let status: any = ListingStatus.NEW;
     logger.debug("OrderBy: " + JSON.stringify(orderBy));
     const itemsQuery = itemRepo // TODO filter out suspended shops and items.
       .createQueryBuilder("item")
       .leftJoinAndSelect("item.shop", "shops")
-      .select([
-        "item", "shops.name"
-      ])
+      .select(["item", "shops.name"])
       .orderBy(orderBy)
       .skip(skipSize)
       .take(pageSize);
 
-    if(category !== undefined && category !== "") {  //TODO schema validation for category
-      itemsQuery.andWhere("item.category = :category", {category: category});
+    if (category !== undefined && category !== "") {
+      //TODO schema validation for category
+      itemsQuery.andWhere("item.category = :category", { category: category });
     }
 
-    if(auditStatus !== undefined && auditStatus !== "") {  
-      itemsQuery.andWhere("item.auditStatus = :auditStatus", {auditStatus: auditStatus});
+    if (auditStatus !== undefined && auditStatus !== "") {
+      itemsQuery.andWhere("item.auditStatus = :auditStatus", {
+        auditStatus: auditStatus,
+      });
     }
 
-    if(shopId !== undefined && shopId !== "") {  
-      itemsQuery.andWhere("item.shopId = :shopId", {shopId: shopId});
+    if (shopId !== undefined && shopId !== "") {
+      itemsQuery.andWhere("item.shopId = :shopId", { shopId: shopId });
     }
 
-    if(startDate !== undefined && startDate !== "") {  
+    if (startDate !== undefined && startDate !== "") {
       const today = new Date(startDate);
       let nextDay = new Date(today.getTime() + 86400000);
-      if(endDate !== undefined && endDate !== "") {
+      if (endDate !== undefined && endDate !== "") {
         nextDay = new Date(endDate);
       }
-      itemsQuery.andWhere("item.createdtime  >= :today", {today: today});
-      itemsQuery.andWhere("item.createdtime  < :nextDay", {nextDay: nextDay});
+      itemsQuery.andWhere("item.createdtime  >= :today", { today: today });
+      itemsQuery.andWhere("item.createdtime  < :nextDay", { nextDay: nextDay });
     }
 
-
-    if(queryStatus !== undefined && queryStatus !== "") {  
+    if (queryStatus !== undefined && queryStatus !== "") {
       status = queryStatus;
     }
 
-    itemsQuery.andWhere("item.status = :status", {status: status});
-    itemsQuery.andWhere("shops.isSuspended = :isSuspended", {isSuspended: false});
+    itemsQuery.andWhere("item.status = :status", { status: status });
+    itemsQuery.andWhere("shops.isSuspended = :isSuspended", {
+      isSuspended: false,
+    });
 
     const items = await itemsQuery.getMany();
 
     res.send({
       data: items,
-      links: getPaginationLinks(req, pageNumber, pageSize)
+      links: getPaginationLinks(req, pageNumber, pageSize),
     });
   }
 
   @HandleError("discoverItems")
   static async discoverItems(req: Request, res: Response): Promise<void> {
-    const sorts = req.query.sort; 
+    const sorts = req.query.sort;
     const category = req.query.category;
     let recentlyViewed: RecentlyViewed[] = [];
     const userId = req.body.userId;
     // TODO: remove front end hardcoded sorting param -id
     const orderBy = getOrderByConditions(null, DEFAULT_SORT_BY);
     const itemRepo = getRepository(Items);
-    const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
+    const [pageNumber, skipSize, pageSize] = getPaginationParams(
+      req.query.page,
+    );
     logger.debug("OrderBy: " + JSON.stringify(orderBy));
-    
 
     const itemsQuery = itemRepo // TODO filter out suspended shops and items.
       .createQueryBuilder("item")
@@ -102,44 +112,58 @@ export class ItemController {
       .skip(skipSize)
       .take(pageSize);
 
-    if(userId && (category === undefined || category === "")) { // no recently viewed insertion for collecton items. 
-      const sevenDayAgo = new Date(new Date().getTime() - (7 * 24 * 60 * 60 * 1000));
+    if (userId && (category === undefined || category === "")) {
+      // no recently viewed insertion for collecton items.
+      const sevenDayAgo = new Date(
+        new Date().getTime() - 7 * 24 * 60 * 60 * 1000,
+      );
       const recentlyViewedRepo = getRepository(RecentlyViewed);
-      recentlyViewed = await recentlyViewedRepo.createQueryBuilder("recentlyViewed")
+      recentlyViewed = await recentlyViewedRepo
+        .createQueryBuilder("recentlyViewed")
         .leftJoinAndSelect("recentlyViewed.owner", "user")
         .leftJoinAndSelect("recentlyViewed.item", "item")
-        .where("recentlyViewed.ownerId = :ownerId", {ownerId: userId })
+        .where("recentlyViewed.ownerId = :ownerId", { ownerId: userId })
         .andWhere("recentlyViewed.createdtime > :time", { time: sevenDayAgo })
-        .andWhere("item.status = :status", {status:ListingStatus.NEW})
+        .andWhere("item.status = :status", { status: ListingStatus.NEW })
         .orderBy("recentlyViewed.viewdCount", "DESC")
         .take(2)
-        .getMany();  
+        .getMany();
 
       if (recentlyViewed.length > 0) {
-        const recentlyViewedItemsId = recentlyViewed.map(element => element.item.id);
-        itemsQuery.andWhere("item.id NOT IN (:...recentlyViewedItemsId)", {recentlyViewedItemsId: recentlyViewedItemsId});
+        const recentlyViewedItemsId = recentlyViewed.map(
+          (element) => element.item.id,
+        );
+        itemsQuery.andWhere("item.id NOT IN (:...recentlyViewedItemsId)", {
+          recentlyViewedItemsId: recentlyViewedItemsId,
+        });
       }
     }
 
-    if(category !== undefined && category !== "") {  //TODO schema validation for category
-      itemsQuery.andWhere("item.category = :category", {category: category});
-    } 
+    if (category !== undefined && category !== "") {
+      //TODO schema validation for category
+      itemsQuery.andWhere("item.category = :category", { category: category });
+    }
 
-    itemsQuery.andWhere("shops.isSuspended = :isSuspended", {isSuspended: false});
-    itemsQuery.andWhere("item.status = :status", {status: ListingStatus.NEW});
-    itemsQuery.andWhere("item.auditStatus IN (:...auditStatus)", {auditStatus: [AuditStatus.PASS, AuditStatus.PENDING]});
+    itemsQuery.andWhere("shops.isSuspended = :isSuspended", {
+      isSuspended: false,
+    });
+    itemsQuery.andWhere("item.status = :status", { status: ListingStatus.NEW });
+    itemsQuery.andWhere("item.auditStatus IN (:...auditStatus)", {
+      auditStatus: [AuditStatus.PASS, AuditStatus.PENDING],
+    });
 
-    const discoverItems = await itemsQuery.getMany();    
-    
-    if (userId) { //check if items liked by requester 
+    const discoverItems = await itemsQuery.getMany();
+
+    if (userId) {
+      //check if items liked by requester
       discoverItems.map(function (element: any) {
-        const likedUserIds = element.itemLikes.map(function(likes:any) { 
+        const likedUserIds = element.itemLikes.map(function (likes: any) {
           return likes.user.id;
         });
         element.likedByUser = false;
-        if(likedUserIds.includes(userId)) {
+        if (likedUserIds.includes(userId)) {
           element.likedByUser = true;
-        } 
+        }
         delete element.itemLikes;
         return element;
       });
@@ -147,7 +171,8 @@ export class ItemController {
 
     let insertIndex = 0;
 
-    if(pageNumber === 1) { // insert two recently viewed items to discoverItems only to page 1.
+    if (pageNumber === 1) {
+      // insert two recently viewed items to discoverItems only to page 1.
       recentlyViewed.forEach((recentlyViewed: any, index: any) => {
         discoverItems.splice(insertIndex, 0, recentlyViewed.item);
         insertIndex = 2;
@@ -156,10 +181,9 @@ export class ItemController {
 
     res.send({
       data: discoverItems,
-      links: getPaginationLinks(req, pageNumber, pageSize)
+      links: getPaginationLinks(req, pageNumber, pageSize),
     });
   }
-
 
   @HandleError("createItem")
   static async createItem(req: Request, res: Response): Promise<void> {
@@ -168,8 +192,8 @@ export class ItemController {
     const shopId = req.params.id;
     const validator = new RequestValidator(createItemSchema);
     validator.validate(itemData);
-    const user = await Users.findOne({id: userId});
-    const shop = await Shops.findOne({id: shopId, owner: user});
+    const user = await Users.findOne({ id: userId });
+    const shop = await Shops.findOne({ id: shopId, owner: user });
     if (!shop) {
       throw new ResourceNotFoundError("Shop not found.");
     }
@@ -177,7 +201,7 @@ export class ItemController {
     itemData.shop = shop;
     const savedItem = await itemRepo.save(itemData);
     res.send({
-      data: savedItem
+      data: savedItem,
     });
   }
 
@@ -186,15 +210,27 @@ export class ItemController {
     const itemId = req.params.id;
     const itemRepo = getRepository(Items);
 
-    const item = await itemRepo.createQueryBuilder("item")
+    const item = await itemRepo
+      .createQueryBuilder("item")
       .where("item.id = :id", { id: itemId })
       .leftJoinAndSelect("item.shop", "shops")
       .leftJoinAndSelect("shops.owner", "users")
       .leftJoinAndSelect("users.defaultAddress", "defaultAddress")
       .select([
-        "item", "shops.name", "shops.id", "shops.introduction", 
-        "shops.logoUrl", "shops.customerServiceUrl", "shops.commissionRate", "users.id", "users.username", 
-        "users.openId", "users.mobilePrefix", "users.mobile", "defaultAddress.city", "defaultAddress.district"
+        "item",
+        "shops.name",
+        "shops.id",
+        "shops.introduction",
+        "shops.logoUrl",
+        "shops.customerServiceUrl",
+        "shops.commissionRate",
+        "users.id",
+        "users.username",
+        "users.openId",
+        "users.mobilePrefix",
+        "users.mobile",
+        "defaultAddress.city",
+        "defaultAddress.district",
       ])
       .getOne();
 
@@ -203,7 +239,7 @@ export class ItemController {
     }
 
     res.send({
-      data: item
+      data: item,
     });
   }
 
@@ -213,13 +249,16 @@ export class ItemController {
     const itemRepo = getRepository(Items);
     const userId = req.body.userId;
 
-    const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
+    const [pageNumber, skipSize, pageSize] = getPaginationParams(
+      req.query.page,
+    );
 
-    const targetItem = await itemRepo.createQueryBuilder("item")
+    const targetItem = await itemRepo
+      .createQueryBuilder("item")
       .where("item.id = :id", { id: itemId })
       .leftJoinAndSelect("item.shop", "shops")
       .getOne();
-      
+
     if (!targetItem) {
       throw new ResourceNotFoundError("Item not found.");
     }
@@ -228,41 +267,47 @@ export class ItemController {
       .leftJoin("item.shop", "shops")
       .leftJoinAndSelect("item.itemLikes", "itemLikes")
       .leftJoinAndSelect("itemLikes.user", "user")
-      .where("item.id != :id", {id: itemId})
+      .where("item.id != :id", { id: itemId })
       .andWhere("item.status = :new", { new: ListingStatus.NEW })
       .andWhere("shops.isSuspended = :isSuspended", { isSuspended: false })
-      .andWhere("item.auditStatus IN (:...auditStatus)", { auditStatus: [AuditStatus.PENDING, AuditStatus.PASS]})
+      .andWhere("item.auditStatus IN (:...auditStatus)", {
+        auditStatus: [AuditStatus.PENDING, AuditStatus.PASS],
+      })
       .skip(skipSize)
       .take(pageSize);
 
     const category = targetItem.category;
     const subcategory = targetItem.subcategory;
 
-    if(category && subcategory) {  //TODO schema validation for category
-      query.andWhere("item.category = :category", { category: category })
-        .andWhere("item.subcategory = :subcategory", { subcategory: subcategory });
+    if (category && subcategory) {
+      //TODO schema validation for category
+      query
+        .andWhere("item.category = :category", { category: category })
+        .andWhere("item.subcategory = :subcategory", {
+          subcategory: subcategory,
+        });
     }
 
     const results = await query.getMany();
 
-
-    if (userId) { //check if items liked by requester 
+    if (userId) {
+      //check if items liked by requester
       results.map(function (element: any) {
-        const likedUserIds = element.itemLikes.map(function(likes:any) { 
+        const likedUserIds = element.itemLikes.map(function (likes: any) {
           return likes.user.id;
         });
         element.likedByUser = false;
-        if(likedUserIds.includes(userId)) {
+        if (likedUserIds.includes(userId)) {
           element.likedByUser = true;
-        } 
+        }
         delete element.itemLikes;
         return element;
       });
     }
-    
+
     res.send({
       data: results,
-      links: getPaginationLinks(req, pageNumber, pageSize)
+      links: getPaginationLinks(req, pageNumber, pageSize),
     });
   }
 
@@ -276,39 +321,47 @@ export class ItemController {
     const itemId = req.params.id;
     const itemRepo = getRepository(Items);
     itemData.id = itemId;
-    const item = await itemRepo.findOne({id: itemId}, {relations: ["shop"]});
+    const item = await itemRepo.findOne(
+      { id: itemId },
+      { relations: ["shop"] },
+    );
 
     logger.debug(`updating ${JSON.stringify(item)}`);
-    
+
     if (!item) {
       throw new ResourceNotFoundError("Item not found.");
     }
     verifyItem(item);
-    const user = await Users.findOne({id: userId});
-    
-    if(userId !== ADMIN_USER_ID) { // TEMP SOLN skip ownership verification for admin.
-      const shop = await Shops.findOne({id: item.shop.id, owner: user}); 
+    const user = await Users.findOne({ id: userId });
+
+    if (userId !== ADMIN_USER_ID) {
+      // TEMP SOLN skip ownership verification for admin.
+      const shop = await Shops.findOne({ id: item.shop.id, owner: user });
       if (!shop) {
         throw new ResourceNotFoundError("Shop not found.");
       }
     }
 
-    const result = await itemRepo.createQueryBuilder()
+    const result = await itemRepo
+      .createQueryBuilder()
       .update(Items, itemData)
       .where("id = :id", { id: itemId })
       .returning("*")
       .updateEntity(true)
       .execute()
-      .then(response => response.raw[0]);
+      .then((response) => response.raw[0]);
 
     res.send({
-      data: result
+      data: result,
     });
-  }  
+  }
 }
 
 const verifyItem = (item: Items): void => {
-  if (item.status == ListingStatus.SOLD) { // only new and delisted items could be updated
-    throw new BadRequestError(`item ${item.id} with status=${item.status} is not valid`);
+  if (item.status == ListingStatus.SOLD) {
+    // only new and delisted items could be updated
+    throw new BadRequestError(
+      `item ${item.id} with status=${item.status} is not valid`,
+    );
   }
 };

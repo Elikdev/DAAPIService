@@ -8,7 +8,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   OneToMany,
-  ManyToOne
+  ManyToOne,
 } from "typeorm";
 import { Users } from "./Users";
 import { Orders } from "./Orders";
@@ -17,7 +17,7 @@ import { Collections } from "./Collections";
 
 export enum CouponType {
   PERCENTOFF = "percentOff",
-  AMOUNTOFF = "amountOff"
+  AMOUNTOFF = "amountOff",
 }
 
 @Entity("coupons")
@@ -28,16 +28,16 @@ export class Coupons extends BaseEntity {
   @Column()
   code: string;
 
-  @Column("bool", {default: false })
+  @Column("bool", { default: false })
   isValid: boolean;
 
-  @Column("bool", {default: false })
+  @Column("bool", { default: false })
   applied: boolean;
 
   @Column({
     type: "enum",
     enum: CouponType,
-    default: CouponType.AMOUNTOFF
+    default: CouponType.AMOUNTOFF,
   })
   couponType: string;
 
@@ -59,19 +59,20 @@ export class Coupons extends BaseEntity {
   @ManyToOne(() => Shops, (shops) => shops.coupons, { nullable: true })
   shop: Shops;
 
-  @ManyToOne(() => Collections, (collections) => collections.coupons, { nullable: true })
+  @ManyToOne(() => Collections, (collections) => collections.coupons, {
+    nullable: true,
+  })
   collection: Collections;
 
-  @Column({type: "timestamp"})
+  @Column({ type: "timestamp" })
   expireTime: string;
 
-  @CreateDateColumn({type: "timestamp"})
+  @CreateDateColumn({ type: "timestamp" })
   createdtime: string;
 
-  @UpdateDateColumn({type: "timestamp"})
+  @UpdateDateColumn({ type: "timestamp" })
   updatedtime: string;
- 
+
   @OneToMany(() => Orders, (orders) => orders.coupon, { cascade: true })
   orders: Orders[];
-
 }

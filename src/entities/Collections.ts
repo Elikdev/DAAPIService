@@ -12,7 +12,6 @@ import {
 import { Items } from "./Items";
 import { Coupons } from "./Coupons";
 
-
 @Entity("collections")
 export class Collections extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
@@ -21,25 +20,25 @@ export class Collections extends BaseEntity {
   @Column()
   name: string;
 
-  @Column("bool", {default: false })
+  @Column("bool", { default: false })
   isSuspended: boolean;
 
-  @Column("character varying", {nullable: true })
+  @Column("character varying", { nullable: true })
   type: string | null;
 
-  @Column({default: 0})
+  @Column({ default: 0 })
   order: number;
 
-  @Column({type: "timestamp"})
+  @Column({ type: "timestamp" })
   endTime: string;
 
-  @CreateDateColumn({type: "timestamp"})
+  @CreateDateColumn({ type: "timestamp" })
   createdtime: string;
 
-  @UpdateDateColumn({type: "timestamp"})
+  @UpdateDateColumn({ type: "timestamp" })
   updatedtime: string;
 
-  @ManyToMany(() => Items, items => items.collections)
+  @ManyToMany(() => Items, (items) => items.collections)
   @JoinTable()
   items: Items[];
 

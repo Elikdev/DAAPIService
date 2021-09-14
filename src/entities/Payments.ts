@@ -1,11 +1,20 @@
-import { BaseEntity, Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import {
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from "typeorm";
 import { Orders } from "./Orders";
 import { Users } from "./Users";
 
 export enum PaymentStatus {
   OPEN = "open",
   CONFIRMED = "confirmed",
-  REFUNDED = "refunded"
+  REFUNDED = "refunded",
 }
 
 @Entity("payments")
@@ -14,7 +23,7 @@ export class Payments extends BaseEntity {
   id: string;
 
   @Column({
-    default: 0
+    default: 0,
   })
   outTradeNo: string;
 
@@ -30,13 +39,13 @@ export class Payments extends BaseEntity {
   @Column({
     type: "enum",
     enum: PaymentStatus,
-    default: PaymentStatus.OPEN
+    default: PaymentStatus.OPEN,
   })
   status: string;
 
-  @CreateDateColumn({type: "timestamp"})
+  @CreateDateColumn({ type: "timestamp" })
   createdtime: string;
 
-  @UpdateDateColumn({type: "timestamp"})
+  @UpdateDateColumn({ type: "timestamp" })
   updatedtime: string;
 }

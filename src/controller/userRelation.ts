@@ -9,36 +9,42 @@ import { logger } from "../logging/logger";
 import { ListingStatus } from "../entities/Items";
 
 export class UserRelationController {
-
   @HandleError("follow")
-  static async follow(req: Request, res: Response, next: NextFunction): Promise<void> {
+  static async follow(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
     const followerId = req.body.userId;
     const followeeId = parseInt(req.params.id);
 
     if (followerId == followeeId) {
       res.send({
-        message: "Users can not follow themselves."
+        message: "Users can not follow themselves.",
       });
       return next();
     }
 
     const userRepo = getRepository(Users);
-    const follower = await userRepo.findOne({id: followerId});
+    const follower = await userRepo.findOne({ id: followerId });
     if (!follower) {
       throw new ResourceNotFoundError("Follower is not found.");
     }
 
-    const followee = await userRepo.findOne({id: followeeId});
+    const followee = await userRepo.findOne({ id: followeeId });
     if (!followee) {
       throw new ResourceNotFoundError("Followee is not found.");
     }
 
     const userRelationRepo = getRepository(UserRelations);
-    const userRelationEntry = await userRelationRepo.findOne({ follower: follower, followee: followee });
+    const userRelationEntry = await userRelationRepo.findOne({
+      follower: follower,
+      followee: followee,
+    });
     if (userRelationEntry) {
       res.send({
         message: "UserRelationEntry already exists.",
-        data: userRelationEntry
+        data: userRelationEntry,
       });
       return next();
     }
@@ -50,41 +56,45 @@ export class UserRelationController {
     const result = await userRelationRepo.save(newUserRelation);
     logger.info("UserRelationEntry created.");
     res.send({
-      data: result
+      data: result,
     });
   }
 
-
-
-
   @HandleError("unfollow")
-  static async unfollow(req: Request, res: Response, next: NextFunction): Promise<void> {
+  static async unfollow(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
     const followerId = req.body.userId;
     const followeeId = parseInt(req.params.id);
 
     if (followerId == followeeId) {
       res.send({
-        message: "Users can not unfollow themselves."
+        message: "Users can not unfollow themselves.",
       });
       return next();
     }
 
     const userRepo = getRepository(Users);
-    const follower = await userRepo.findOne({id: followerId});
+    const follower = await userRepo.findOne({ id: followerId });
     if (!follower) {
       throw new ResourceNotFoundError("Follower is not found.");
     }
 
-    const followee = await userRepo.findOne({id: followeeId});
+    const followee = await userRepo.findOne({ id: followeeId });
     if (!followee) {
       throw new ResourceNotFoundError("Followee is not found.");
     }
 
     const userRelationRepo = getRepository(UserRelations);
-    const userRelationEntry = await userRelationRepo.findOne({ follower: follower, followee: followee });
+    const userRelationEntry = await userRelationRepo.findOne({
+      follower: follower,
+      followee: followee,
+    });
     if (!userRelationEntry) {
       res.send({
-        message: "UserRelationEntry does not exist."
+        message: "UserRelationEntry does not exist.",
       });
       return next();
     }
@@ -92,36 +102,39 @@ export class UserRelationController {
     const result = await userRelationRepo.remove(userRelationEntry);
     res.send({
       message: "UserRelationEntry deleted.",
-      data: result
+      data: result,
     });
   }
 
   @HandleError("isFollowed")
-  static async isFollowed(req: Request, res: Response, next: NextFunction): Promise<void> {
+  static async isFollowed(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
     const followerId = req.body.userId;
     const followeeId = parseInt(req.params.id);
 
     if (followerId == followeeId) {
       res.send({
         message: "Users can not follow themselves.",
-        data: false
+        data: false,
       });
       return next();
     }
-    
+
     const userRelationEntry = await getRepository(UserRelations)
       .createQueryBuilder("userRelations")
       .leftJoinAndSelect("userRelations.follower", "follower")
       .leftJoinAndSelect("userRelations.followee", "followee")
-      .where("follower.id = :followerId", {followerId: followerId})
-      .andWhere("followee.id = :followeeId", {followeeId: followeeId})
+      .where("follower.id = :followerId", { followerId: followerId })
+      .andWhere("followee.id = :followeeId", { followeeId: followeeId })
       .getOne();
-      
+
     const isFollowed = userRelationEntry != null;
     res.send({
-      data: isFollowed
+      data: isFollowed,
     });
-
   }
 
   @HandleError("getUserFollowings")
@@ -137,25 +150,25 @@ export class UserRelationController {
       .where("users.id = :id", { id: userId })
       .select([
         "users.id",
-        "followings", 
-        "followee.id", 
+        "followings",
+        "followee.id",
         "followee.role",
-        "followee.username", 
-        "followee.followersCount", 
+        "followee.username",
+        "followee.followersCount",
         "followee.avatarUrl",
-        "shops.id", 
-        "shops.rating", 
-        "shops.name", 
-        "shops.introduction", 
-        "shops.logoUrl", 
+        "shops.id",
+        "shops.rating",
+        "shops.name",
+        "shops.introduction",
+        "shops.logoUrl",
         "items.id",
         "items.imageUrls",
       ])
       .orderBy("followee.role", "DESC")
-      .getOne(); 
+      .getOne();
 
     res.send({
-      data: userFollowings
+      data: userFollowings,
     });
   }
 
@@ -172,17 +185,17 @@ export class UserRelationController {
       .where("users.id = :id", { id: userId })
       .select([
         "users.id",
-        "followers", 
-        "follower.id", 
+        "followers",
+        "follower.id",
         "follower.role",
-        "follower.username", 
-        "follower.followersCount", 
-        "follower.avatarUrl", 
-        "shops.id", 
-        "shops.rating", 
-        "shops.name", 
-        "shops.introduction", 
-        "shops.logoUrl", 
+        "follower.username",
+        "follower.followersCount",
+        "follower.avatarUrl",
+        "shops.id",
+        "shops.rating",
+        "shops.name",
+        "shops.introduction",
+        "shops.logoUrl",
         "items.id",
         "items.imageUrls",
       ])
@@ -190,7 +203,7 @@ export class UserRelationController {
       .getOne();
 
     res.send({
-      data: userFollowers
+      data: userFollowers,
     });
-  }   
+  }
 }

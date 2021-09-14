@@ -9,12 +9,14 @@ import { createShopSchema, updateShopSchema } from "../validator/schemas";
 import { ResourceNotFoundError } from "../error/notfoundError";
 import { ListingStatus, AuditStatus } from "../entities/Items";
 import { getOrderByConditions } from "./helper/orderByHelper";
-import { getPaginationLinks, getPaginationParams } from "./helper/paginationHelper";
+import {
+  getPaginationLinks,
+  getPaginationParams,
+} from "./helper/paginationHelper";
 
 const MAX_OWNED_SHOPS = 1;
-const DEFAULT_SORT_BY:OrderByCondition = { "users.followersCount":"DESC" };
+const DEFAULT_SORT_BY: OrderByCondition = { "users.followersCount": "DESC" };
 const ADMIN_USER_ID = 3;
-
 
 export class ShopController {
   @HandleError("createShop")
@@ -37,7 +39,7 @@ export class ShopController {
     const createdShop = await shopRepo.save(shopData);
 
     res.send({
-      data: createdShop
+      data: createdShop,
     });
   }
 
@@ -46,26 +48,29 @@ export class ShopController {
     const sorts = req.query.sort;
     const orderBy = getOrderByConditions(sorts, DEFAULT_SORT_BY);
     const repo = getRepository(Shops);
-    const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
-     
+    const [pageNumber, skipSize, pageSize] = getPaginationParams(
+      req.query.page,
+    );
+
     // Sort shops by followersCount
-    const shopsQuery = repo.createQueryBuilder("shops")
+    const shopsQuery = repo
+      .createQueryBuilder("shops")
       .innerJoin("shops.owner", "users")
       .innerJoin("shops.items", "items")
       .where("shops.isSuspended = :isSuspended", { isSuspended: false })
       .andWhere("items.status = :new", { new: ListingStatus.NEW }) //this will only return shosp that currentluy has new items.
       .select([
-        "shops.id", 
-        "shops.rating", 
-        "shops.name", 
+        "shops.id",
+        "shops.rating",
+        "shops.name",
         "shops.createdtime",
-        "shops.introduction", 
-        "shops.logoUrl", 
+        "shops.introduction",
+        "shops.logoUrl",
         "users.id",
-        "users.username", 
-        "users.followersCount", 
+        "users.username",
+        "users.followersCount",
         "items.id",
-        "items.imageUrls"
+        "items.imageUrls",
       ])
       .orderBy(orderBy)
       .skip(skipSize)
@@ -74,7 +79,7 @@ export class ShopController {
     const shops: Shops[] = await shopsQuery.getMany();
 
     // Sort shops by recently (in 24 hours) created items
-    const oneDayAgo = new Date(new Date().getTime() - (24 * 60 * 60 * 1000));
+    const oneDayAgo = new Date(new Date().getTime() - 24 * 60 * 60 * 1000);
     const recentlyActiveShops: Shops[] = await shopsQuery
       .andWhere("items.createdtime > :time", { time: oneDayAgo })
       .getMany();
@@ -83,11 +88,14 @@ export class ShopController {
     let recentlyActiveShopsCount = 0;
 
     if (recentlyActiveShops && recentlyActiveShops.length > 0) {
-      const shopIds = new Set(recentlyActiveShops.map(shop => shop.id));
+      const shopIds = new Set(recentlyActiveShops.map((shop) => shop.id));
       // promotedShops = Top 20 followers count & created items in last 24 hours
-      const promotedShops = shops.filter(shop => shopIds.has(shop.id));
+      const promotedShops = shops.filter((shop) => shopIds.has(shop.id));
       recentlyActiveShopsCount = promotedShops.length;
-      const sortedShops = [...promotedShops, ...shops.filter(shop => !shopIds.has(shop.id))];
+      const sortedShops = [
+        ...promotedShops,
+        ...shops.filter((shop) => !shopIds.has(shop.id)),
+      ];
       resultShops = sortedShops;
     } else {
       resultShops = shops;
@@ -96,7 +104,7 @@ export class ShopController {
     res.send({
       data: resultShops,
       recentlyActiveShopsCount: recentlyActiveShopsCount,
-      links: getPaginationLinks(req, pageNumber, pageSize)
+      links: getPaginationLinks(req, pageNumber, pageSize),
     });
   }
 
@@ -109,40 +117,52 @@ export class ShopController {
       .leftJoinAndSelect("shops.owner", "users")
       .leftJoinAndSelect("users.defaultAddress", "defaultAddress")
       .select([
-        "shops.id", "shops.name", "shops.introduction", "shops.logoUrl", "shops.location",
-        "users.id", "users.username", "users.followersCount", "users.followingsCount", 
-        "defaultAddress.city", "defaultAddress.district", "defaultAddress.street"
+        "shops.id",
+        "shops.name",
+        "shops.introduction",
+        "shops.logoUrl",
+        "shops.location",
+        "users.id",
+        "users.username",
+        "users.followersCount",
+        "users.followingsCount",
+        "defaultAddress.city",
+        "defaultAddress.district",
+        "defaultAddress.street",
       ])
       .getOne();
-  
+
     res.send({
-      data: shops 
+      data: shops,
     });
   }
 
-  @HandleError("updateShop") 
+  @HandleError("updateShop")
   static async updateShop(req: Request, res: Response): Promise<void> {
     const userId = req.body.userId;
     const shopId = req.params.id;
     const shopData = req.body.data;
-
 
     const validator = new RequestValidator(updateShopSchema);
     validator.validate(shopData);
 
     shopData.id = shopId; // for update sync to algolia
 
-
-    if(userId === ADMIN_USER_ID) {
+    if (userId === ADMIN_USER_ID) {
       const ownerId = shopData.ownerId;
-      if(ownerId !== undefined) {
-        const user = await Users.findOne({id: ownerId});
+      if (ownerId !== undefined) {
+        const user = await Users.findOne({ id: ownerId });
         if (!user) {
           throw new ResourceNotFoundError("User doesn't exist.");
         }
-        const ownedShops = await Shops.find({owner: user});
-        if (ownedShops.length === MAX_OWNED_SHOPS && ownedShops[0].id !== shopId) {
-          throw new BadRequestError(`No more than ${MAX_OWNED_SHOPS} shops is allowed.`);
+        const ownedShops = await Shops.find({ owner: user });
+        if (
+          ownedShops.length === MAX_OWNED_SHOPS &&
+          ownedShops[0].id !== shopId
+        ) {
+          throw new BadRequestError(
+            `No more than ${MAX_OWNED_SHOPS} shops is allowed.`,
+          );
         }
         shopData.owner = user;
       }
@@ -150,53 +170,59 @@ export class ShopController {
 
     delete shopData.ownerId;
 
-    const shopRepo = await getRepository(Shops); 
+    const shopRepo = await getRepository(Shops);
     const result = await shopRepo.save(shopData); // TODO ownership verification
 
-
     res.send({
-      data: result
+      data: result,
     });
-
   }
 
   @HandleError("getShopItems")
   static async getShopItems(req: Request, res: Response): Promise<void> {
     const sorts = req.query.sort;
-    const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
+    const [pageNumber, skipSize, pageSize] = getPaginationParams(
+      req.query.page,
+    );
     const shopId = req.params.id;
     const from = req.query.from; // distinguish if the request comes from myprofie or seller dp.
-    
+
     const shopItemsQeury = getRepository(Shops)
       .createQueryBuilder("shops")
       .leftJoinAndSelect("shops.items", "items")
       .where("shops.id = :id", { id: shopId })
-      .andWhere("items.status IN (:...status)", {status: [ListingStatus.NEW, ListingStatus.SOLD, ListingStatus.DELISTED]})
+      .andWhere("items.status IN (:...status)", {
+        status: [ListingStatus.NEW, ListingStatus.SOLD, ListingStatus.DELISTED],
+      })
       .loadRelationCountAndMap("shops.itemsCount", "shops.items")
       .select(["shops.id", "items"])
-      .orderBy("CASE WHEN items.auditStatus='fail' AND items.status='new' THEN 0 WHEN items.status='new' THEN 1 ELSE 2 END")
-      .addOrderBy("items.createdtime", "DESC") 
+      .orderBy(
+        "CASE WHEN items.auditStatus='fail' AND items.status='new' THEN 0 WHEN items.status='new' THEN 1 ELSE 2 END",
+      )
+      .addOrderBy("items.createdtime", "DESC")
       .offset(skipSize)
       .limit(pageSize);
-    
-    if(from === "shopper") {
-      shopItemsQeury.andWhere("items.auditStatus IN (:...auditStatus)", {auditStatus: [AuditStatus.PASS, AuditStatus.PENDING]});
+
+    if (from === "shopper") {
+      shopItemsQeury.andWhere("items.auditStatus IN (:...auditStatus)", {
+        auditStatus: [AuditStatus.PASS, AuditStatus.PENDING],
+      });
     }
 
     const shopItems = await shopItemsQeury.getOne();
 
-    if(shopItems === undefined) { 
+    if (shopItems === undefined) {
       res.send({
         data: {
           id: shopId,
           items: [],
-          itemsCount: 0
-        }
+          itemsCount: 0,
+        },
       });
     } else {
       res.send({
         data: shopItems,
-        links: getPaginationLinks(req, pageNumber, pageSize)
+        links: getPaginationLinks(req, pageNumber, pageSize),
       });
     }
   }

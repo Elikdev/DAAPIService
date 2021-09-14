@@ -1,4 +1,13 @@
-import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import {
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from "typeorm";
 import { Items } from "./Items";
 
 @Entity("item_comments")
@@ -6,16 +15,16 @@ export class ItemComments extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string | null;
 
-  @Column("integer", {nullable: true })
+  @Column("integer", { nullable: true })
   commentedBy: number | null;
 
-  @Column("character varying", {nullable: true })
+  @Column("character varying", { nullable: true })
   content: string | null;
 
-  @CreateDateColumn({type: "timestamp"})
+  @CreateDateColumn({ type: "timestamp" })
   createdAt: string;
 
-  @UpdateDateColumn({type: "timestamp"})
+  @UpdateDateColumn({ type: "timestamp" })
   updatedAt: string;
 
   @ManyToOne(() => Items)

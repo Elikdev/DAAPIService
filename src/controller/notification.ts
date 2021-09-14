@@ -10,7 +10,7 @@ export class NotificationController {
     const timestamp = req.query.timestamp;
     const nonce = req.query.nonce;
     const echostr = req.query.echostr;
-    
+
     res.send(echostr);
   }
 }

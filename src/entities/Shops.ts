@@ -19,7 +19,7 @@ import { ShopCollections } from "./ShopCollections";
 // type = merchant 为 签约商家
 export enum ShopType {
   MERCHANT = "merchant",
-  DEFAULT = "default"
+  DEFAULT = "default",
 }
 
 @Entity("shops")
@@ -33,32 +33,32 @@ export class Shops extends BaseEntity {
   @Column({
     type: "enum",
     enum: ShopType,
-    default: ShopType.DEFAULT
+    default: ShopType.DEFAULT,
   })
   type: string;
 
-  @Column("character varying", {nullable: true })
+  @Column("character varying", { nullable: true })
   introduction: string | null;
 
   @OneToMany(() => Orders, (orders) => orders.shop)
   shopOrders: Orders[];
 
-  @Column("float", {default: 0.0 })
+  @Column("float", { default: 0.0 })
   rating: number;
 
-  @Column("character varying", {nullable: true })
+  @Column("character varying", { nullable: true })
   logoUrl: string;
 
-  @Column("bool", {default: false })
+  @Column("bool", { default: false })
   isSuspended: boolean;
 
-  @Column("character varying", {nullable: true })
+  @Column("character varying", { nullable: true })
   customerServiceUrl: string;
 
-  @Column("character varying", {nullable: true })
+  @Column("character varying", { nullable: true })
   location: string;
 
-  @Column("float", { default: 0.0})
+  @Column("float", { default: 0.0 })
   commissionRate: number;
 
   @OneToMany(() => Items, (items) => items.shop, { cascade: true })
@@ -70,12 +70,12 @@ export class Shops extends BaseEntity {
   @ManyToOne(() => Users, (users) => users.shops)
   owner: Users;
 
-  @ManyToMany(() => ShopCollections, shopCollections => shopCollections.shops)
-  shopCollections: ShopCollections[]
+  @ManyToMany(() => ShopCollections, (shopCollections) => shopCollections.shops)
+  shopCollections: ShopCollections[];
 
-  @CreateDateColumn({type: "timestamp"})
+  @CreateDateColumn({ type: "timestamp" })
   createdtime: string;
 
-  @UpdateDateColumn({type: "timestamp"})
+  @UpdateDateColumn({ type: "timestamp" })
   updatedtime: string;
 }

@@ -1,7 +1,7 @@
 import { OrderStatus, OrderCNStatus, Orders } from "../../entities/Orders";
 import { BadRequestError } from "../../error/badRequestError";
 
-export class OrderUtility {  
+export class OrderUtility {
   static transformOrderResponse(order: any): void {
     order.displayStatusCN = OrderUtility.getDisplayStatusInCN(order.status);
     order.displayCreatedDate = OrderUtility.convertDateTime(order.createdtime);
@@ -23,7 +23,7 @@ export class OrderUtility {
     // Marks as paid when payment finished on client side
     else if (OrderUtility.isPaidOrder(orderStatus)) {
       return OrderCNStatus.PAID;
-    // Marks as confirmed when payment confirmed by wechat callback
+      // Marks as confirmed when payment confirmed by wechat callback
     } else if (OrderUtility.isToShipOrder(orderStatus)) {
       return OrderCNStatus.CONFIRMED;
     } else if (OrderUtility.isToReceiveOrder(orderStatus)) {
@@ -66,11 +66,13 @@ export class OrderUtility {
   }
 
   static validateOrderForUpdate(order: Orders): void {
-    if (this.isCompletedOrder(order.status) || this.isCancelledOrder(order.status)) {
-      throw new BadRequestError(`Cannot update order in ${order.status} status`);
+    if (
+      this.isCompletedOrder(order.status) ||
+      this.isCancelledOrder(order.status)
+    ) {
+      throw new BadRequestError(
+        `Cannot update order in ${order.status} status`,
+      );
     }
   }
 }
-
-
- 

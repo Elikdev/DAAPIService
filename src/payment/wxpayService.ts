@@ -1,4 +1,3 @@
-
 import { PaymentConstants } from "./constants";
 import { ServiceCall } from "../service/serviceCall";
 import { Response } from "node-fetch";
@@ -10,42 +9,41 @@ import { Users } from "../entities/Users";
 import { ResourceNotFoundError } from "../error/notfoundError";
 
 interface PaymentRequestData {
-  [key: string]: string | number
+  [key: string]: string | number;
 }
 
 interface PayResult {
-  [key: string]: string | number
+  [key: string]: string | number;
 }
 
-export class WxpayService { 
-
-  payUrl: string
-  merchantId: string
-  storeId: string
-  apiToken: string
-  callbackUrl: string
-  ip: string
-  useSandbox: boolean
+export class WxpayService {
+  payUrl: string;
+  merchantId: string;
+  storeId: string;
+  apiToken: string;
+  callbackUrl: string;
+  ip: string;
+  useSandbox: boolean;
 
   constructor() {
     const APP_ENV = process.env.APP_ENV;
     let constants;
     this.useSandbox = false;
-    switch(APP_ENV) {
-    case "development":
-      constants = PaymentConstants.sandbox;
-      this.useSandbox = true;
-      break;
-    case "test":
-      constants = PaymentConstants.test;
-      break;
-    case "production":
-      constants = PaymentConstants.prod;
-      break;
-    default:
-      constants = PaymentConstants.sandbox;
-      this.useSandbox = true;
-      break;
+    switch (APP_ENV) {
+      case "development":
+        constants = PaymentConstants.sandbox;
+        this.useSandbox = true;
+        break;
+      case "test":
+        constants = PaymentConstants.test;
+        break;
+      case "production":
+        constants = PaymentConstants.prod;
+        break;
+      default:
+        constants = PaymentConstants.sandbox;
+        this.useSandbox = true;
+        break;
     }
     this.apiToken = constants.API_TOKEN;
     this.payUrl = constants.PAY_URL;
@@ -56,17 +54,22 @@ export class WxpayService {
   }
 
   /**
-   * @param {*} amount x 100 = total_fee 订单总金额，传入单位为元，传出单位为分 
+   * @param {*} amount x 100 = total_fee 订单总金额，传入单位为元，传出单位为分
    * https://pay.weixin.qq.com/wiki/doc/api/wxa/wxa_api.php?chapter=4_2
-   * @param {*} openId trade_type=JSAPI，此参数必传，用户在商户appid下的唯一标识。openid如何获取，可参考 
+   * @param {*} openId trade_type=JSAPI，此参数必传，用户在商户appid下的唯一标识。openid如何获取，可参考
    * https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/Wechat_webpage_authorization.html
-   * @param {*} orderId out_trade_no 商户系统内部订单号，要求32个字符内，只能是数字、大小写字母_-|*且在同一个商户号下唯一 
+   * @param {*} orderId out_trade_no 商户系统内部订单号，要求32个字符内，只能是数字、大小写字母_-|*且在同一个商户号下唯一
    * https://pay.weixin.qq.com/wiki/doc/api/wxa/wxa_api.php?chapter=4_2
-   * 
+   *
    * 统一下单文档： https://pay.weixin.qq.com/wiki/doc/api/wxa/wxa_api.php?chapter=9_1
    */
 
-  async prepay(amount:number, openId:string, orderId:string, useProfitSharing:boolean): Promise<any> {
+  async prepay(
+    amount: number,
+    openId: string,
+    orderId: string,
+    useProfitSharing: boolean,
+  ): Promise<any> {
     const headers = {
       "Content-Type": "application/xml",
     };
@@ -86,22 +89,22 @@ export class WxpayService {
     data.spbill_create_ip = this.ip;
     data.notify_url = this.callbackUrl;
     data.trade_type = "JSAPI";
-    data.profit_sharing = useProfitSharing ? "Y": "N";
+    data.profit_sharing = useProfitSharing ? "Y" : "N";
     data.openid = openId;
     data.body = "Retopia商品订单";
-    
+
     const signature = WxpayUtility.generateSignature(data, this.apiToken);
     data.sign = signature;
 
     const xmlBody = {
-      xml: data
+      xml: data,
     };
 
     const parser = new j2xParser({});
     const xmlData = parser.parse(xmlBody);
 
     return ServiceCall.post(this.payUrl, xmlData, headers)
-      .then((response:Response) => response.text())
+      .then((response: Response) => response.text())
       .then((text) => {
         const res = parse(text);
         logger.debug("pay result:" + JSON.stringify(res));
@@ -117,18 +120,21 @@ export class WxpayService {
     const headers = {
       "Content-Type": "application/xml",
     };
-    
+
     const url = PaymentConstants.sandbox.SB_KEY_URL;
     const nonceStr = WxpayUtility.generateNonceStr();
     const data: PaymentRequestData = {};
     data.mch_id = PaymentConstants.sandbox.MERCHANT_ID;
     data.nonce_str = nonceStr;
 
-    const signature = WxpayUtility.generateSignature(data, PaymentConstants.test.API_TOKEN);
+    const signature = WxpayUtility.generateSignature(
+      data,
+      PaymentConstants.test.API_TOKEN,
+    );
     data.sign = signature;
 
     const xmlBody = {
-      xml: data
+      xml: data,
     };
 
     const parser = new j2xParser({});
@@ -142,8 +148,12 @@ export class WxpayService {
       });
   }
 
-  payOrder = async (userId: any, paymentId: string, totalPrice: number): Promise<any> => {
-    const user = await Users.findOne({id: userId});
+  payOrder = async (
+    userId: any,
+    paymentId: string,
+    totalPrice: number,
+  ): Promise<any> => {
+    const user = await Users.findOne({ id: userId });
     if (!user) {
       throw new ResourceNotFoundError("user in order not found");
     }
@@ -172,10 +182,12 @@ export class WxpayService {
     payResult.nonceStr = prepayResponse.nonce_str;
     payResult.package = `prepay_id=${prepayResponse.prepay_id}`;
     payResult.signType = "MD5";
-    
-    const sign = WxpayUtility.generateSignature(payResult, PaymentConstants.prod.API_TOKEN);
+
+    const sign = WxpayUtility.generateSignature(
+      payResult,
+      PaymentConstants.prod.API_TOKEN,
+    );
     payResult.paySign = sign;
     return payResult;
-  }
+  };
 }
-
