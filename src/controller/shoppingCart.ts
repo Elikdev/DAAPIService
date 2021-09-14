@@ -58,12 +58,12 @@ export class ShoppingCartController {
           }
         });
 
-        cart.items.concat(item);
+        cart.items = cartItems.concat(item);
       } else {
         cart.items = [item];
       }
 
-      await cartRepo.save(cart);
+      await cart.save();
 
       // if cart doesn't exist, create new one
     } else {
