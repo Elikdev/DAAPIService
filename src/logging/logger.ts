@@ -13,9 +13,6 @@ winston.addColors(LoggingConfig.colors);
 
 export const logger = winston.createLogger({
   level: LoggingConfig.level,
-  format: winston.format.combine(
-    winston.format.colorize(),
-    rTracerFormat
-  ),
-  transports: [new winston.transports.Console()]
+  format: winston.format.combine(winston.format.colorize(), rTracerFormat),
+  transports: [new winston.transports.Console()],
 });

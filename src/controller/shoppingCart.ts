@@ -8,21 +8,24 @@ import { logger } from "../logging/logger";
 import { Carts } from "../entities/Cart";
 
 export class ShoppingCartController {
-
   @HandleError("getCart")
   static async getCart(req: Request, res: Response): Promise<void> {
     const userId = req.body.userId;
-    const user = await getRepository(Users).findOne({id: userId});
+    const user = await getRepository(Users).findOne({ id: userId });
     if (!user) {
       throw new ResourceNotFoundError("User is not found.");
     }
-    
-    const cartRepo =  await getRepository(Carts);
-    const cart = await cartRepo.createQueryBuilder("cart")
-      .leftJoinAndSelect("cart.items", "items").leftJoinAndSelect("items.shop", "shop").where("cart.ownerId = :userId", {userId: user.id}).getOne();
+
+    const cartRepo = await getRepository(Carts);
+    const cart = await cartRepo
+      .createQueryBuilder("cart")
+      .leftJoinAndSelect("cart.items", "items")
+      .leftJoinAndSelect("items.shop", "shop")
+      .where("cart.ownerId = :userId", { userId: user.id })
+      .getOne();
 
     res.send({
-      data: cart
+      data: cart,
     });
   }
 
@@ -31,27 +34,26 @@ export class ShoppingCartController {
     const userId = req.body.userId;
     const itemId = req.params.id;
 
-    const item = await getRepository(Items).findOne({id: itemId});
+    const item = await getRepository(Items).findOne({ id: itemId });
     if (!item) {
       throw new ResourceNotFoundError("Item not found.");
     }
-    const user = await getRepository(Users).findOne({id: userId});
+    const user = await getRepository(Users).findOne({ id: userId });
     if (!user) {
       throw new ResourceNotFoundError("User is not found.");
     }
 
-    const cartRepo =  await getRepository(Carts);
-    const cart = await cartRepo.findOne({owner: user});
-  
+    const cartRepo = await getRepository(Carts);
+    const cart = await cartRepo.findOne({ owner: user });
+
     if (cart) {
       const cartItems = cart.items;
       if (cart.items) {
-
         // if already in cart, just return
-        cartItems.forEach(item => {
+        cartItems.forEach((item) => {
           if (item.id === itemId) {
             res.send({
-              data: cart
+              data: cart,
             });
           }
         });
@@ -63,17 +65,17 @@ export class ShoppingCartController {
 
       await cartRepo.save(cart);
 
-    // if cart doesn't exist, create new one
+      // if cart doesn't exist, create new one
     } else {
       const newCart = new Carts();
-      newCart.items= [item];
+      newCart.items = [item];
       newCart.owner = user;
       await newCart.save();
       logger.info("New cart created.");
     }
 
     res.send({
-      data: cart
+      data: cart,
     });
   }
 
@@ -82,29 +84,29 @@ export class ShoppingCartController {
     const userId = req.body.userId;
     const itemId = req.params.id;
 
-    const item = await getRepository(Items).findOne({id: itemId});
+    const item = await getRepository(Items).findOne({ id: itemId });
     if (!item) {
       throw new ResourceNotFoundError("Item not found.");
     }
-    const user = await getRepository(Users).findOne({id: userId});
+    const user = await getRepository(Users).findOne({ id: userId });
     if (!user) {
       throw new ResourceNotFoundError("User is not found.");
     }
 
-    const cartRepo =  await getRepository(Carts);
-    const cart = await cartRepo.findOne({owner: user});
+    const cartRepo = await getRepository(Carts);
+    const cart = await cartRepo.findOne({ owner: user });
 
     if (!cart) {
       throw new ResourceNotFoundError("User's cart is not found.");
     }
     const cartItems = cart.items;
     if (cartItems) {
-      cart.items = cartItems.filter(item => item.id !== itemId);
+      cart.items = cartItems.filter((item) => item.id !== itemId);
       await cartRepo.save(cart);
     }
 
     res.send({
-      data: cart
+      data: cart,
     });
-  } 
+  }
 }

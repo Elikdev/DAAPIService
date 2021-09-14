@@ -6,7 +6,7 @@ import {
   JoinTable,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-  ManyToOne
+  ManyToOne,
 } from "typeorm";
 
 import { Users } from "./Users";
@@ -17,19 +17,22 @@ export class RecentlyViewed extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @ManyToOne(() => Users, (users) => users.recentlyViewed, {onDelete: "CASCADE"})
+  @ManyToOne(() => Users, (users) => users.recentlyViewed, {
+    onDelete: "CASCADE",
+  })
   owner: Users;
 
-  @ManyToOne(() => Items, (items) => items.recentlyViewed, {onDelete: "CASCADE"})
+  @ManyToOne(() => Items, (items) => items.recentlyViewed, {
+    onDelete: "CASCADE",
+  })
   item: Items;
 
-  @CreateDateColumn({type: "timestamp"})
+  @CreateDateColumn({ type: "timestamp" })
   createdtime: string;
 
-  @UpdateDateColumn({type: "timestamp"})
+  @UpdateDateColumn({ type: "timestamp" })
   updatedtime: string;
 
-  @Column({default: 0})
+  @Column({ default: 0 })
   viewdCount: number;
-
 }

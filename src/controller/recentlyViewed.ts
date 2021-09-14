@@ -9,68 +9,69 @@ import { ResourceNotFoundError } from "../error/notfoundError";
 import { logger } from "../logging/logger";
 import { RequestValidator } from "../validator/requestValidator";
 import { getOrderByConditions } from "./helper/orderByHelper";
-import { getPaginationLinks, getPaginationParams } from "./helper/paginationHelper";
-
+import {
+  getPaginationLinks,
+  getPaginationParams,
+} from "./helper/paginationHelper";
 
 export class RecentlyViewedController {
-
   @HandleError("add")
   static async add(req: Request, res: Response): Promise<void> {
     const data = req.body.data;
     const userId = req.body.userId;
     const recentlyViewedRepo = getRepository(RecentlyViewed);
-    const item = await getRepository(Items).findOne({id: data.itemId});
+    const item = await getRepository(Items).findOne({ id: data.itemId });
     if (!item) {
       throw new ResourceNotFoundError("Item not found.");
     }
-    const user = await getRepository(Users).findOne({id: userId});
+    const user = await getRepository(Users).findOne({ id: userId });
     if (!user) {
       throw new ResourceNotFoundError("User is not found.");
     }
 
-    let recentlyViewedEntity = await recentlyViewedRepo.createQueryBuilder("recentlyViewed")
-      .where("recentlyViewed.ownerId = :ownerId", {ownerId: userId })
-      .andWhere("recentlyViewed.itemId = :itemId", {itemId: data.itemId })
+    let recentlyViewedEntity = await recentlyViewedRepo
+      .createQueryBuilder("recentlyViewed")
+      .where("recentlyViewed.ownerId = :ownerId", { ownerId: userId })
+      .andWhere("recentlyViewed.itemId = :itemId", { itemId: data.itemId })
       .getOne();
-    if(recentlyViewedEntity) {
+    if (recentlyViewedEntity) {
       recentlyViewedEntity.viewdCount += 1;
       console.log(recentlyViewedEntity);
       await recentlyViewedRepo.save(recentlyViewedEntity);
     } else {
-      const entity :any = new RecentlyViewed();
+      const entity: any = new RecentlyViewed();
       entity.item = item;
       entity.owner = user;
       recentlyViewedEntity = await recentlyViewedRepo.save(entity);
     }
 
     res.send({
-      data: recentlyViewedEntity
+      data: recentlyViewedEntity,
     });
   }
-  
+
   @HandleError("get")
   static async get(req: Request, res: Response): Promise<void> {
     const recentlyViewedRepo = getRepository(RecentlyViewed);
     const userId = req.body.userId;
-    const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
+    const [pageNumber, skipSize, pageSize] = getPaginationParams(
+      req.query.page,
+    );
 
-    const recentlyViewed = await recentlyViewedRepo.createQueryBuilder("recentlyViewed")
+    const recentlyViewed = await recentlyViewedRepo
+      .createQueryBuilder("recentlyViewed")
       .leftJoinAndSelect("recentlyViewed.owner", "user")
       .leftJoinAndSelect("recentlyViewed.item", "item")
-      .where("recentlyViewed.ownerId = :ownerId", {ownerId: userId })
-      .andWhere("item.status = status", {status:ListingStatus.NEW})
+      .where("recentlyViewed.ownerId = :ownerId", { ownerId: userId })
+      .andWhere("item.status = status", { status: ListingStatus.NEW })
       .orderBy("recentlyViewed.viewdCount", "DESC")
       .skip(skipSize)
       .take(pageSize)
-      .getMany();  
+      .getMany();
 
     res.send({
       data: recentlyViewed,
-      links: getPaginationLinks(req, pageNumber, pageSize)
+      links: getPaginationLinks(req, pageNumber, pageSize),
     });
   }
-
-
 }
-
-

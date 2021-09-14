@@ -6,28 +6,31 @@ import { Orders } from "../../entities/Orders";
 import { ResourceNotFoundError } from "../../error/notfoundError";
 import { logger } from "../../logging/logger";
 import { Items, ListingStatus } from "../../entities/Items";
-import { Coupons } from "../../entities/Coupons"; 
+import { Coupons } from "../../entities/Coupons";
 import { BadRequestError } from "../../error/badRequestError";
 import { Carts } from "../../entities/Cart";
 
-export const createSingleOrder = async (userId: number, orderData: any): Promise<any> => {
+export const createSingleOrder = async (
+  userId: number,
+  orderData: any,
+): Promise<any> => {
   const shopId = orderData.shopId;
   const addressId = orderData.addressId;
   const couponId = orderData.couponId;
-  const shop = await Shops.findOne({id: shopId}, {relations: ["owner"]});
+  const shop = await Shops.findOne({ id: shopId }, { relations: ["owner"] });
   if (!shop) {
     throw new ResourceNotFoundError("Shop not found.");
   }
   if (shop.owner.id === userId) {
     throw new BadRequestError("Cannot purchase own item.");
   }
-  const address = await Addresses.findOne({id: addressId});
+  const address = await Addresses.findOne({ id: addressId });
   if (!address) {
     throw new ResourceNotFoundError("Address not found.");
   }
 
-  const coupon = await Coupons.findOne({id: couponId});
-  const user = await Users.findOne({id: userId});
+  const coupon = await Coupons.findOne({ id: couponId });
+  const user = await Users.findOne({ id: userId });
 
   if (!user) {
     throw new ResourceNotFoundError("User not found.");
@@ -39,23 +42,27 @@ export const createSingleOrder = async (userId: number, orderData: any): Promise
   orderData.buyerAddress = address;
   orderData.shop = shop;
 
-  const items = await Items.findByIds(orderData.itemIds, { relations: ["shop"] });
+  const items = await Items.findByIds(orderData.itemIds, {
+    relations: ["shop"],
+  });
   logger.debug(`purchasing ${JSON.stringify(items)}`);
   if (!items) {
     throw new ResourceNotFoundError("Items not found.");
   }
-  items.map(item => verifyItem(shopId, item));
+  items.map((item) => verifyItem(shopId, item));
 
   orderData.orderItems = items;
   const savedOrder = await getRepository(Orders).save(orderData);
 
-  await Promise.all(items.map(item => changeItemStatus(item)));
+  await Promise.all(items.map((item) => changeItemStatus(item)));
   return savedOrder;
-}; 
+};
 
 const verifyItem = (shopId: string, item: Items): void => {
   if (item.status != ListingStatus.NEW) {
-    throw new BadRequestError(`item ${item.id} with status=${item.status} is not valid`);
+    throw new BadRequestError(
+      `item ${item.id} with status=${item.status} is not valid`,
+    );
   }
   if (item.shop.id != shopId) {
     throw new BadRequestError(`item ${item.id} is not in shop ${shopId}`);
@@ -68,8 +75,8 @@ const changeItemStatus = async (item: Items): Promise<void> => {
 };
 
 const clearUserCart = async (user: Users): Promise<void> => {
-  const cartRepo =  await getRepository(Carts);
-  const cart = await cartRepo.findOne({owner: user});
+  const cartRepo = await getRepository(Carts);
+  const cart = await cartRepo.findOne({ owner: user });
 
   if (!cart) {
     console.error("Cart is not found");

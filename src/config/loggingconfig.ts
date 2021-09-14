@@ -1,4 +1,3 @@
-
 export const LoggingConfig = {
   level: "debug",
   perf: false,
@@ -10,6 +9,6 @@ export const LoggingConfig = {
     info: "green",
     verbose: "cyan",
     silly: "magenta",
-    custom: "yellow"
-  }
+    custom: "yellow",
+  },
 };

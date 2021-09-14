@@ -7,7 +7,7 @@ import {
   Index,
   ManyToOne,
   OneToMany,
-  PrimaryGeneratedColumn
+  PrimaryGeneratedColumn,
 } from "typeorm";
 import { Items } from "./Items";
 import { Users } from "./Users";
@@ -16,8 +16,6 @@ import { Shops } from "./Shops";
 import { Payments } from "./Payments";
 import { Coupons } from "./Coupons";
 
-
-
 export enum OrderStatus {
   OPEN = "open",
   PAID = "paid",
@@ -25,7 +23,7 @@ export enum OrderStatus {
   SHIPPED = "shipped",
   COMPLETED = "completed",
   CANCELLED = "cancelled",
-  SETTLED = "settled"
+  SETTLED = "settled",
 }
 
 export enum OrderCNStatus {
@@ -35,7 +33,7 @@ export enum OrderCNStatus {
   SHIPPED = "待收货",
   COMPLETED = "已完成",
   CANCELLED = "已取消",
-  SETTLED = "已结算"
+  SETTLED = "已结算",
 }
 
 @Index("orders_pkey", ["id"], { unique: true })
@@ -56,38 +54,37 @@ export class Orders extends BaseEntity {
   @ManyToOne(() => Payments, (payments) => payments.orders)
   payment: Payments;
 
-  @Column("double precision", {nullable: true })
+  @Column("double precision", { nullable: true })
   totalPrice: number | null;
 
-  @Column("double precision", {nullable: true })
+  @Column("double precision", { nullable: true })
   itemsPrice: number | null;
 
-  @Column("double precision", {nullable: true })
+  @Column("double precision", { nullable: true })
   processingFee: number | null;
 
-  @Column("character varying", {nullable: true })
+  @Column("character varying", { nullable: true })
   trackingNum: string | null;
 
-  @Column("character varying", {nullable: true })
+  @Column("character varying", { nullable: true })
   orderNotes: string | null;
 
   @Column({
     type: "enum",
     enum: OrderStatus,
-    default: OrderStatus.OPEN
+    default: OrderStatus.OPEN,
   })
   status: string;
 
-  @CreateDateColumn({type: "timestamp"})
+  @CreateDateColumn({ type: "timestamp" })
   createdtime: string;
 
-  @UpdateDateColumn({type: "timestamp"})
+  @UpdateDateColumn({ type: "timestamp" })
   updatedtime: string;
 
   @OneToMany(() => Items, (items) => items.order, { cascade: true })
   orderItems: Items[];
 
-  @ManyToOne(() => Coupons, coupons => coupons.orders)
+  @ManyToOne(() => Coupons, (coupons) => coupons.orders)
   coupon: Coupons;
-
 }

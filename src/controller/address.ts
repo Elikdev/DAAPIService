@@ -9,7 +9,6 @@ import { RequestValidator } from "../validator/requestValidator";
 import { createAddressSchema, updateAddressSchema } from "../validator/schemas";
 
 export class AddressController {
-
   @HandleError("createAddress")
   static async createAddress(req: Request, res: Response): Promise<void> {
     const addressData = req.body.data;
@@ -18,7 +17,7 @@ export class AddressController {
     validator.validate(addressData);
 
     const userRepo = getRepository(Users);
-    const user = await userRepo.findOne({id: userId});
+    const user = await userRepo.findOne({ id: userId });
 
     addressData.user = user;
     const result = await getRepository(Addresses).save(addressData);
@@ -26,11 +25,11 @@ export class AddressController {
 
     const isDefault = addressData.isDefault;
     if (isDefault) {
-      await userRepo.update(userId, {defaultAddress: result});                   
+      await userRepo.update(userId, { defaultAddress: result });
     }
 
     res.send({
-      data: result
+      data: result,
     });
   }
 
@@ -47,55 +46,57 @@ export class AddressController {
     const addressId = req.params.id;
     const addressRepo = getRepository(Addresses);
 
-    const buyerAddress = await addressRepo.findOne({id: addressId});
+    const buyerAddress = await addressRepo.findOne({ id: addressId });
     if (!buyerAddress) {
       throw new ResourceNotFoundError("Address not found.");
     }
 
-    const result = await addressRepo.createQueryBuilder()
+    const result = await addressRepo
+      .createQueryBuilder()
       .update(Addresses, addressData)
       .where("id = :id", { id: addressId })
       .returning("*")
       .updateEntity(true)
       .execute()
-      .then(response => response.raw[0]);
+      .then((response) => response.raw[0]);
 
     if (isDefault !== isDefaultBeforeUpdate) {
       const userId = req.body.userId;
       const userRepo = getRepository(Users);
-      const user = await userRepo.findOne({id: userId});
+      const user = await userRepo.findOne({ id: userId });
       if (isDefault) {
-        await userRepo.update(userId, {defaultAddress: result}); 
+        await userRepo.update(userId, { defaultAddress: result });
       } else {
-        await userRepo.update(userId, {defaultAddress: null}); 
+        await userRepo.update(userId, { defaultAddress: null });
       }
     }
 
     res.send({
-      data: result
+      data: result,
     });
   }
-  
+
   @HandleError("deleteAddress")
   static async deleteAddress(req: Request, res: Response): Promise<void> {
     const addressId = req.params.id;
     const addressRepo = getRepository(Addresses);
 
-    const buyerAddress = await addressRepo.findOne({id: addressId});
+    const buyerAddress = await addressRepo.findOne({ id: addressId });
     if (!buyerAddress) {
       throw new ResourceNotFoundError("Address not found.");
     }
 
-    const result = await addressRepo.createQueryBuilder()
-      .update(Addresses, {isActive: false})
+    const result = await addressRepo
+      .createQueryBuilder()
+      .update(Addresses, { isActive: false })
       .where("id = :id", { id: addressId })
       .returning("*")
       .updateEntity(true)
       .execute()
-      .then(response => response.raw[0]);
+      .then((response) => response.raw[0]);
     logger.info("Address deleted.");
     res.send({
-      data: result
+      data: result,
     });
   }
 
@@ -104,18 +105,31 @@ export class AddressController {
     const userId = req.body.userId;
     const user = await getRepository(Users)
       .createQueryBuilder("user")
-      .leftJoinAndSelect("user.addresses", "address", "address.isActive = :isActive", {isActive: true})
-      .leftJoinAndSelect("user.defaultAddress", "defaultAddress", "defaultAddress.isActive = :isActive", {isActive: true})
+      .leftJoinAndSelect(
+        "user.addresses",
+        "address",
+        "address.isActive = :isActive",
+        { isActive: true },
+      )
+      .leftJoinAndSelect(
+        "user.defaultAddress",
+        "defaultAddress",
+        "defaultAddress.isActive = :isActive",
+        { isActive: true },
+      )
       .where("user.id = :id", { id: userId })
       .getOne();
-                    
+
     if (!user) {
       throw new ResourceNotFoundError("User is not found.");
-    }              
+    }
 
-    const result = {addresses: user.addresses, defaultAddress: user.defaultAddress};
+    const result = {
+      addresses: user.addresses,
+      defaultAddress: user.defaultAddress,
+    };
     res.send({
-      data: result
+      data: result,
     });
-  }  
+  }
 }

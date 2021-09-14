@@ -10,26 +10,33 @@ import { BadRequestError } from "../error/badRequestError";
 import { ResourceNotFoundError } from "../error/notfoundError";
 import { logger } from "../logging/logger";
 import { RequestValidator } from "../validator/requestValidator";
-import { createShopCollectionSchema, updateShopCollectionSchema } from "../validator/schemas";
+import {
+  createShopCollectionSchema,
+  updateShopCollectionSchema,
+} from "../validator/schemas";
 import { getOrderByConditions } from "./helper/orderByHelper";
-import { getPaginationLinks, getPaginationParams } from "./helper/paginationHelper";
+import {
+  getPaginationLinks,
+  getPaginationParams,
+} from "./helper/paginationHelper";
 
-const DEFAULT_SORT_BY:OrderByCondition = { "createdtime":"DESC" };
+const DEFAULT_SORT_BY: OrderByCondition = { createdtime: "DESC" };
 
 export class ShopCollectionsController {
-
   @HandleError("getShopCollections")
   static async getShopCollections(req: Request, res: Response): Promise<void> {
     const sorts = req.query.sort;
     const orderBy = getOrderByConditions(null, DEFAULT_SORT_BY);
     const collectionRepo = getRepository(ShopCollections);
-    const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
+    const [pageNumber, skipSize, pageSize] = getPaginationParams(
+      req.query.page,
+    );
     logger.debug("OrderBy: " + JSON.stringify(orderBy));
 
     const collections = await collectionRepo
       .createQueryBuilder("collection")
       .where("collection.isSuspended = :isSuspended", { isSuspended: false })
-      .andWhere("collection.endTime > :current", {current:  new Date()})
+      .andWhere("collection.endTime > :current", { current: new Date() })
       .orderBy("collection.order", "ASC")
       .skip(skipSize)
       .take(pageSize)
@@ -37,17 +44,21 @@ export class ShopCollectionsController {
 
     res.send({
       data: collections,
-      links: getPaginationLinks(req, pageNumber, pageSize)
+      links: getPaginationLinks(req, pageNumber, pageSize),
     });
   }
 
-
   @HandleError("getAllShopCollections")
-  static async getAllShopCollections(req: Request, res: Response): Promise<void> {
+  static async getAllShopCollections(
+    req: Request,
+    res: Response,
+  ): Promise<void> {
     const sorts = req.query.sort;
     const orderBy = getOrderByConditions(null, DEFAULT_SORT_BY);
     const collectionRepo = getRepository(ShopCollections);
-    const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
+    const [pageNumber, skipSize, pageSize] = getPaginationParams(
+      req.query.page,
+    );
     logger.debug("OrderBy: " + JSON.stringify(orderBy));
 
     const collections = await collectionRepo
@@ -59,12 +70,15 @@ export class ShopCollectionsController {
 
     res.send({
       data: collections,
-      links: getPaginationLinks(req, pageNumber, pageSize)
+      links: getPaginationLinks(req, pageNumber, pageSize),
     });
   }
 
   @HandleError("createShopCollection")
-  static async createShopCollection(req: Request, res: Response): Promise<void> {
+  static async createShopCollection(
+    req: Request,
+    res: Response,
+  ): Promise<void> {
     const userId = req.body.userId;
     const collectionData = req.body.data;
     const validator = new RequestValidator(createShopCollectionSchema);
@@ -73,16 +87,20 @@ export class ShopCollectionsController {
     const collectionRepo = getRepository(ShopCollections);
     const savedItem = await collectionRepo.save(collectionData);
     res.send({
-      data: savedItem
+      data: savedItem,
     });
   }
 
   @HandleError("getShopCollectionShops")
-  static async getShopCollectionShops(req: Request, res: Response): Promise<void> {
+  static async getShopCollectionShops(
+    req: Request,
+    res: Response,
+  ): Promise<void> {
     const collectionId = req.params.id;
     const shopsRepo = getRepository(Shops);
-    const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
-
+    const [pageNumber, skipSize, pageSize] = getPaginationParams(
+      req.query.page,
+    );
 
     const shopsQuery = await shopsRepo
       .createQueryBuilder("shops")
@@ -90,29 +108,29 @@ export class ShopCollectionsController {
       .leftJoin("shops.owner", "users")
       .leftJoin("shops.items", "items")
       .where("shopCollections.id = :id", { id: collectionId })
-      .andWhere("shops.isSuspended = :isSuspended", {isSuspended: false})
+      .andWhere("shops.isSuspended = :isSuspended", { isSuspended: false })
       .andWhere("items.status = :new", { new: ListingStatus.NEW })
       .select([
-        "shops.id", 
-        "shops.rating", 
-        "shops.name", 
+        "shops.id",
+        "shops.rating",
+        "shops.name",
         "shops.createdtime",
-        "shops.introduction", 
-        "shops.logoUrl", 
+        "shops.introduction",
+        "shops.logoUrl",
         "users.id",
-        "users.username", 
-        "users.followersCount", 
+        "users.username",
+        "users.followersCount",
         "items.id",
-        "items.imageUrls"
+        "items.imageUrls",
       ])
-      .orderBy("users.followersCount", "DESC")      
+      .orderBy("users.followersCount", "DESC")
       .skip(skipSize)
       .take(pageSize);
 
     const shops: Shops[] = await shopsQuery.getMany();
 
     // Sort shops by recently (in 24 hours) created items
-    const oneDayAgo = new Date(new Date().getTime() - (24 * 60 * 60 * 1000));
+    const oneDayAgo = new Date(new Date().getTime() - 24 * 60 * 60 * 1000);
     const recentlyActiveShops: Shops[] = await shopsQuery
       .andWhere("items.createdtime > :time", { time: oneDayAgo })
       .getMany();
@@ -121,84 +139,99 @@ export class ShopCollectionsController {
     let recentlyActiveShopsCount = 0;
 
     if (recentlyActiveShops && recentlyActiveShops.length > 0) {
-      const shopIds = new Set(recentlyActiveShops.map(shop => shop.id));
+      const shopIds = new Set(recentlyActiveShops.map((shop) => shop.id));
       // promotedShops = Top 20 followers count & created items in last 24 hours
-      const promotedShops = shops.filter(shop => shopIds.has(shop.id));
+      const promotedShops = shops.filter((shop) => shopIds.has(shop.id));
       recentlyActiveShopsCount = promotedShops.length;
-      const sortedShops = [...promotedShops, ...shops.filter(shop => !shopIds.has(shop.id))];
+      const sortedShops = [
+        ...promotedShops,
+        ...shops.filter((shop) => !shopIds.has(shop.id)),
+      ];
       resultShops = sortedShops;
     } else {
       resultShops = shops;
     }
-    
-      
-    
+
     res.send({
       data: resultShops,
       recentlyActiveShopsCount: recentlyActiveShopsCount,
-      links: getPaginationLinks(req, pageNumber, pageSize)
+      links: getPaginationLinks(req, pageNumber, pageSize),
     });
   }
 
-
-   @HandleError("getAllShopCollectionShops")
-  static async getAllShopCollectionShops(req: Request, res: Response): Promise<void> {
+  @HandleError("getAllShopCollectionShops")
+  static async getAllShopCollectionShops(
+    req: Request,
+    res: Response,
+  ): Promise<void> {
     const collectionRepo = getRepository(ShopCollections);
-    const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
+    const [pageNumber, skipSize, pageSize] = getPaginationParams(
+      req.query.page,
+    );
 
-    const shops = await collectionRepo.createQueryBuilder("shopCollections").getMany();
-
+    const shops = await collectionRepo
+      .createQueryBuilder("shopCollections")
+      .getMany();
 
     res.send({
       data: shops,
-      links: getPaginationLinks(req, pageNumber, pageSize)
+      links: getPaginationLinks(req, pageNumber, pageSize),
     });
   }
 
-
   @HandleError("removeShopCollectionItem")
-   static async removeShopCollectionItem(req: Request, res: Response): Promise<void> {
-     const collectionId = req.params.id;
-     const collectionRepo = getRepository(ShopCollections);
-     const collectionData = req.body.data;
-     const shopId = collectionData.id;
-    
-     const collection = await ShopCollections.findOne({id: collectionId}, { relations: ["shops"] });
-     const toRemoveShop = await Shops.findOne({id: shopId});
-    
-   
-     if (!toRemoveShop) {
-       throw new ResourceNotFoundError("shop not found.");
-     }
-
-     if (!collection) {
-       throw new ResourceNotFoundError("collection not found.");
-     } else {
-
-       const   newShops = collection.shops.filter(shop => { // this might be slow if collection is large. 
-         return shop.id !== toRemoveShop.id;
-       });
-    
-       collection.shops = newShops;
-       const savedCollection = await collectionRepo.save(collection);
-
-       res.send({
-         data: savedCollection
-       });
-     }
-   }
-
-  @HandleError("addShopCollectionItem")
-  static async addShopCollectionItem(req: Request, res: Response): Promise<void> {
+  static async removeShopCollectionItem(
+    req: Request,
+    res: Response,
+  ): Promise<void> {
     const collectionId = req.params.id;
     const collectionRepo = getRepository(ShopCollections);
     const collectionData = req.body.data;
     const shopId = collectionData.id;
-    
-    const collection = await ShopCollections.findOne({id: collectionId}, { relations: ["shops"] });
-    const shop = await Shops.findOne({id: shopId});
-    
-   
+
+    const collection = await ShopCollections.findOne(
+      { id: collectionId },
+      { relations: ["shops"] },
+    );
+    const toRemoveShop = await Shops.findOne({ id: shopId });
+
+    if (!toRemoveShop) {
+      throw new ResourceNotFoundError("shop not found.");
+    }
+
+    if (!collection) {
+      throw new ResourceNotFoundError("collection not found.");
+    } else {
+      const newShops = collection.shops.filter((shop) => {
+        // this might be slow if collection is large.
+        return shop.id !== toRemoveShop.id;
+      });
+
+      collection.shops = newShops;
+      const savedCollection = await collectionRepo.save(collection);
+
+      res.send({
+        data: savedCollection,
+      });
+    }
+  }
+
+  @HandleError("addShopCollectionItem")
+  static async addShopCollectionItem(
+    req: Request,
+    res: Response,
+  ): Promise<void> {
+    const collectionId = req.params.id;
+    const collectionRepo = getRepository(ShopCollections);
+    const collectionData = req.body.data;
+    const shopId = collectionData.id;
+
+    const collection = await ShopCollections.findOne(
+      { id: collectionId },
+      { relations: ["shops"] },
+    );
+    const shop = await Shops.findOne({ id: shopId });
+
     if (!shop) {
       throw new ResourceNotFoundError("shop not found.");
     }
@@ -209,13 +242,16 @@ export class ShopCollectionsController {
       collection.shops = collection.shops.concat(shop);
       const savedCollection = await collectionRepo.save(collection);
       res.send({
-        data: savedCollection
+        data: savedCollection,
       });
     }
   }
 
   @HandleError("updateShopCollection")
-  static async updateShopCollection(req: Request, res: Response): Promise<void> {
+  static async updateShopCollection(
+    req: Request,
+    res: Response,
+  ): Promise<void> {
     const userId = req.body.userId;
     const collectionData = req.body.data;
     const validator = new RequestValidator(updateShopCollectionSchema);
@@ -224,26 +260,25 @@ export class ShopCollectionsController {
     const collectionId = req.params.id;
     const collectionRepo = getRepository(ShopCollections);
 
-    const collection = await collectionRepo.findOne({id: collectionId});
+    const collection = await collectionRepo.findOne({ id: collectionId });
 
     logger.debug(`updating ${JSON.stringify(collection)}`);
-    
+
     if (!collection) {
       throw new ResourceNotFoundError("Collection not found.");
     }
 
-
-    const result = await collectionRepo.createQueryBuilder()
+    const result = await collectionRepo
+      .createQueryBuilder()
       .update(ShopCollections, collectionData)
       .where("id = :id", { id: collectionId })
       .returning("*")
       .updateEntity(true)
       .execute()
-      .then(response => response.raw[0]);
+      .then((response) => response.raw[0]);
 
     res.send({
-      data: result
+      data: result,
     });
-  }  
-
+  }
 }

@@ -3,7 +3,6 @@ import { logger } from "../logging/logger";
 import { StatusCodes, getReasonPhrase } from "http-status-codes";
 
 export class ErrorHandler {
-
   static handle(response: Response, error: any): void {
     const code = error.code || StatusCodes.INTERNAL_SERVER_ERROR;
     const name = error.name || "Unknown";
@@ -14,10 +13,12 @@ export class ErrorHandler {
         response.status(code).json({
           status: "ERROR",
           errorName: name,
-          message: message
+          message: message,
         });
-      } catch(error) {
-        logger.error("Unexpected error while handling error, closing connection.");
+      } catch (error) {
+        logger.error(
+          "Unexpected error while handling error, closing connection.",
+        );
         response.end();
       }
     } else {
@@ -25,7 +26,7 @@ export class ErrorHandler {
       response.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
         status: "ERROR",
         errorName: name,
-        message: message
+        message: message,
       });
     }
   }
@@ -34,7 +35,7 @@ export class ErrorHandler {
    * Return false if this code is not found
    * @param code input http code
    */
-  static isValidHttpCode(code: (number | string)): boolean {
+  static isValidHttpCode(code: number | string): boolean {
     try {
       return !!getReasonPhrase(code);
     } catch {

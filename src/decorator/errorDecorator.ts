@@ -11,7 +11,7 @@ export const HandleError = (funcName: string): any => {
     descriptor.value = function (...args: [Request, Response]) {
       try {
         const result = originalMethod.apply(this, args);
-        
+
         // Check if method is asynchronous
         if (result && result instanceof Promise) {
           // Return promise
@@ -23,7 +23,7 @@ export const HandleError = (funcName: string): any => {
 
         // Return actual result
         return result;
-      } catch(error) {
+      } catch (error) {
         logger.error(`Encountered problem calling ${funcName}:`, error);
         ErrorHandler.handle(args[1], error);
       }

@@ -6,29 +6,32 @@ import { logger } from "../logging/logger";
 
 export class MessageController {
   @HandleError("sendSubscriptionMessage")
-  static async sendSubscriptionMessage(req: Request, res: Response): Promise<void> {
+  static async sendSubscriptionMessage(
+    req: Request,
+    res: Response,
+  ): Promise<void> {
     const messageData = req.body;
 
     const data = {
       touser: messageData.openid,
       template_id: "CM9TwYeMFeWS_vwvEoGI3adgVG3rayAy3G_BYDXeWK8",
       data: {
-        thing1:{
-          value: messageData.scene
+        thing1: {
+          value: messageData.scene,
         },
-        thing5:{
-          value: messageData.nick_name
+        thing5: {
+          value: messageData.nick_name,
         },
-        thing7:{
-          value: messageData.content
-        }
-      }
+        thing7: {
+          value: messageData.content,
+        },
+      },
     };
 
-    const params =  {
+    const params = {
       appid: process.env.WX_APP_ID,
       secret: process.env.WX_APP_SECRET,
-      grant_type: "client_credential"
+      grant_type: "client_credential",
     };
     const queryString = qs.stringify(params);
     const wxurl = `https://api.weixin.qq.com/cgi-bin/token?${queryString}`;
@@ -36,10 +39,13 @@ export class MessageController {
     const accessTokenData = await axios.get(wxurl);
     const accessToken = accessTokenData.data.access_token;
 
-    const result = await axios.post(`https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token=${accessToken}`, data);
+    const result = await axios.post(
+      `https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token=${accessToken}`,
+      data,
+    );
 
     res.send({
-      data: result.data
+      data: result.data,
     });
   }
 }

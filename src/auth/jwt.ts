@@ -1,4 +1,3 @@
-
 import jwt, { DecodeOptions, SignOptions } from "jsonwebtoken";
 
 import fs from "fs";
@@ -14,12 +13,11 @@ const privateKEY = fs.readFileSync(getAppPath() + "/../private.key", "utf8");
 const publicKEY = fs.readFileSync(getAppPath() + "/../public.key", "utf8");
 
 export class JwtHelper {
-
   static sign(payload: any): string {
     // Token signing options
-    const signOptions:SignOptions = {
+    const signOptions: SignOptions = {
       expiresIn: "30d", // 30 days validity
-      algorithm: "RS256"
+      algorithm: "RS256",
     };
     return jwt.sign(payload, privateKEY, signOptions);
   }
@@ -27,10 +25,10 @@ export class JwtHelper {
   static verify(token: string): any | string {
     return jwt.verify(token, publicKEY);
   }
-  
+
   static decode(token: string): null | { [key: string]: any } | string {
-    const decodeOptions:DecodeOptions = {
-      complete: true
+    const decodeOptions: DecodeOptions = {
+      complete: true,
     };
     return jwt.decode(token, decodeOptions);
   }

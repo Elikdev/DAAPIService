@@ -8,32 +8,35 @@ import { ResourceNotFoundError } from "../error/notfoundError";
 import { logger } from "../logging/logger";
 
 export class ItemLikeController {
-
   @HandleError("likeItem")
-  static async likeItem(req: Request, res: Response, next: NextFunction): Promise<void> {
+  static async likeItem(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
     const userId = req.body.userId;
     const itemId = req.params.id;
 
-    const item = await getRepository(Items).findOne({id: itemId});
+    const item = await getRepository(Items).findOne({ id: itemId });
     if (!item) {
       throw new ResourceNotFoundError("Item not found.");
     }
 
-    const user = await getRepository(Users).findOne({id: userId});
+    const user = await getRepository(Users).findOne({ id: userId });
     if (!user) {
       throw new ResourceNotFoundError("User is not found.");
     }
 
     const itemLikeRepo = getRepository(ItemLikes);
-    const itemLike = await itemLikeRepo.findOne({user: user, item: item});
+    const itemLike = await itemLikeRepo.findOne({ user: user, item: item });
     if (itemLike) {
       logger.info("ItemLike already exists.");
       res.send({
-        data: itemLike
+        data: itemLike,
       });
       return next();
     }
-    
+
     const newItemLike = new ItemLikes();
     newItemLike.user = user;
     newItemLike.item = item;
@@ -41,30 +44,34 @@ export class ItemLikeController {
     const result = await itemLikeRepo.save(newItemLike);
     logger.info("ItemLike created.");
     res.send({
-      data: result
+      data: result,
     });
   }
 
   @HandleError("unlikeItem")
-  static async unlikeItem(req: Request, res: Response, next: NextFunction): Promise<void> {
+  static async unlikeItem(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
     const userId = req.body.userId;
     const itemId = req.params.id;
 
-    const item = await getRepository(Items).findOne({id: itemId});
+    const item = await getRepository(Items).findOne({ id: itemId });
     if (!item) {
       throw new ResourceNotFoundError("Item not found.");
     }
 
-    const user = await getRepository(Users).findOne({id: userId});
+    const user = await getRepository(Users).findOne({ id: userId });
     if (!user) {
       throw new ResourceNotFoundError("User is not found.");
     }
 
     const itemLikeRepo = getRepository(ItemLikes);
-    const itemLike = await itemLikeRepo.findOne({user: user, item: item});
+    const itemLike = await itemLikeRepo.findOne({ user: user, item: item });
     if (!itemLike) {
       res.send({
-        message: "ItemLikeEntry does not exist."
+        message: "ItemLikeEntry does not exist.",
       });
       return next();
     }
@@ -74,9 +81,9 @@ export class ItemLikeController {
 
     res.send({
       message: "ItemLike deleted.",
-      id: itemLikeId
+      id: itemLikeId,
     });
-  }  
+  }
 
   @HandleError("getUserLikedItems")
   static async getUserLikedItems(req: Request, res: Response): Promise<void> {
@@ -87,11 +94,17 @@ export class ItemLikeController {
       .leftJoinAndSelect("itemLikes.item", "item")
       .where("users.id = :id", { id: userId })
       .loadRelationCountAndMap("users.itemLikesCount", "users.itemLikes")
-      .select(["users.id", "itemLikes.id", "item.id", "item.imageUrls", "item.status"])
+      .select([
+        "users.id",
+        "itemLikes.id",
+        "item.id",
+        "item.imageUrls",
+        "item.status",
+      ])
       .getOne();
 
     res.send({
-      data: userLikedItems
+      data: userLikedItems,
     });
   }
 }

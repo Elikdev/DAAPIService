@@ -4,7 +4,11 @@ import { HandleError } from "../decorator/errorDecorator";
 import { Orders, OrderStatus } from "../entities/Orders";
 import { logger } from "../logging/logger";
 import { RequestValidator } from "../validator/requestValidator";
-import { batchCreateOrderSchema, buyerUpdateOrderSchema, sellerUpdateOrderSchema } from "../validator/schemas";
+import {
+  batchCreateOrderSchema,
+  buyerUpdateOrderSchema,
+  sellerUpdateOrderSchema,
+} from "../validator/schemas";
 import { createSingleOrder } from "./helper/orderCreater";
 import { OrderUtility } from "./helper/orderUtility";
 import { getOrderByConditions } from "./helper/orderByHelper";
@@ -15,14 +19,16 @@ import { UserRole, Users } from "../entities/Users";
 import { ResourceNotFoundError } from "../error/notfoundError";
 import { BadRequestError } from "../error/badRequestError";
 import { WxpayUtility } from "../payment/wxpayUtility";
-import { getPaginationLinks, getPaginationParams } from "./helper/paginationHelper";
+import {
+  getPaginationLinks,
+  getPaginationParams,
+} from "./helper/paginationHelper";
 import { resetItems } from "./helper/orderUpdater";
 
 // By default latest orders first
-const DEFAULT_SORT_BY:OrderByCondition = { "orders.createdtime":"DESC" };
+const DEFAULT_SORT_BY: OrderByCondition = { "orders.createdtime": "DESC" };
 
 export class OrderController {
-
   @HandleError("createOrders")
   static async createOrder(req: Request, res: Response): Promise<void> {
     const userId = req.body.userId;
@@ -31,14 +37,14 @@ export class OrderController {
     validator.validate(orderDataArray);
     let numberOfSaves = 0;
     let totalPrice = 0;
-    const results: any[] = await Promise.all(orderDataArray.map(
-      async (orderData: any) => {
+    const results: any[] = await Promise.all(
+      orderDataArray.map(async (orderData: any) => {
         const result = await createSingleOrder(userId, orderData);
         numberOfSaves += 1;
         totalPrice += orderData.totalPrice;
         return result;
-      }
-    ));
+      }),
+    );
     logger.info(`Created ${numberOfSaves} orders in DB.`);
 
     const payment = new Payments();
@@ -47,7 +53,11 @@ export class OrderController {
     payment.amount = totalPrice;
     const savedPayment = await payment.save();
     const payService = new WxpayService();
-    const response = await payService.payOrder(userId, savedPayment.outTradeNo, totalPrice);
+    const response = await payService.payOrder(
+      userId,
+      savedPayment.outTradeNo,
+      totalPrice,
+    );
     const payResult = payService.generatePayResult(response);
 
     logger.debug(`Generated pay result: ${JSON.stringify(payResult)}`);
@@ -56,8 +66,8 @@ export class OrderController {
         orders: results,
         payResult: payResult,
         paymentId: savedPayment.id,
-        totalCount: results.length
-      }
+        totalCount: results.length,
+      },
     });
   }
 
@@ -72,10 +82,10 @@ export class OrderController {
       .leftJoinAndSelect("orders.shop", "shop")
       .getOne();
 
-    OrderUtility.transformOrderResponse(order);  
-  
+    OrderUtility.transformOrderResponse(order);
+
     res.send({
-      data: order 
+      data: order,
     });
   }
 
@@ -87,21 +97,17 @@ export class OrderController {
     const buyerOrders = await getRepository(Orders)
       .createQueryBuilder("orders")
       .orderBy(orderBy)
-      .innerJoin(
-        "orders.buyer", 
-        "buyer", 
-        "buyer.id = :id", 
-        { id: userId })
-      .where("orders.status != :status", {status: OrderStatus.CANCELLED})
+      .innerJoin("orders.buyer", "buyer", "buyer.id = :id", { id: userId })
+      .where("orders.status != :status", { status: OrderStatus.CANCELLED })
       .leftJoinAndSelect("orders.shop", "shop")
       .leftJoinAndSelect("orders.orderItems", "item")
       .getMany();
 
-    buyerOrders.forEach(order => OrderUtility.transformOrderResponse(order));  
+    buyerOrders.forEach((order) => OrderUtility.transformOrderResponse(order));
 
     res.send({
       data: buyerOrders,
-      totalCount: buyerOrders.length
+      totalCount: buyerOrders.length,
     });
   }
 
@@ -110,10 +116,12 @@ export class OrderController {
     const userId = req.body.userId; //TODO  check if its admin
     const sorts = req.query.sort;
     const orderBy = getOrderByConditions(sorts, DEFAULT_SORT_BY, "orders.");
-    const [pageNumber, skipSize, pageSize] = getPaginationParams(req.query.page);
+    const [pageNumber, skipSize, pageSize] = getPaginationParams(
+      req.query.page,
+    );
     const shopId = req.query.shopId;
-    const startDate :any = req.query.startDate;
-    const endDate :any = req.query.endDate;
+    const startDate: any = req.query.startDate;
+    const endDate: any = req.query.endDate;
     const status = req.query.status;
 
     const orderQuery = await getRepository(Orders)
@@ -125,34 +133,34 @@ export class OrderController {
       .skip(skipSize)
       .take(pageSize);
 
-    if(shopId !== undefined && shopId !== "") {  
-      orderQuery.andWhere("orders.shopId = :shopId", {shopId: shopId});
+    if (shopId !== undefined && shopId !== "") {
+      orderQuery.andWhere("orders.shopId = :shopId", { shopId: shopId });
     }
 
-    if(startDate !== undefined && startDate !== "") {  
+    if (startDate !== undefined && startDate !== "") {
       const today = new Date(startDate);
       let nextDay = new Date(today.getTime() + 86400000);
-      if(endDate !== undefined && endDate !== "") {
+      if (endDate !== undefined && endDate !== "") {
         nextDay = new Date(endDate);
       }
-      orderQuery.andWhere("orders.createdtime  >= :today", {today: today});
-      orderQuery.andWhere("orders.createdtime  < :nextDay", {nextDay: nextDay});
+      orderQuery.andWhere("orders.createdtime  >= :today", { today: today });
+      orderQuery.andWhere("orders.createdtime  < :nextDay", {
+        nextDay: nextDay,
+      });
     }
 
-
-    if(status !== undefined && status !== "") {  
-      orderQuery.andWhere("orders.status = :status", {status: status});
+    if (status !== undefined && status !== "") {
+      orderQuery.andWhere("orders.status = :status", { status: status });
     }
 
     const allOrders = await orderQuery.getMany();
 
-
-    allOrders.forEach(order => OrderUtility.transformOrderResponse(order));  
+    allOrders.forEach((order) => OrderUtility.transformOrderResponse(order));
 
     res.send({
       data: allOrders,
       totalCount: allOrders.length,
-      links: getPaginationLinks(req, pageNumber, pageSize)
+      links: getPaginationLinks(req, pageNumber, pageSize),
     });
   }
 
@@ -161,29 +169,27 @@ export class OrderController {
     const userId = req.body.userId;
     const shopId = req.params.id;
     const sorts = req.query.sort;
-    const user = await Users.findOne({id: userId});
-    const shop = await Shops.findOne({id: shopId, owner: user});
+    const user = await Users.findOne({ id: userId });
+    const shop = await Shops.findOne({ id: shopId, owner: user });
     if (!shop) {
       throw new ResourceNotFoundError("Shop not found for user.");
     }
     const orderBy = getOrderByConditions(sorts, DEFAULT_SORT_BY, "orders.");
     const shopOrders = await getRepository(Orders)
       .createQueryBuilder("orders")
-      .innerJoinAndSelect(
-        "orders.shop", 
-        "shop", 
-        "shop.id = :id", 
-        { id: shopId })
-      .where("orders.status != :status", {status: OrderStatus.CANCELLED})
+      .innerJoinAndSelect("orders.shop", "shop", "shop.id = :id", {
+        id: shopId,
+      })
+      .where("orders.status != :status", { status: OrderStatus.CANCELLED })
       .leftJoinAndSelect("orders.orderItems", "item")
       .orderBy(orderBy)
       .getMany();
 
-    shopOrders.forEach(order => OrderUtility.transformOrderResponse(order));  
+    shopOrders.forEach((order) => OrderUtility.transformOrderResponse(order));
 
     res.send({
       data: shopOrders,
-      totalCount: shopOrders.length
+      totalCount: shopOrders.length,
     });
   }
 
@@ -192,16 +198,16 @@ export class OrderController {
     const userId = req.body.userId;
     const orderId = req.params.id;
 
-    const user = await Users.findOne({id: userId});
+    const user = await Users.findOne({ id: userId });
     if (!user) {
       throw new ResourceNotFoundError("User not found");
     }
     let order = await getRepository(Orders)
       .createQueryBuilder("orders")
       .leftJoinAndSelect("orders.orderItems", "items")
-      .where({id: orderId, buyer: user})
+      .where({ id: orderId, buyer: user })
       .getOne();
-    
+
     const updateData = req.body.data;
     let validator;
 
@@ -213,18 +219,19 @@ export class OrderController {
 
       if (updateData.status === OrderStatus.CANCELLED) {
         if (!OrderUtility.isUnpaidOrder(order.status)) {
-        // can only cancel open order
-          throw new BadRequestError(`Cannot cancel order in ${order.status} status`);
+          // can only cancel open order
+          throw new BadRequestError(
+            `Cannot cancel order in ${order.status} status`,
+          );
         }
         // relist items
         await resetItems(order.orderItems);
       }
       order.status = updateData.status;
-
     } else {
       // Check if seller order
       // TODO: more comprehensive check
-      order = await Orders.findOne({id: orderId});
+      order = await Orders.findOne({ id: orderId });
       if (!order || user.role != UserRole.SELLER) {
         throw new ResourceNotFoundError("Order not found.");
       }
@@ -232,15 +239,16 @@ export class OrderController {
       validator.validate(updateData);
       OrderUtility.validateOrderForUpdate(order);
       order.trackingNum = updateData.trackingNum;
-      if (OrderUtility.isPaidOrder(order.status) ||
-        OrderUtility.isToShipOrder(order.status)) {
+      if (
+        OrderUtility.isPaidOrder(order.status) ||
+        OrderUtility.isToShipOrder(order.status)
+      ) {
         order.status = OrderStatus.SHIPPED;
       }
     }
     const result = await getRepository(Orders).save(order);
     res.send({
-      data: result
+      data: result,
     });
   }
-
 }
