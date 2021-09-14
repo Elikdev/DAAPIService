@@ -18,7 +18,8 @@ export class ShoppingCartController {
     }
     
     const cartRepo =  await getRepository(Carts);
-    const cart = await cartRepo.createQueryBuilder("cart").leftJoinAndSelect("cart.items", "items").where("cart.ownerId = :userId", {userId: user.id}).getOne();
+    const cart = await cartRepo.createQueryBuilder("cart")
+      .leftJoinAndSelect("cart.items", "items").leftJoinAndSelect("items.shop", "shop").where("cart.ownerId = :userId", {userId: user.id}).getOne();
 
     res.send({
       data: cart
