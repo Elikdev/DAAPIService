@@ -14,7 +14,7 @@ const publicKEY = fs.readFileSync(getAppPath() + "/../public.key", "utf8");
 const APPLE_BASE_URL = "https://appleid.apple.com";
 const jwksClient = require("jwks-rsa");
 const client = jwksClient({
-  jwksUri: "https://appleid.apple.com/auth/keys"
+  jwksUri: "https://appleid.apple.com/auth/keys",
 });
 
 export class JwtHelper {
@@ -39,29 +39,32 @@ export class JwtHelper {
   }
 }
 
-
-
 export const getApplePublicKey = async (kid: any) => {
-
   const key: any = await new Promise((resolve, reject) => {
-    client.getSigningKey(kid, (error:any, result:any) => {
+    client.getSigningKey(kid, (error: any, result: any) => {
       if (error) {
         return reject(error);
       }
       return resolve(result);
     });
   });
-  return (key.publicKey ) || (key.rsaPublicKey);
+  return key.publicKey || key.rsaPublicKey;
 };
 
-export const verifyAppleToken = async (token: any)  => {
+export const verifyAppleToken = async (token: any) => {
   const decoded: any = jwt.decode(token, { complete: true });
   const { kid, alg } = decoded.header;
   const applePublicKey = await getApplePublicKey(kid);
 
-  const  jwtClaims: any =  await jwt.verify(token, applePublicKey, { algorithms: ["RS256"], issuer: "https://appleid.apple.com", audience: "com.retopia.vintage" });
+  const jwtClaims: any = await jwt.verify(token, applePublicKey, {
+    algorithms: ["RS256"],
+    issuer: "https://appleid.apple.com",
+    audience: "com.retopia.vintage",
+  });
   if (!jwtClaims.iss || jwtClaims.iss !== APPLE_BASE_URL) {
-    throw new Error(`The iss does not match the Apple URL - iss: ${jwtClaims.iss} | expected: ${APPLE_BASE_URL}`);
+    throw new Error(
+      `The iss does not match the Apple URL - iss: ${jwtClaims.iss} | expected: ${APPLE_BASE_URL}`,
+    );
   }
 
   if (jwtClaims.aud === "com.retopia.vintage") {
@@ -71,5 +74,4 @@ export const verifyAppleToken = async (token: any)  => {
   throw new Error(
     `The aud parameter does not include this client - is: ${jwtClaims.aud} | expected: com.retopia.vintage`,
   );
-
 };

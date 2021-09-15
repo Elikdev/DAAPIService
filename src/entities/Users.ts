@@ -28,7 +28,7 @@ export enum UserRole {
 export enum Platform {
   WX = "wx",
   MINIPROGRAM = "miniprogram",
-  APPLE = "apple"
+  APPLE = "apple",
 }
 
 @Index("users_pkey", ["id"], { unique: true })
@@ -40,10 +40,10 @@ export class Users extends BaseEntity {
   @Column("character varying", { nullable: true })
   openId: string;
 
-  @Column("character varying", {nullable: true })
+  @Column("character varying", { nullable: true })
   appleSub: string;
 
-  @Column("character varying", {nullable: true })
+  @Column("character varying", { nullable: true })
   email: string;
 
   @Column({
