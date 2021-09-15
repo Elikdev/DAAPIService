@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { getRepository } from "typeorm";
-import { JwtHelper } from "../auth/jwt";
-import { getSessionData, getUserInfo } from "../auth/wxSessionData";
+import { JwtHelper, verifyAppleToken } from "../auth/jwt";
+import { getSessionData, getUserInfo} from "../auth/wxSessionData";
 import { HandleError } from "../decorator/errorDecorator";
 import { Users } from "../entities/Users";
 import { AuthError } from "../error/authError";
@@ -17,6 +17,7 @@ import { Decode } from "./helper/wxDecode";
 import { Constants } from "../config/constants";
 import { Platform } from "../entities/Users";
 
+const DEFAULT_AVATAR = "https://item-images.oss-cn-shanghai.aliyuncs.com/item-images/assets/5171631692765_.pic_hd.jpg";
 export class UserController {
   @HandleError("signUp")
   static async signUp(req: Request, res: Response): Promise<void> {
@@ -24,8 +25,7 @@ export class UserController {
     const platform = userData.platform;
     const userRepo = getRepository(Users);
 
-    if (platform === Platform.APP) {
-      // login from app
+    if (platform === Platform.WX) { // login from app wx
       const validator = new RequestValidator(appSignUpSchema);
       validator.validate(userData);
       const code = userData.code;
@@ -44,13 +44,14 @@ export class UserController {
       let newUser = false;
       if (!user) {
         logger.info("Creating new user record.");
+        delete userData.code;
         userData.openId = userInfo.openid;
         userData.username = userInfo.nickname;
         userData.role = Constants.SHOPPER;
         userData.unionId = userInfo.unionid;
         userData.avatarUrl = userInfo.headimgurl;
         userData.sex = userInfo.sex;
-        userData.platform = Platform.APP;
+        userData.platform = Platform.WX;
         user = await userRepo.save(userData);
         if (!user) {
           throw new AuthError("Failed to create user.");
@@ -69,7 +70,53 @@ export class UserController {
         userInfo: user,
         newUser: newUser,
       });
-    } else {
+
+    } else if(platform === Platform.APPLE) {
+      const validator = new RequestValidator(appSignUpSchema);
+      validator.validate(userData);
+      const code = userData.code;
+      const decodedToken = await verifyAppleToken(code);
+      const appleSub = decodedToken.sub;
+      const email = decodedToken.email;
+      let user = await userRepo.createQueryBuilder("user") // check if user created through app first as app sign in only stores unionid 
+        .where("user.appleSub = :appleSub", { appleSub: appleSub })
+        .leftJoinAndSelect("user.shops", "shops")
+        .leftJoinAndSelect("user.itemLikes", "itemLikes")
+        .leftJoinAndSelect("itemLikes.item", "likedItem")
+        .leftJoinAndSelect("user.itemSaves", "itemSaves")
+        .leftJoinAndSelect("itemSaves.item", "savedItem")
+        .loadRelationCountAndMap("user.itemLikesCount", "user.itemLikes")
+        .loadRelationCountAndMap("user.itemSavesCount", "user.itemSaves")
+        .getOne();
+      let newUser = false;
+      if (!user) {
+        logger.info("Creating new user record.");
+        delete userData.code;
+        userData.appleSub = appleSub;
+        userData.email = email;
+        userData.username = email;
+        userData.avatarUrl = DEFAULT_AVATAR;
+        userData.platform = Platform.APPLE;
+        user = await userRepo.save(userData);
+        if (!user) {
+          throw new AuthError("Failed to create user.");
+        }
+        newUser = true;
+      }
+
+      const payload = {
+        customerId: user.id
+      };
+
+      const accessToken = JwtHelper.sign(payload);
+
+      res.send({
+        loginToken: accessToken,
+        userInfo: user,
+        newUser: newUser
+      });
+
+    } else  {
       const validator = new RequestValidator(signUpSchema);
 
       const code = userData.code;
@@ -113,6 +160,7 @@ export class UserController {
           .getOne();
         if (!user) {
           logger.info("Creating new user record.");
+          delete userData.code;
           userData.openId = openId;
           userData.mobilePrefix = userInfo.countryCode;
           userData.mobile = userInfo.phoneNumber;

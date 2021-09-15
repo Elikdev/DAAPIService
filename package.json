@@ -29,6 +29,7 @@
       "joi": "^17.4.0",
       "js-base64": "^3.6.0",
       "jsonwebtoken": "^8.5.1",
+      "jwks-rsa": "^2.0.4",
       "moment": "^2.29.1",
       "mysql": "^2.14.1",
       "node-fetch": "^2.6.1",
