@@ -66,12 +66,7 @@ export class ConversationsController {
     const conversationData = req.body.data;
     const validator = new RequestValidator(createConversationSchema);
     validator.validate(conversationData);
-    if (
-      userId !== conversationData.senderId ||
-      userId !== conversationData.receiverId
-    ) {
-      throw new BadRequestError("You can't create conversations for others");
-    }
+
     const conversations = await conversationRepo
       .createQueryBuilder("conversation")
       .where("conversation.senderId = :senderId", {
@@ -93,6 +88,10 @@ export class ConversationsController {
         data: conversations,
       });
     } else {
+      if (userId !== conversationData.senderId) {
+        throw new BadRequestError("You can't create conversations for others");
+      }
+
       const sender = await Users.findOne({ id: conversationData.senderId });
       const receiver = await Users.findOne({ id: conversationData.receiverId });
       const item = await Items.findOne({ id: conversationData.itemId });
