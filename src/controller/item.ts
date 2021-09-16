@@ -169,7 +169,7 @@ export class ItemController {
       });
     }
 
-    const insertIndex = 0;
+    let insertIndex = 0;
 
     if (pageNumber === 1) {
       // insert two recently viewed items to discoverItems only to page 1.
