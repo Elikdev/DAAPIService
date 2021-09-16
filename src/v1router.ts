@@ -19,6 +19,7 @@ import { RecentlyViewedController } from "./controller/recentlyViewed";
 import bodyParser from "body-parser";
 import { NotificationController } from "./controller/notification";
 import { ShoppingCartController } from "./controller/shoppingCart";
+import { ConversationsController } from "./controller/conversation";
 
 export const v1router = Router();
 
@@ -136,3 +137,7 @@ v1router.get("/coupons/apply", CouponsController.apply);
 
 v1router.post("/recentlyViewed", RecentlyViewedController.add);
 v1router.get("/recentlyViewed", RecentlyViewedController.get);
+
+v1router.post("/conversations", ConversationsController.createConversations);
+v1router.get("/conversations", ConversationsController.getConversations);
+v1router.put("/conversations/:id", ConversationsController.updateConversations);

@@ -19,7 +19,7 @@ import { ItemLikes } from "./ItemLikes";
 import { UserRelations } from "./UserRelations";
 import { RecentlyViewed } from "./RecentlyViewed";
 import { Carts } from "./Cart";
-
+import { Conversations } from "./Conversations";
 export enum UserRole {
   SHOPPER = "shopper",
   SELLER = "seller",
@@ -111,6 +111,16 @@ export class Users extends BaseEntity {
 
   @OneToMany(() => ItemLikes, (itemLikes) => itemLikes.user, { cascade: true })
   itemLikes: ItemLikes[];
+
+  @OneToMany(() => Conversations, (conversations) => conversations.sender, {
+    cascade: true,
+  })
+  senderConversations: Conversations[];
+
+  @OneToMany(() => Conversations, (conversations) => conversations.receiver, {
+    cascade: true,
+  })
+  reciverConversations: Conversations[];
 
   @OneToMany((type) => UserRelations, (userRelations) => userRelations.follower)
   followings: UserRelations[];

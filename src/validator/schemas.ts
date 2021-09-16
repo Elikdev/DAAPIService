@@ -200,3 +200,14 @@ export const updateShopSchema = Joi.object().keys({
   ownerId: Joi.number().optional(),
   rating: Joi.number().optional(),
 });
+
+export const updateConversationSchema = Joi.object().keys({
+  buyerArchived: Joi.boolean().optional(),
+  sellerArchived: Joi.boolean().optional(),
+});
+export const createConversationSchema = Joi.object().keys({
+  cloudConvId: Joi.string().required(),
+  senderId: Joi.number().required(),
+  receiverId: Joi.number().required(),
+  itemId: Joi.string().uuid().required(),
+});

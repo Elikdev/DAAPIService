@@ -14,6 +14,7 @@ import { Orders } from "./Orders";
 import { Shops } from "./Shops";
 import { ItemSaves } from "./ItemSaves";
 import { ItemLikes } from "./ItemLikes";
+import { Conversations } from "./Conversations";
 import { Collections } from "./Collections";
 import { RecentlyViewed } from "./RecentlyViewed";
 import { Carts } from "./Cart";
@@ -160,6 +161,11 @@ export class Items extends BaseEntity {
 
   @OneToMany(() => ItemSaves, (itemSaves) => itemSaves.item, { cascade: true })
   itemSaves: ItemSaves[];
+
+  @OneToMany(() => Conversations, (conversations) => conversations.item, {
+    cascade: true,
+  })
+  conversations: Conversations[];
 
   @OneToMany(() => ItemLikes, (itemLikes) => itemLikes.item, { cascade: true })
   itemLikes: ItemLikes[];
