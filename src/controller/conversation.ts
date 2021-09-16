@@ -72,7 +72,7 @@ export class ConversationsController {
       .where("conversation.senderId = :senderId", {
         senderId: conversationData.senderId,
       })
-      .orWhere("conversation.receiverId = :receiverId", {
+      .andWhere("conversation.receiverId = :receiverId", {
         receiverId: conversationData.receiverId,
       })
       .andWhere("conversation.itemId = :itemId", {
