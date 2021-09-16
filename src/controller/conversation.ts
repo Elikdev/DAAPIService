@@ -88,7 +88,7 @@ export class ConversationsController {
         data: conversations,
       });
     } else {
-      if (userId !== conversationData.senderId) {
+      if (Number(userId) != Number(conversationData.senderId)) {
         throw new BadRequestError("You can't create conversations for others");
       }
 

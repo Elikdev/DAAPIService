@@ -210,4 +210,6 @@ export const createConversationSchema = Joi.object().keys({
   senderId: Joi.number().required(),
   receiverId: Joi.number().required(),
   itemId: Joi.string().uuid().required(),
+  lastMessageText: Joi.string().optional(),
+  lastDeliveredAt: Joi.string().optional(),
 });

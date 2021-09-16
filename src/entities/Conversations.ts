@@ -22,6 +22,12 @@ export class Conversations extends BaseEntity {
   @Column("character varying", { nullable: true })
   cloudConvId: string;
 
+  @Column("character varying", { nullable: true })
+  lastMessageText: string;
+
+  @Column("character varying", { nullable: true })
+  lastDeliveredAt: string;
+
   @ManyToOne(() => Items, (items) => items.conversations, {
     eager: true,
     onDelete: "CASCADE",
