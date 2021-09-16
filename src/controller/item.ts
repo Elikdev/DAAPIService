@@ -42,8 +42,6 @@ export class ItemController {
     const itemsQuery = itemRepo // TODO filter out suspended shops and items.
       .createQueryBuilder("item")
       .leftJoinAndSelect("item.shop", "shops")
-      .innerJoin("item.shop", "shops")
-      .where("shops.id = :id", { id: "c6a8eaaa-5892-456b-9fe2-9764e7f7823c" })
       .select(["item", "shops.name"])
       .orderBy(orderBy)
       .skip(skipSize)
@@ -110,9 +108,6 @@ export class ItemController {
       .leftJoin("item.shop", "shops")
       .leftJoinAndSelect("item.itemLikes", "itemLikes")
       .leftJoinAndSelect("itemLikes.user", "user")
-      .where("item.shopId = :shopId", {
-        shopId: "c6a8eaaa-5892-456b-9fe2-9764e7f7823c",
-      })
       .orderBy(orderBy)
       .skip(skipSize)
       .take(pageSize);
@@ -176,12 +171,13 @@ export class ItemController {
 
     const insertIndex = 0;
 
-    // if(pageNumber === 1) { // insert two recently viewed items to discoverItems only to page 1.
-    //   recentlyViewed.forEach((recentlyViewed: any, index: any) => {
-    //     discoverItems.splice(insertIndex, 0, recentlyViewed.item);
-    //     insertIndex = 2;
-    //   });
-    // }
+    if (pageNumber === 1) {
+      // insert two recently viewed items to discoverItems only to page 1.
+      recentlyViewed.forEach((recentlyViewed: any, index: any) => {
+        discoverItems.splice(insertIndex, 0, recentlyViewed.item);
+        insertIndex = 2;
+      });
+    }
 
     res.send({
       data: discoverItems,
@@ -311,7 +307,7 @@ export class ItemController {
     }
 
     res.send({
-      data: [],
+      data: results,
       links: getPaginationLinks(req, pageNumber, pageSize),
     });
   }
