@@ -38,8 +38,8 @@ export class ConversationsController {
     }
     const conversations = await conversationRepo
       .createQueryBuilder("conversation")
-      .where("conversation.senderId = :senderId", { senderId: 3 })
-      .orWhere("conversation.receiverId = :receiverId", { receiverId: 3 })
+      .where("conversation.senderId = :senderId", { senderId: userId })
+      .orWhere("conversation.receiverId = :receiverId", { receiverId: userId })
       .andWhere("conversation.isSuspended = :isSuspended", {
         isSuspended: false,
       })
