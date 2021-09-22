@@ -1,5 +1,6 @@
 export const PaymentConstants = {
-  APP_ID: "wxf3dcefa8d5e1abd3",
+  MINIPROGRAM_APP_ID: "wxf3dcefa8d5e1abd3",
+  APP_APP_ID: "wx9b8bc030312d08e2",
   prod: {
     IP: "47.102.124.11",
     PAY_URL: "https://api.mch.weixin.qq.com/pay/unifiedorder",

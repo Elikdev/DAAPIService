@@ -12,7 +12,7 @@ import {
 import { createSingleOrder } from "./helper/orderCreater";
 import { OrderUtility } from "./helper/orderUtility";
 import { getOrderByConditions } from "./helper/orderByHelper";
-import { Payments } from "../entities/Payments";
+import { Payments, Platform } from "../entities/Payments";
 import { WxpayService } from "../payment/wxpayService";
 import { Shops } from "../entities/Shops";
 import { UserRole, Users } from "../entities/Users";
@@ -33,6 +33,7 @@ export class OrderController {
   static async createOrder(req: Request, res: Response): Promise<void> {
     const userId = req.body.userId;
     const orderDataArray = req.body.data;
+    const platform = req.body.platform || Platform.MINIPROGRAM;
     const validator = new RequestValidator(batchCreateOrderSchema);
     validator.validate(orderDataArray);
     let numberOfSaves = 0;
@@ -51,14 +52,16 @@ export class OrderController {
     payment.outTradeNo = WxpayUtility.encodeValue(results[0].id, "md5");
     payment.orders = results;
     payment.amount = totalPrice;
+    payment.platform = platform;
     const savedPayment = await payment.save();
     const payService = new WxpayService();
     const response = await payService.payOrder(
       userId,
       savedPayment.outTradeNo,
       totalPrice,
+      platform,
     );
-    const payResult = payService.generatePayResult(response);
+    const payResult = payService.generatePayResult(response, platform);
 
     logger.debug(`Generated pay result: ${JSON.stringify(payResult)}`);
     res.send({

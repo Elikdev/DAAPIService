@@ -17,6 +17,11 @@ export enum PaymentStatus {
   REFUNDED = "refunded",
 }
 
+export enum Platform {
+  MINIPROGRAM = "miniprogram",
+  APP = "app",
+}
+
 @Entity("payments")
 export class Payments extends BaseEntity {
   @PrimaryGeneratedColumn("increment")
@@ -26,6 +31,13 @@ export class Payments extends BaseEntity {
     default: 0,
   })
   outTradeNo: string;
+
+  @Column({
+    type: "enum",
+    enum: Platform,
+    default: Platform.MINIPROGRAM,
+  })
+  platform: string;
 
   @ManyToOne(() => Users, (users) => users.buyerOrders)
   buyer: Users;

@@ -7,6 +7,7 @@ import { logger } from "../logging/logger";
 import { DependencyError } from "../error/dependencyError";
 import { Users } from "../entities/Users";
 import { ResourceNotFoundError } from "../error/notfoundError";
+import { Platform } from "../entities/Payments";
 
 interface PaymentRequestData {
   [key: string]: string | number;
@@ -69,6 +70,7 @@ export class WxpayService {
     openId: string,
     orderId: string,
     useProfitSharing: boolean,
+    platform: string,
   ): Promise<any> {
     const headers = {
       "Content-Type": "application/xml",
@@ -79,8 +81,15 @@ export class WxpayService {
         throw new DependencyError("Failed to get sandbox sign key.");
       }
     }
+    let appId = PaymentConstants.APP_APP_ID;
+    let tradeType = "APP";
     const data: PaymentRequestData = {};
-    data.appid = PaymentConstants.APP_ID;
+    if (platform == Platform.MINIPROGRAM) {
+      data.openid = openId;
+      appId = PaymentConstants.MINIPROGRAM_APP_ID;
+      tradeType = "JSAPI";
+    }
+    data.appid = appId;
     data.mch_id = this.merchantId;
     const nonce_str = WxpayUtility.generateNonceStr();
     data.nonce_str = nonce_str;
@@ -88,9 +97,8 @@ export class WxpayService {
     data.total_fee = amount * 100;
     data.spbill_create_ip = this.ip;
     data.notify_url = this.callbackUrl;
-    data.trade_type = "JSAPI";
+    data.trade_type = tradeType;
     data.profit_sharing = useProfitSharing ? "Y" : "N";
-    data.openid = openId;
     data.body = "Retopia商品订单";
 
     const signature = WxpayUtility.generateSignature(data, this.apiToken);
@@ -152,6 +160,7 @@ export class WxpayService {
     userId: any,
     paymentId: string,
     totalPrice: number,
+    platform: string,
   ): Promise<any> => {
     const user = await Users.findOne({ id: userId });
     if (!user) {
@@ -162,7 +171,13 @@ export class WxpayService {
       throw new ResourceNotFoundError("openid for user not found");
     }
     // TODO: 分账
-    const payresult = await this.prepay(totalPrice, openId, paymentId, false);
+    const payresult = await this.prepay(
+      totalPrice,
+      openId,
+      paymentId,
+      false,
+      platform,
+    );
     if (payresult.xml.return_code != "SUCCESS") {
       throw new DependencyError("Encounter error calling wx prepay api");
     }
@@ -174,14 +189,23 @@ export class WxpayService {
    * @param prepayResponse wx prepay response
    * https://pay.weixin.qq.com/wiki/doc/api/wxa/wxa_api.php?chapter=7_7&index=5
    */
-  generatePayResult = (prepayResponse: any): PayResult => {
+  generatePayResult = (prepayResponse: any, platform: string): PayResult => {
     const payResult: PayResult = {};
 
-    payResult.appId = PaymentConstants.APP_ID;
-    payResult.timeStamp = Math.floor(Date.now() / 1000).toString();
-    payResult.nonceStr = prepayResponse.nonce_str;
-    payResult.package = `prepay_id=${prepayResponse.prepay_id}`;
-    payResult.signType = "MD5";
+    if (platform === Platform.MINIPROGRAM) {
+      payResult.appId = PaymentConstants.MINIPROGRAM_APP_ID;
+      payResult.timeStamp = Math.floor(Date.now() / 1000).toString();
+      payResult.nonceStr = prepayResponse.nonce_str;
+      payResult.package = `prepay_id=${prepayResponse.prepay_id}`;
+      payResult.signType = "MD5";
+    } else {
+      payResult.appid = PaymentConstants.APP_APP_ID;
+      payResult.timestamp = Math.floor(Date.now() / 1000).toString();
+      payResult.noncestr = prepayResponse.nonce_str;
+      payResult.prepayid = prepayResponse.prepay_id;
+      payResult.partnerid = "1610299103";
+      payResult.package = "Sign=WXPay";
+    }
 
     const sign = WxpayUtility.generateSignature(
       payResult,
