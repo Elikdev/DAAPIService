@@ -169,11 +169,11 @@ export class UserController {
           userData.role = Constants.SHOPPER;
           userData.unionId = unionId;
           user = await userRepo.save(userData);
+          newUser = true;
         }
         if (!user) {
           throw new AuthError("Failed to create user.");
         }
-        newUser = true;
       }
       user.unionId = unionId;
       user.platform = Platform.MINIPROGRAM;
