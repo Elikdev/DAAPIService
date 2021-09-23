@@ -5,18 +5,20 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  ManyToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
 import { Items } from "./Items";
+import { Users } from "./Users";
 
 @Entity("item_comments")
 export class ItemComments extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string | null;
 
-  @Column("integer", { nullable: true })
-  commentedBy: number | null;
+  @ManyToOne(() => Users, (user) => user.itemComments)
+  commenter: Users;
 
   @Column("character varying", { nullable: true })
   content: string | null;
@@ -27,6 +29,9 @@ export class ItemComments extends BaseEntity {
   @UpdateDateColumn({ type: "timestamp" })
   updatedAt: string;
 
-  @ManyToOne(() => Items)
+  @Column("bool", { default: false })
+  isSuspended: boolean;
+
+  @ManyToOne(() => Items, (items) => items.itemComments)
   item: Items;
 }

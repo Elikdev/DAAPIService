@@ -19,7 +19,9 @@ import { ItemLikes } from "./ItemLikes";
 import { UserRelations } from "./UserRelations";
 import { RecentlyViewed } from "./RecentlyViewed";
 import { Carts } from "./Cart";
+import { Reviews } from "./Reviews";
 import { Conversations } from "./Conversations";
+import { ItemComments } from "./ItemComments";
 export enum UserRole {
   SHOPPER = "shopper",
   SELLER = "seller",
@@ -98,6 +100,14 @@ export class Users extends BaseEntity {
 
   @OneToMany(() => Addresses, (addresses) => addresses.user, { cascade: true })
   addresses: Addresses[];
+
+  @OneToMany(() => Reviews, (reviews) => reviews.reviewer, { cascade: true })
+  reviews: Reviews[];
+
+  @OneToMany(() => ItemComments, (itemComments) => itemComments.commenter, {
+    cascade: true,
+  })
+  itemComments: ItemComments[];
 
   @OneToOne(() => Addresses, { nullable: true })
   @JoinColumn()

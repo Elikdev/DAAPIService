@@ -13,7 +13,7 @@ import { Items } from "./Items";
 import { Users } from "./Users";
 import { Orders } from "./Orders";
 import { Coupons } from "./Coupons";
-
+import { Reviews } from "./Reviews";
 import { ShopCollections } from "./ShopCollections";
 
 // type = merchant 为 签约商家
@@ -63,6 +63,9 @@ export class Shops extends BaseEntity {
 
   @OneToMany(() => Items, (items) => items.shop, { cascade: true })
   items: Items[];
+
+  @OneToMany(() => Reviews, (reviews) => reviews.shop, { cascade: true })
+  reviews: Reviews[];
 
   @OneToMany(() => Coupons, (coupons) => coupons.shop, { cascade: true })
   coupons: Coupons[];

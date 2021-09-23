@@ -215,3 +215,17 @@ export const createConversationSchema = Joi.object().keys({
   lastMessageText: Joi.string().allow("").allow(null).optional(),
   lastDeliveredAt: Joi.string().allow("").allow(null).optional(),
 });
+
+export const createReviewSchema = Joi.object().keys({
+  review: Joi.string().required(),
+  rating: Joi.number().required(),
+  reviewerId: Joi.number().required(),
+  shopId: Joi.string().uuid().required(),
+  itemIds: Joi.array().required(),
+});
+
+export const createItemCommentSchema = Joi.object().keys({
+  content: Joi.string().required(),
+  commenterId: Joi.number().required(),
+  itemId: Joi.string().uuid().required(),
+});

@@ -11,15 +11,15 @@ import { OrderController } from "./controller/order";
 import { FeedsController } from "./controller/feeds";
 import { CollectionsController } from "./controller/collections";
 import { ShopCollectionsController } from "./controller/shop_collections";
-
 import { CouponsController } from "./controller/coupons";
 import { SearchController } from "./controller/search";
 import { RecentlyViewedController } from "./controller/recentlyViewed";
-
 import bodyParser from "body-parser";
 import { NotificationController } from "./controller/notification";
 import { ShoppingCartController } from "./controller/shoppingCart";
 import { ConversationsController } from "./controller/conversation";
+import { ReviewsController } from "./controller/review";
+import { itemCommentController } from "./controller/itemComment";
 
 export const v1router = Router();
 
@@ -64,6 +64,8 @@ v1router.get("/querySug", SearchController.querySuggestion);
 v1router.get("/coupons", CouponsController.get); // TODO access control
 v1router.put("/coupons/:id", CouponsController.update);
 v1router.post("/coupons", CouponsController.create);
+
+v1router.get("/itemComments/:itemId", itemCommentController.getItemComments);
 
 // Do auth filtering for the following apis
 v1router.use(authMiddleWare);
@@ -141,3 +143,8 @@ v1router.get("/recentlyViewed", RecentlyViewedController.get);
 v1router.post("/conversations", ConversationsController.createConversations);
 v1router.get("/conversations", ConversationsController.getConversations);
 v1router.put("/conversations/:id", ConversationsController.updateConversations);
+
+v1router.post("/reviews", ReviewsController.createReviews);
+v1router.get("/reviews/:shopId", ReviewsController.getShopReviews);
+
+v1router.post("/itemComments", itemCommentController.createItemComment);

@@ -12,12 +12,14 @@ import {
 } from "typeorm";
 import { Orders } from "./Orders";
 import { Shops } from "./Shops";
+import { Reviews } from "./Reviews";
 import { ItemSaves } from "./ItemSaves";
 import { ItemLikes } from "./ItemLikes";
 import { Conversations } from "./Conversations";
 import { Collections } from "./Collections";
 import { RecentlyViewed } from "./RecentlyViewed";
 import { Carts } from "./Cart";
+import { ItemComments } from "./ItemComments";
 
 export enum ListingStatus {
   NEW = "new",
@@ -159,6 +161,9 @@ export class Items extends BaseEntity {
   @ManyToOne(() => Shops, (shops) => shops.items)
   shop: Shops;
 
+  @ManyToOne(() => Reviews, (reviews) => reviews.items)
+  review: Reviews;
+
   @OneToMany(() => ItemSaves, (itemSaves) => itemSaves.item, { cascade: true })
   itemSaves: ItemSaves[];
 
@@ -177,6 +182,9 @@ export class Items extends BaseEntity {
 
   @ManyToMany(() => Collections, (collections) => collections.items)
   collections: Collections[];
+
+  @OneToMany(() => ItemComments, (itemComments) => itemComments.item)
+  itemComments: ItemComments[];
 
   @ManyToMany(() => Carts, (carts) => carts.items)
   carts: Carts[];
