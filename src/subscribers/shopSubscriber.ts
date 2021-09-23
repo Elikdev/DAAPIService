@@ -38,9 +38,11 @@ export class ShopsSubscriber implements EntitySubscriberInterface<Shops> {
     if (APP_ENV === "production") {
       const object: any = event.entity;
       object.objectID = object.id;
-      const result = await index.partialUpdateObject(object).then(() => {
-        console.log("success");
-      });
+      const result = await index
+        .partialUpdateObject(object, { createIfNotExists: true })
+        .then(() => {
+          console.log("success");
+        });
     }
   }
 }
