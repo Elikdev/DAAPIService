@@ -38,9 +38,11 @@ export class ReviewsController {
     const reviews = await reviewRepo
       .createQueryBuilder("review")
       .where("review.shopId = :shopId", { shopId: shopId })
+      .leftJoin("review.reviewer", "reviewer")
       .andWhere("review.isSuspended = :isSuspended", {
         isSuspended: false,
       })
+      .select(["review", "reviewer.avatarUrl", "reviewer.username"])
       .orderBy(orderBy)
       .skip(skipSize)
       .take(pageSize)
