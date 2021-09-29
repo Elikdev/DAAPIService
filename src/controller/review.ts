@@ -54,6 +54,26 @@ export class ReviewsController {
     });
   }
 
+  @HandleError("getShopReviewsCount")
+  static async getShopReviewsCount(req: Request, res: Response): Promise<void> {
+    const sorts = req.query.sort;
+    const orderBy = getOrderByConditions(null, DEFAULT_SORT_BY);
+    const shopId = req.params.shopId;
+    const reviewRepo = getRepository(Reviews);
+    const reviewCount = await reviewRepo
+      .createQueryBuilder("review")
+      .where("review.shopId = :shopId", { shopId: shopId })
+      .andWhere("review.isSuspended = :isSuspended", {
+        isSuspended: false,
+      })
+
+      .getCount();
+
+    res.send({
+      count: reviewCount,
+    });
+  }
+
   @HandleError("createReviews")
   static async createReviews(req: Request, res: Response): Promise<void> {
     const sorts = req.query.sort;

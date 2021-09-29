@@ -67,6 +67,8 @@ v1router.post("/coupons", CouponsController.create);
 
 v1router.get("/itemComments/:itemId", itemCommentController.getItemComments);
 
+v1router.get("/reviews/:shopId/count", ReviewsController.getShopReviewsCount);
+
 // Do auth filtering for the following apis
 v1router.use(authMiddleWare);
 
