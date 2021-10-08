@@ -157,7 +157,7 @@ export class UserRelationController {
         "followee.followersCount",
         "followee.followingsCount",
         "followee.avatarUrl",
-        "follower.introduction",
+        "followee.introduction",
         "shops.id",
         "shops.rating",
         "shops.name",
