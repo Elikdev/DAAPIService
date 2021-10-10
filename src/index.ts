@@ -35,6 +35,8 @@ createConnection(DBConfig)
     const allowedOrigins = [
       "https://www.admin.pbrick.cn",
       "http://www.admin.pbrick.cn",
+      "https://www.share.pbrick.cn",
+      "http://www.share.pbrick.cn",
     ];
     //options for cors midddleware
     const options: cors.CorsOptions = {
