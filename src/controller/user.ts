@@ -5,7 +5,6 @@ import { getSessionData, getUserInfo } from "../auth/wxSessionData";
 import { HandleError } from "../decorator/errorDecorator";
 import { Users } from "../entities/Users";
 import { AuthError } from "../error/authError";
-import { BadRequestError } from "../error/badRequestError";
 import { ResourceNotFoundError } from "../error/notfoundError";
 import { logger } from "../logging/logger";
 import { RequestValidator } from "../validator/requestValidator";
@@ -233,7 +232,10 @@ export class UserController {
   }
 
   @HandleError("updateUserDeviceInfo")
-  static async updateUserDeviceInfo(req: Request, res: Response): Promise<void> {
+  static async updateUserDeviceInfo(
+    req: Request,
+    res: Response,
+  ): Promise<void> {
     const userId = req.params.id;
     const userDeviceInfoData = req.body.data;
 
@@ -249,14 +251,12 @@ export class UserController {
       throw new ResourceNotFoundError("User is not found.");
     }
 
-    if (user.deviceToken || user.deviceType) {
-      throw new BadRequestError("user deviceInfo can only be registered once.");
+    if (!user.deviceToken && !user.deviceType) {
+      // user deviceInfo can only be registered once.
+      user.deviceToken = userDeviceInfoData.deviceToken;
+      user.deviceType = userDeviceInfoData.deviceType;
+      await userRepo.save(user);
     }
-
-    user.deviceToken = userDeviceInfoData.deviceToken;
-    user.deviceType = userDeviceInfoData.deviceType;
-
-    await userRepo.save(user);
 
     res.send({
       data: user,
