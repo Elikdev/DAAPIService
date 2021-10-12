@@ -177,7 +177,7 @@ export class UserController {
       }
       user.unionId = unionId;
       user.platform = Platform.MINIPROGRAM;
-      await user.save(); // back fill union Id
+      await userRepo.save(user); // back fill union Id
       const payload = {
         customerId: user.id,
       };
