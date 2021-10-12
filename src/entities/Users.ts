@@ -144,6 +144,12 @@ export class Users extends BaseEntity {
   @Column({ default: 0 })
   followersCount: number;
 
+  @Column("character varying", { nullable: true })
+  deviceToken: string | null;
+
+  @Column("character varying", { nullable: true })
+  deviceType: string | null;
+
   @CreateDateColumn({ type: "timestamp" })
   createdAt: string;
 

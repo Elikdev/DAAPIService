@@ -191,6 +191,11 @@ export const updateUserSchema = Joi.object().keys({
   avatarUrl: Joi.string().max(500),
 });
 
+export const updateUserDeviceInfoSchema = Joi.object().keys({
+  deviceToken: Joi.string().max(100),
+  deviceType: Joi.string().max(100),
+});
+
 export const updateShopSchema = Joi.object().keys({
   name: Joi.string().max(100),
   introduction: Joi.string().max(500),

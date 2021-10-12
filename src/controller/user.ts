@@ -5,12 +5,14 @@ import { getSessionData, getUserInfo } from "../auth/wxSessionData";
 import { HandleError } from "../decorator/errorDecorator";
 import { Users } from "../entities/Users";
 import { AuthError } from "../error/authError";
+import { BadRequestError } from "../error/badRequestError";
 import { ResourceNotFoundError } from "../error/notfoundError";
 import { logger } from "../logging/logger";
 import { RequestValidator } from "../validator/requestValidator";
 import {
   signUpSchema,
   updateUserSchema,
+  updateUserDeviceInfoSchema,
   appSignUpSchema,
 } from "../validator/schemas";
 import { Decode } from "./helper/wxDecode";
@@ -227,6 +229,37 @@ export class UserController {
     }
     res.send({
       data: result,
+    });
+  }
+
+  @HandleError("updateUserDeviceInfo")
+  static async updateUserDeviceInfo(req: Request, res: Response): Promise<void> {
+    const userId = req.params.id;
+    const userDeviceInfoData = req.body.data;
+
+    const validator = new RequestValidator(updateUserDeviceInfoSchema);
+    validator.validate(userDeviceInfoData);
+
+    const userRepo = getRepository(Users);
+    const user = await userRepo
+      .createQueryBuilder()
+      .where("id = :id", { id: userId })
+      .getOne();
+    if (!user) {
+      throw new ResourceNotFoundError("User is not found.");
+    }
+
+    if (user.deviceToken || user.deviceType) {
+      throw new BadRequestError("user deviceInfo can only be registered once.");
+    }
+
+    user.deviceToken = userDeviceInfoData.deviceToken;
+    user.deviceType = userDeviceInfoData.deviceType;
+
+    await userRepo.save(user);
+
+    res.send({
+      data: user,
     });
   }
 

@@ -27,6 +27,7 @@ v1router.use(bodyParser.json());
 v1router.post("/signup", UserController.signUp);
 v1router.post("/signin", UserController.signIn);
 v1router.put("/users/:id", UserController.updateUser);
+v1router.put("/users/:id/deviceInfo", UserController.updateUserDeviceInfo);
 v1router.get("/users/:id", UserController.getUser);
 v1router.get("/test", NotificationController.test);
 
