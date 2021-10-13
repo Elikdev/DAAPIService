@@ -24,6 +24,7 @@ import {
   getPaginationParams,
 } from "./helper/paginationHelper";
 import { resetItems } from "./helper/orderUpdater";
+import { sendPush } from "./helper/umengPushHelper";
 
 // By default latest orders first
 const DEFAULT_SORT_BY: OrderByCondition = { "orders.createdtime": "DESC" };
@@ -64,6 +65,7 @@ export class OrderController {
     const payResult = payService.generatePayResult(response, platform);
 
     logger.debug(`Generated pay result: ${JSON.stringify(payResult)}`);
+
     res.send({
       data: {
         orders: results,
@@ -247,6 +249,7 @@ export class OrderController {
         OrderUtility.isToShipOrder(order.status)
       ) {
         order.status = OrderStatus.SHIPPED;
+        sendPush("你的订单在路上了！", "", "", order.buyer.deviceToken);
       }
     }
     const result = await getRepository(Orders).save(order);
