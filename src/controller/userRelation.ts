@@ -7,6 +7,7 @@ import { UserRelations } from "../entities/UserRelations";
 import { Items } from "../entities/Items";
 import { logger } from "../logging/logger";
 import { ListingStatus } from "../entities/Items";
+import { sendPush } from "./helper/umengPushHelper";
 
 export class UserRelationController {
   @HandleError("follow")
@@ -35,6 +36,8 @@ export class UserRelationController {
     if (!followee) {
       throw new ResourceNotFoundError("Followee is not found.");
     }
+
+    sendPush(follower.username + "开始关注了你!", "", "", followee.deviceToken);
 
     const userRelationRepo = getRepository(UserRelations);
     const userRelationEntry = await userRelationRepo.findOne({

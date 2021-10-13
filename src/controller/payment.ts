@@ -5,6 +5,7 @@ import { Payments, PaymentStatus } from "../entities/Payments";
 import { BadRequestError } from "../error/badRequestError";
 import { ResourceNotFoundError } from "../error/notfoundError";
 import { logger } from "../logging/logger";
+import { sendPush } from "./helper/umengPushHelper";
 
 export class PaymentController {
   @HandleError("confirmWxPay")
@@ -34,9 +35,11 @@ export class PaymentController {
           payment.orders.map((order) => {
             order.status = OrderStatus.CONFIRMED;
             order.save();
+            sendPush("店铺有新订单了!", "", "", order.shop.owner.deviceToken);
           }),
         );
       }
+
       res.send(SUCCESS_RESPONSE_STRING);
     } catch (error) {
       logger.error("Encountered problem confirming payment", error);

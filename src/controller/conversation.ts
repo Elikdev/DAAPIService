@@ -17,6 +17,7 @@ import {
   getPaginationLinks,
   getPaginationParams,
 } from "./helper/paginationHelper";
+import { sendPush } from "./helper/umengPushHelper";
 
 const DEFAULT_SORT_BY: OrderByCondition = { "conversation.updatedAt": "DESC" };
 
@@ -128,6 +129,13 @@ export class ConversationsController {
     if (!conversation) {
       throw new ResourceNotFoundError("Conversation not found.");
     }
+
+    sendPush(
+      conversation.sender.username + "给你发了一条消息!",
+      "",
+      "",
+      conversation.receiver.deviceToken,
+    );
 
     const result = await conversationRepo
       .createQueryBuilder()

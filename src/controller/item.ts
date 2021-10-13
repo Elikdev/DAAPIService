@@ -11,7 +11,6 @@ import { logger } from "../logging/logger";
 import { RequestValidator } from "../validator/requestValidator";
 import { createItemSchema, updateItemSchema } from "../validator/schemas";
 import { getOrderByConditions } from "./helper/orderByHelper";
-import { sendPush } from "./helper/umengPushHelper";
 
 import {
   getPaginationLinks,
@@ -26,7 +25,6 @@ const ADMIN_USER_ID = 3;
 export class ItemController {
   @HandleError("getItems")
   static async getItems(req: Request, res: Response): Promise<void> {
-    sendPush();
     const sorts = req.query.sort;
     const category = req.query.category;
     const shopId = req.query.shopId;

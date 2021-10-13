@@ -5,14 +5,17 @@ const umeng = new Umeng({
   appMasterSecret: "oj41rao8e9xpxoagtmbqekhdxhtrfl5y",
 });
 
-export const sendPush = async (): Promise<any> => {
-  console.log("here");
+export const sendPush = async (
+  title: string,
+  content: string | "",
+  subtitle: string | "",
+  device_token: string | null,
+): Promise<any> => {
   await umeng.pushSingle({
-    title: "标题",
-    content: "内容",
-    subtitle: "wtf",
-    device_token:
-      "fa9b6a368ff45078ea4569ee7eb4e037dd36a6e177c866882fc6555d84d8c55e",
+    title: title,
+    content: content,
+    subtitle: subtitle,
+    device_token: device_token,
     success(response: any) {
       console.log(response);
     }, // 成功回调
