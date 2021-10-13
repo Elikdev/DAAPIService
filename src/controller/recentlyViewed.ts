@@ -42,6 +42,7 @@ export class RecentlyViewedController {
       const entity: any = new RecentlyViewed();
       entity.item = item;
       entity.owner = user;
+      entity.platform = data.platform;
       recentlyViewedEntity = await recentlyViewedRepo.save(entity);
     }
 

@@ -12,6 +12,11 @@ import {
 import { Users } from "./Users";
 import { Items } from "./Items";
 
+export enum Platform {
+  APP = "app",
+  MINIPROGRAM = "miniprogram",
+}
+
 @Entity("recentlyViewed")
 export class RecentlyViewed extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
@@ -26,6 +31,13 @@ export class RecentlyViewed extends BaseEntity {
     onDelete: "CASCADE",
   })
   item: Items;
+
+  @Column({
+    type: "enum",
+    enum: Platform,
+    default: Platform.MINIPROGRAM,
+  })
+  platform: string;
 
   @CreateDateColumn({ type: "timestamp" })
   createdtime: string;
