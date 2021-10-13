@@ -3,6 +3,7 @@
 build/
 tmp/
 temp/
+node_modules/
 pgdata
 .DS_Store
 src/.DS_Store
