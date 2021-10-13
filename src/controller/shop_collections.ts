@@ -39,7 +39,7 @@ export class ShopCollectionsController {
       .andWhere("collection.endTime > :current", { current: new Date() })
       .orderBy("collection.order", "ASC")
       .skip(skipSize)
-      .take(pageSize)
+      .take(10) // temp change
       .getMany();
 
     res.send({

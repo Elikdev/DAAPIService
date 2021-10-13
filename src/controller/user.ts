@@ -11,6 +11,7 @@ import { RequestValidator } from "../validator/requestValidator";
 import {
   signUpSchema,
   updateUserSchema,
+  updateUserDeviceInfoSchema,
   appSignUpSchema,
 } from "../validator/schemas";
 import { Decode } from "./helper/wxDecode";
@@ -177,7 +178,7 @@ export class UserController {
       }
       user.unionId = unionId;
       user.platform = Platform.MINIPROGRAM;
-      await user.save(); // back fill union Id
+      await userRepo.save(user); // back fill union Id
       const payload = {
         customerId: user.id,
       };
@@ -227,6 +228,38 @@ export class UserController {
     }
     res.send({
       data: result,
+    });
+  }
+
+  @HandleError("updateUserDeviceInfo")
+  static async updateUserDeviceInfo(
+    req: Request,
+    res: Response,
+  ): Promise<void> {
+    const userId = req.params.id;
+    const userDeviceInfoData = req.body.data;
+
+    const validator = new RequestValidator(updateUserDeviceInfoSchema);
+    validator.validate(userDeviceInfoData);
+
+    const userRepo = getRepository(Users);
+    const user = await userRepo
+      .createQueryBuilder()
+      .where("id = :id", { id: userId })
+      .getOne();
+    if (!user) {
+      throw new ResourceNotFoundError("User is not found.");
+    }
+
+    if (!user.deviceToken && !user.deviceType) {
+      // user deviceInfo can only be registered once.
+      user.deviceToken = userDeviceInfoData.deviceToken;
+      user.deviceType = userDeviceInfoData.deviceType;
+      await userRepo.save(user);
+    }
+
+    res.send({
+      data: user,
     });
   }
 
