@@ -1,4 +1,4 @@
-const Umeng = require("push-umeng");
+const Umeng = require("umengtuisong");
 
 const umeng = new Umeng({
   appKey: "614579ecd884567d811b5254",
