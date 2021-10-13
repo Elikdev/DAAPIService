@@ -40,7 +40,9 @@ export class FeedsController {
         feeds = await getRepository(Items)
           .createQueryBuilder("items")
           .leftJoinAndSelect("items.itemLikes", "itemLikes")
-          .leftJoinAndSelect("itemLikes.user", "user")
+          .leftJoinAndSelect("items.itemSaves", "itemSaves")
+          .leftJoinAndSelect("itemSaves.user", "saveByUser")
+          .leftJoinAndSelect("itemLikes.user", "likedByUser")
           .leftJoinAndSelect("items.shop", "shops")
           .leftJoinAndSelect("shops.owner", "users")
           .where("items.shopId IN (:...ids)", { ids: followingShopIds })
@@ -50,7 +52,9 @@ export class FeedsController {
           .select([
             "items",
             "itemLikes",
-            "user",
+            "itemSaves",
+            "saveByUser",
+            "likedByUser",
             "shops.name",
             "shops.id",
             "shops.introduction",
@@ -74,7 +78,16 @@ export class FeedsController {
         if (likedUserIds.includes(userId)) {
           element.likedByUser = true;
         }
+        const savedUserIds = element.itemSaves.map(function (saves: any) {
+          return saves.user.id;
+        });
+        element.savedByUser = false;
+        if (savedUserIds.includes(userId)) {
+          element.savedByUser = true;
+        }
         delete element.itemLikes;
+        delete element.itemSaves;
+
         return element;
       });
     }
