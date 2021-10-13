@@ -28,6 +28,11 @@ export class Conversations extends BaseEntity {
   @Column("character varying", { nullable: true })
   lastDeliveredAt: string;
 
+  @Column({
+    nullable: true,
+  })
+  lastMessageSenderUserId: number;
+
   @ManyToOne(() => Items, (items) => items.conversations, {
     eager: true,
     onDelete: "CASCADE",

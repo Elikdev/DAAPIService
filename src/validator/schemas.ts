@@ -211,6 +211,7 @@ export const updateConversationSchema = Joi.object().keys({
   sellerArchived: Joi.boolean().optional(),
   lastMessageText: Joi.string().allow("").allow(null).optional(),
   lastDeliveredAt: Joi.string().allow("").allow(null).optional(),
+  lastMessageSenderUserId: Joi.number().allow("").allow(null).optional(),
 });
 export const createConversationSchema = Joi.object().keys({
   cloudConvId: Joi.string().required(),

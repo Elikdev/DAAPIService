@@ -130,12 +130,14 @@ export class ConversationsController {
       throw new ResourceNotFoundError("Conversation not found.");
     }
 
-    sendPush(
-      conversation.sender.username + "给你发了一条消息!",
-      "",
-      "",
-      conversation.receiver.deviceToken,
-    );
+    let pushTitle = conversation.sender.username + "给你发了一条消息!";
+    let deviceToken = conversation.receiver.deviceToken;
+    if (conversation.receiver.id === conversationData.lastMessageSenderUserId) {
+      pushTitle = conversation.receiver.username + "给你发了一条消息!";
+      deviceToken = conversation.sender.deviceToken;
+    }
+
+    sendPush(pushTitle, "", "", deviceToken);
 
     const result = await conversationRepo
       .createQueryBuilder()
