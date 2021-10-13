@@ -56,6 +56,7 @@
       "husky": "^6.0.0",
       "nodemon": "^2.0.7",
       "prettier": "2.4.0",
+      "push-umeng": "^0.3.0",
       "ts-node": "3.3.0",
       "typescript": "3.3.3333"
    },
