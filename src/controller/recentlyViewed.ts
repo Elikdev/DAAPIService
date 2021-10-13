@@ -36,6 +36,7 @@ export class RecentlyViewedController {
       .getOne();
     if (recentlyViewedEntity) {
       recentlyViewedEntity.viewdCount += 1;
+      recentlyViewedEntity.platform = data.platform;
       console.log(recentlyViewedEntity);
       await recentlyViewedRepo.save(recentlyViewedEntity);
     } else {
