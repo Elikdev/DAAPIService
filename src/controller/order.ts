@@ -234,9 +234,8 @@ export class OrderController {
       }
       order.status = updateData.status;
     } else {
-      // Check if seller order
-      // TODO: more comprehensive check
-      order = await Orders.findOne({ id: orderId });
+
+      order = await Orders.findOne({ id: orderId }, { relations: ['buyer'] });
       if (!order || user.role != UserRole.SELLER) {
         throw new ResourceNotFoundError("Order not found.");
       }
