@@ -251,12 +251,9 @@ export class UserController {
       throw new ResourceNotFoundError("User is not found.");
     }
 
-    if (!user.deviceToken && !user.deviceType) {
-      // user deviceInfo can only be registered once.
-      user.deviceToken = userDeviceInfoData.deviceToken;
-      user.deviceType = userDeviceInfoData.deviceType;
-      await userRepo.save(user);
-    }
+    user.deviceToken = userDeviceInfoData.deviceToken;
+    user.deviceType = userDeviceInfoData.deviceType;
+    await userRepo.save(user);
 
     res.send({
       data: user,
