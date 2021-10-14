@@ -16,7 +16,7 @@ export class PaymentController {
       const paymentAmount = parseInt(req.body.xml.total_fee[0]);
       const payment = await Payments.findOne(
         { outTradeNo: outTradeNo },
-        { relations: ["orders"] },
+        { relations: ["orders", "orders.shop", "orders.shop.owner"] },
       );
       if (!payment) {
         throw new ResourceNotFoundError("Payment not found.");
