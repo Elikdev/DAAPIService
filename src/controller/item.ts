@@ -11,6 +11,9 @@ import { logger } from "../logging/logger";
 import { RequestValidator } from "../validator/requestValidator";
 import { createItemSchema, updateItemSchema } from "../validator/schemas";
 import { getOrderByConditions } from "./helper/orderByHelper";
+import { ShopCollections } from "../entities/ShopCollections";
+import * as _ from "lodash";
+import { Constants } from "../config/constants";
 
 import {
   getPaginationLinks,
@@ -102,16 +105,75 @@ export class ItemController {
     const [pageNumber, skipSize, pageSize] = getPaginationParams(
       req.query.page,
     );
+    const collectionRepo = getRepository(ShopCollections);
+
+    //get shops by styles
+    const shopsCollections = await collectionRepo
+      .createQueryBuilder("shopCollections")
+      .leftJoinAndSelect("shopCollections.shops", "shops")
+      .andWhere("shops.isSuspended = :isSuspended", {
+        isSuspended: false,
+      })
+      .getMany();
+    //select 1 shop from each style collection
+    const shopPool: any = [];
+    shopsCollections.forEach((shopCollection: any, index: any) => {
+      shopPool.push(_.sample(shopCollection.shops).id); // 随机从shopCollection里面选一个shop, TODO: 如果前端是翻页而不是刷新, 应该用于上一个page同样的shopPool.
+    });
+    console.log(shopPool);
     logger.debug("OrderBy: " + JSON.stringify(orderBy));
 
-    const itemsQuery = itemRepo // TODO filter out suspended shops and items.
+    //根据平台卖出比例选择返回商品种类，https://ft4910ylw7.feishu.cn/docs/doccn3iZnCse5hlGs1Z8Tr5aPey#
+    const itemsQueryForTop = itemRepo
       .createQueryBuilder("item")
       .leftJoin("item.shop", "shops")
       .leftJoinAndSelect("item.itemLikes", "itemLikes")
       .leftJoinAndSelect("itemLikes.user", "user")
+      .where("shops.id IN (:...shopPool)", {
+        shopPool: shopPool,
+      })
+      .andWhere("item.category = :category", { category: "上衣" })
+      .andWhere("item.status = :status", { status: ListingStatus.NEW })
+      .andWhere("item.auditStatus IN (:...auditStatus)", {
+        auditStatus: [AuditStatus.PASS, AuditStatus.PENDING],
+      })
       .orderBy(orderBy)
       .skip(skipSize)
-      .take(pageSize);
+      .take(Constants.TOPSDISTRIBUTIONSIZEFORFEEDS);
+
+    const itemsQueryForAccessories = itemRepo
+      .createQueryBuilder("item")
+      .leftJoin("item.shop", "shops")
+      .leftJoinAndSelect("item.itemLikes", "itemLikes")
+      .leftJoinAndSelect("itemLikes.user", "user")
+      .where("shops.id IN (:...shopPool)", {
+        shopPool: shopPool,
+      })
+      .andWhere("item.category = :category", { category: "饰品" })
+      .andWhere("item.status = :status", { status: ListingStatus.NEW })
+      .andWhere("item.auditStatus IN (:...auditStatus)", {
+        auditStatus: [AuditStatus.PASS, AuditStatus.PENDING],
+      })
+      .orderBy(orderBy)
+      .skip(skipSize)
+      .take(Constants.ACCESSORIESDISTRIBUTIONSIZEFORFEEDS);
+
+    const itemsQueryForDress = itemRepo
+      .createQueryBuilder("item")
+      .leftJoin("item.shop", "shops")
+      .leftJoinAndSelect("item.itemLikes", "itemLikes")
+      .leftJoinAndSelect("itemLikes.user", "user")
+      .where("shops.id IN (:...shopPool)", {
+        shopPool: shopPool,
+      })
+      .andWhere("item.category = :category", { category: "裙" })
+      .andWhere("item.status = :status", { status: ListingStatus.NEW })
+      .andWhere("item.auditStatus IN (:...auditStatus)", {
+        auditStatus: [AuditStatus.PASS, AuditStatus.PENDING],
+      })
+      .orderBy(orderBy)
+      .skip(skipSize)
+      .take(Constants.DRESSDISTRIBUTIONSIZEFORFEEDS);
 
     if (userId && (category === undefined || category === "")) {
       // no recently viewed insertion for collecton items.
@@ -134,26 +196,46 @@ export class ItemController {
         const recentlyViewedItemsId = recentlyViewed.map(
           (element) => element.item.id,
         );
-        itemsQuery.andWhere("item.id NOT IN (:...recentlyViewedItemsId)", {
-          recentlyViewedItemsId: recentlyViewedItemsId,
-        });
+        itemsQueryForTop.andWhere(
+          "item.id NOT IN (:...recentlyViewedItemsId)",
+          {
+            recentlyViewedItemsId: recentlyViewedItemsId,
+          },
+        );
+        itemsQueryForAccessories.andWhere(
+          "item.id NOT IN (:...recentlyViewedItemsId)",
+          {
+            recentlyViewedItemsId: recentlyViewedItemsId,
+          },
+        );
+        itemsQueryForDress.andWhere(
+          "item.id NOT IN (:...recentlyViewedItemsId)",
+          {
+            recentlyViewedItemsId: recentlyViewedItemsId,
+          },
+        );
       }
     }
 
     if (category !== undefined && category !== "") {
       //TODO schema validation for category
-      itemsQuery.andWhere("item.category = :category", { category: category });
+      itemsQueryForTop.where("item.category = :category", {
+        category: category,
+      });
+      itemsQueryForAccessories.where("item.category = :category", {
+        category: category,
+      });
+      itemsQueryForDress.where("item.category = :category", {
+        category: category,
+      });
     }
 
-    itemsQuery.andWhere("shops.isSuspended = :isSuspended", {
-      isSuspended: false,
-    });
-    itemsQuery.andWhere("item.status = :status", { status: ListingStatus.NEW });
-    itemsQuery.andWhere("item.auditStatus IN (:...auditStatus)", {
-      auditStatus: [AuditStatus.PASS, AuditStatus.PENDING],
-    });
-
-    const discoverItems = await itemsQuery.getMany();
+    const topItems = await itemsQueryForTop.getMany();
+    const accessoryItems = await itemsQueryForAccessories.getMany();
+    const dressItems = await itemsQueryForDress.getMany();
+    let discoverItems: any = [];
+    discoverItems = topItems.concat(accessoryItems, dressItems);
+    discoverItems = _.shuffle(discoverItems);
 
     if (userId) {
       //check if items liked by requester
