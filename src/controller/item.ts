@@ -43,8 +43,6 @@ export class ItemController {
     const itemsQuery = itemRepo // TODO filter out suspended shops and items.
       .createQueryBuilder("item")
       .leftJoinAndSelect("item.shop", "shops")
-      .innerJoin("item.shop", "shops")
-      .where("shops.id = :id", { id: "c6a8eaaa-5892-456b-9fe2-9764e7f7823c" })
       .select(["item", "shops.name"])
       .orderBy(orderBy)
       .skip(skipSize)
@@ -109,7 +107,6 @@ export class ItemController {
     const itemsQuery = itemRepo // TODO filter out suspended shops and items.
       .createQueryBuilder("item")
       .leftJoin("item.shop", "shops")
-      .where("item.shopId = :shopId", { shopId: "c6a8eaaa-5892-456b-9fe2-9764e7f7823c" })
       .leftJoinAndSelect("item.itemLikes", "itemLikes")
       .leftJoinAndSelect("itemLikes.user", "user")
       .orderBy(orderBy)
@@ -311,7 +308,7 @@ export class ItemController {
     }
 
     res.send({
-      data: [],
+      data: results,
       links: getPaginationLinks(req, pageNumber, pageSize),
     });
   }
