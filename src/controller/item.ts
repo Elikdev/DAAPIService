@@ -116,7 +116,7 @@ export class ItemController {
         isSuspended: false,
       })
       .getMany();
-    //select 1 shop from each style collection
+    //randomly select 2 shops from each style collection
     const shopPool: any = [];
     shopsCollections.forEach((shopCollection: any, index: any) => {
       shopPool.push(`${_.sample(shopCollection.shops).id}`); // 随机从shopCollection里面选2个shop, TODO: 如果前端是翻页而不是刷新, 应该用于上一个page同样的shopPool.
@@ -134,7 +134,7 @@ export class ItemController {
       accessoryCategory = category;
       dressCategory = category;
     }
-    // The following query will select 2 items for each shop to avoid the case such that all 10 tops are from one shop.
+    // The following query will select 1 items for each shop to avoid the case such that all 10 tops are from one shop.
     const itemIdsForTop = await entityManager.query(`SELECT id FROM 
       (SELECT *, ROW_NUMBER() OVER (PARTITION BY "shopId" ORDER BY "score" DESC) 
       AS order_in_grp FROM items WHERE items."category" = '${topCategory}'
@@ -146,7 +146,7 @@ export class ItemController {
       OFFSET ${skipSize}) 
       AS A 
       WHERE order_in_grp < 2
-      LIMIT ${Constants.TOPSDISTRIBUTIONSIZEFORFEEDS}`);
+      LIMIT ${Constants.TOPSDISTRIBUTIONSIZEFORFEEDS}`); //根据平台卖出比例选择返回商品种类，https://ft4910ylw7.feishu.cn/docs/doccn3iZnCse5hlGs1Z8Tr5aPey#
 
     const itemIdsForAccessories = await entityManager.query(`SELECT id FROM
       (SELECT *, ROW_NUMBER() OVER (PARTITION BY "shopId" ORDER BY "score" DESC) 
@@ -174,7 +174,6 @@ export class ItemController {
       WHERE order_in_grp < 2
       LIMIT ${Constants.DRESSDISTRIBUTIONSIZEFORFEEDS}`);
 
-    //根据平台卖出比例选择返回商品种类，https://ft4910ylw7.feishu.cn/docs/doccn3iZnCse5hlGs1Z8Tr5aPey#
     const itemsQueryForTop = itemRepo
       .createQueryBuilder("item")
       .leftJoin("item.shop", "shops")
