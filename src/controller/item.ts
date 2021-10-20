@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { getRepository, Not, OrderByCondition } from "typeorm";
+import { getRepository, Not, OrderByCondition, getManager } from "typeorm";
 import { HandleError } from "../decorator/errorDecorator";
 import { Items, ListingStatus, AuditStatus } from "../entities/Items";
 import { RecentlyViewed } from "../entities/RecentlyViewed";
@@ -11,6 +11,9 @@ import { logger } from "../logging/logger";
 import { RequestValidator } from "../validator/requestValidator";
 import { createItemSchema, updateItemSchema } from "../validator/schemas";
 import { getOrderByConditions } from "./helper/orderByHelper";
+import { ShopCollections } from "../entities/ShopCollections";
+import * as _ from "lodash";
+import { Constants } from "../config/constants";
 
 import {
   getPaginationLinks,
@@ -93,7 +96,7 @@ export class ItemController {
   @HandleError("discoverItems")
   static async discoverItems(req: Request, res: Response): Promise<void> {
     const sorts = req.query.sort;
-    const category = req.query.category;
+    const category: any = req.query.category;
     let recentlyViewed: RecentlyViewed[] = [];
     const userId = req.body.userId;
     // TODO: remove front end hardcoded sorting param -id
@@ -102,16 +105,101 @@ export class ItemController {
     const [pageNumber, skipSize, pageSize] = getPaginationParams(
       req.query.page,
     );
+    const collectionRepo = getRepository(ShopCollections);
+    const entityManager = getManager(); // you can also get it via getConnection().manager
+
+    //get shops by styles
+    const shopsCollections = await collectionRepo
+      .createQueryBuilder("shopCollections")
+      .leftJoinAndSelect("shopCollections.shops", "shops")
+      .andWhere("shops.isSuspended = :isSuspended", {
+        isSuspended: false,
+      })
+      .getMany();
+    //randomly select 2 shops from each style collection
+    const shopPool: any = [];
+    shopsCollections.forEach((shopCollection: any, index: any) => {
+      shopPool.push(`${_.sample(shopCollection.shops).id}`); // 随机从shopCollection里面选2个shop, TODO: 如果前端是翻页而不是刷新, 应该用于上一个page同样的shopPool.
+      shopPool.push(`${_.sample(shopCollection.shops).id}`);
+    });
+    console.log(shopPool.map((shop: any) => `'${shop}'`).join(","));
     logger.debug("OrderBy: " + JSON.stringify(orderBy));
 
-    const itemsQuery = itemRepo // TODO filter out suspended shops and items.
+    let topCategory: any = "上衣";
+    let accessoryCategory: any = "饰品";
+    let dressCategory: any = "裙";
+
+    if (category !== undefined && category !== "") {
+      topCategory = category;
+      accessoryCategory = category;
+      dressCategory = category;
+    }
+    // The following query will select 1 items for each shop to avoid the case such that all 10 tops are from one shop.
+    const itemIdsForTop = await entityManager.query(`SELECT id FROM 
+      (SELECT *, ROW_NUMBER() OVER (PARTITION BY "shopId" ORDER BY "score" DESC) 
+      AS order_in_grp FROM items WHERE items."category" = '${topCategory}'
+      AND items."status" = '${ListingStatus.NEW}'  
+      AND items."auditStatus" IN ('pass', 'pending')
+      AND items."shopId"  IN (${shopPool
+        .map((shop: any) => `'${shop}'`)
+        .join(",")})
+      OFFSET ${skipSize}) 
+      AS A 
+      WHERE order_in_grp < 2
+      LIMIT ${Constants.TOPSDISTRIBUTIONSIZEFORFEEDS}`); //根据平台卖出比例选择返回商品种类，https://ft4910ylw7.feishu.cn/docs/doccn3iZnCse5hlGs1Z8Tr5aPey#
+
+    const itemIdsForAccessories = await entityManager.query(`SELECT id FROM
+      (SELECT *, ROW_NUMBER() OVER (PARTITION BY "shopId" ORDER BY "score" DESC) 
+      AS order_in_grp FROM items WHERE items."category" = '${accessoryCategory}'
+      AND items."status" = '${ListingStatus.NEW}'  
+      AND items."auditStatus" IN ('pass', 'pending')
+      AND items."shopId"  IN (${shopPool
+        .map((shop: any) => `'${shop}'`)
+        .join(",")})
+      OFFSET ${skipSize}) 
+      AS A 
+      WHERE order_in_grp < 2
+      LIMIT ${Constants.ACCESSORIESDISTRIBUTIONSIZEFORFEEDS}`);
+
+    const itemIdsForDress = await entityManager.query(`SELECT id FROM
+      (SELECT *, ROW_NUMBER() OVER (PARTITION BY "shopId" ORDER BY "score" DESC) 
+      AS order_in_grp FROM items WHERE items."category" = '${dressCategory}'
+      AND items."status" = '${ListingStatus.NEW}'  
+      AND items."auditStatus" IN ('pass', 'pending')
+      AND items."shopId"  IN (${shopPool
+        .map((shop: any) => `'${shop}'`)
+        .join(",")})
+      OFFSET ${skipSize}) 
+      AS A 
+      WHERE order_in_grp < 2
+      LIMIT ${Constants.DRESSDISTRIBUTIONSIZEFORFEEDS}`);
+
+    const itemsQueryForTop = itemRepo
       .createQueryBuilder("item")
       .leftJoin("item.shop", "shops")
       .leftJoinAndSelect("item.itemLikes", "itemLikes")
       .leftJoinAndSelect("itemLikes.user", "user")
-      .orderBy(orderBy)
-      .skip(skipSize)
-      .take(pageSize);
+      .where("item.id IN (:...itemIds)", {
+        itemIds: itemIdsForTop.map((item: any) => item.id),
+      });
+
+    const itemsQueryForAccessories = itemRepo
+      .createQueryBuilder("item")
+      .leftJoin("item.shop", "shops")
+      .leftJoinAndSelect("item.itemLikes", "itemLikes")
+      .leftJoinAndSelect("itemLikes.user", "user")
+      .where("item.id IN (:...itemIds)", {
+        itemIds: itemIdsForAccessories.map((item: any) => item.id),
+      });
+
+    const itemsQueryForDress = itemRepo
+      .createQueryBuilder("item")
+      .leftJoin("item.shop", "shops")
+      .leftJoinAndSelect("item.itemLikes", "itemLikes")
+      .leftJoinAndSelect("itemLikes.user", "user")
+      .where("item.id IN (:...itemIds)", {
+        itemIds: itemIdsForDress.map((item: any) => item.id),
+      });
 
     if (userId && (category === undefined || category === "")) {
       // no recently viewed insertion for collecton items.
@@ -134,26 +222,43 @@ export class ItemController {
         const recentlyViewedItemsId = recentlyViewed.map(
           (element) => element.item.id,
         );
-        itemsQuery.andWhere("item.id NOT IN (:...recentlyViewedItemsId)", {
-          recentlyViewedItemsId: recentlyViewedItemsId,
-        });
+        itemsQueryForTop.andWhere(
+          "item.id NOT IN (:...recentlyViewedItemsId)",
+          {
+            recentlyViewedItemsId: recentlyViewedItemsId,
+          },
+        );
+        itemsQueryForAccessories.andWhere(
+          "item.id NOT IN (:...recentlyViewedItemsId)",
+          {
+            recentlyViewedItemsId: recentlyViewedItemsId,
+          },
+        );
+        itemsQueryForDress.andWhere(
+          "item.id NOT IN (:...recentlyViewedItemsId)",
+          {
+            recentlyViewedItemsId: recentlyViewedItemsId,
+          },
+        );
       }
     }
 
-    if (category !== undefined && category !== "") {
-      //TODO schema validation for category
-      itemsQuery.andWhere("item.category = :category", { category: category });
+    let topItems: Items[] = [];
+    let accessoryItems: Items[] = [];
+    let dressItems: Items[] = [];
+    if (itemIdsForTop.length > 0) {
+      topItems = await itemsQueryForTop.getMany(); // otherwise where IN [] will throw exception
+    }
+    if (itemIdsForAccessories.length > 0) {
+      accessoryItems = await itemsQueryForAccessories.getMany();
+    }
+    if (itemIdsForDress.length > 0) {
+      dressItems = await itemsQueryForDress.getMany();
     }
 
-    itemsQuery.andWhere("shops.isSuspended = :isSuspended", {
-      isSuspended: false,
-    });
-    itemsQuery.andWhere("item.status = :status", { status: ListingStatus.NEW });
-    itemsQuery.andWhere("item.auditStatus IN (:...auditStatus)", {
-      auditStatus: [AuditStatus.PASS, AuditStatus.PENDING],
-    });
-
-    const discoverItems = await itemsQuery.getMany();
+    let discoverItems: any = [];
+    discoverItems = topItems.concat(accessoryItems, dressItems);
+    discoverItems = _.shuffle(discoverItems);
 
     if (userId) {
       //check if items liked by requester
