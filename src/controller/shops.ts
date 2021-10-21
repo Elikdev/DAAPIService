@@ -102,7 +102,7 @@ export class ShopController {
     }
 
     res.send({
-      data: resultShops,
+      data: [],
       recentlyActiveShopsCount: recentlyActiveShopsCount,
       links: getPaginationLinks(req, pageNumber, pageSize),
     });
