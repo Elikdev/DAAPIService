@@ -96,7 +96,6 @@ export class ItemController {
   @HandleError("discoverItems")
   static async discoverItems(req: Request, res: Response): Promise<void> {
     const sorts = req.query.sort;
-    const category: any = req.query.category;
     let recentlyViewed: RecentlyViewed[] = [];
     const userId = req.body.userId;
     // TODO: remove front end hardcoded sorting param -id
@@ -116,34 +115,30 @@ export class ItemController {
         isSuspended: false,
       })
       .getMany();
-    //randomly select 2 shops from each style collection
+    //randomly select 3 shops from each style collection
     const shopPool: any = [];
     shopsCollections.forEach((shopCollection: any, index: any) => {
-      shopPool.push(`${_.sample(shopCollection.shops).id}`); // 随机从shopCollection里面选2个shop, TODO: 如果前端是翻页而不是刷新, 应该用于上一个page同样的shopPool.
+      shopPool.push(`${_.sample(shopCollection.shops).id}`); // 随机从shopCollection里面选3个shop, TODO: 如果前端是翻页而不是刷新, 应该用于上一个page同样的shopPool.
+      shopPool.push(`${_.sample(shopCollection.shops).id}`);
       shopPool.push(`${_.sample(shopCollection.shops).id}`);
     });
-    console.log(shopPool.map((shop: any) => `'${shop}'`).join(","));
+
     logger.debug("OrderBy: " + JSON.stringify(orderBy));
 
-    let topCategory: any = "上衣";
-    let accessoryCategory: any = "饰品";
-    let dressCategory: any = "裙";
+    const topCategory: any = "上衣";
+    const accessoryCategory: any = "饰品";
+    const dressCategory: any = "裙";
 
-    if (category !== undefined && category !== "") {
-      topCategory = category;
-      accessoryCategory = category;
-      dressCategory = category;
-    }
     // The following query will select 1 items for each shop to avoid the case such that all 10 tops are from one shop.
     const itemIdsForTop = await entityManager.query(`SELECT id FROM 
-      (SELECT *, ROW_NUMBER() OVER (PARTITION BY "shopId" ORDER BY "score" DESC) 
+      (SELECT *, ROW_NUMBER() OVER (PARTITION BY "shopId" ORDER BY "score" DESC, "createdtime" DESC) 
       AS order_in_grp FROM items WHERE items."category" = '${topCategory}'
       AND items."status" = '${ListingStatus.NEW}'  
       AND items."auditStatus" IN ('pass', 'pending')
       AND items."shopId"  IN (${shopPool
         .map((shop: any) => `'${shop}'`)
         .join(",")})
-      OFFSET ${skipSize}) 
+      OFFSET ${Constants.TOPSDISTRIBUTIONSIZEFORFEEDS * (pageNumber - 1)}) 
       AS A 
       WHERE order_in_grp < 2
       LIMIT ${Constants.TOPSDISTRIBUTIONSIZEFORFEEDS}`); //根据平台卖出比例选择返回商品种类，https://ft4910ylw7.feishu.cn/docs/doccn3iZnCse5hlGs1Z8Tr5aPey#
@@ -156,7 +151,7 @@ export class ItemController {
       AND items."shopId"  IN (${shopPool
         .map((shop: any) => `'${shop}'`)
         .join(",")})
-      OFFSET ${skipSize}) 
+      OFFSET ${Constants.ACCESSORIESDISTRIBUTIONSIZEFORFEEDS * (pageNumber - 1)}) 
       AS A 
       WHERE order_in_grp < 2
       LIMIT ${Constants.ACCESSORIESDISTRIBUTIONSIZEFORFEEDS}`);
@@ -169,7 +164,7 @@ export class ItemController {
       AND items."shopId"  IN (${shopPool
         .map((shop: any) => `'${shop}'`)
         .join(",")})
-      OFFSET ${skipSize}) 
+      OFFSET ${Constants.DRESSDISTRIBUTIONSIZEFORFEEDS * (pageNumber - 1)}) 
       AS A 
       WHERE order_in_grp < 2
       LIMIT ${Constants.DRESSDISTRIBUTIONSIZEFORFEEDS}`);
@@ -201,7 +196,7 @@ export class ItemController {
         itemIds: itemIdsForDress.map((item: any) => item.id),
       });
 
-    if (userId && (category === undefined || category === "")) {
+    if (userId) {
       // no recently viewed insertion for collecton items.
       const sevenDayAgo = new Date(
         new Date().getTime() - 7 * 24 * 60 * 60 * 1000,
@@ -295,7 +290,7 @@ export class ItemController {
     //   .orderBy(orderBy)
     //   .skip(skipSize)
     //   .take(pageSize);
-    // const discoverRetopiaItems = await itemsQuery.getMany();      
+    // const discoverRetopiaItems = await itemsQuery.getMany();
 
     res.send({
       data: discoverItems,
