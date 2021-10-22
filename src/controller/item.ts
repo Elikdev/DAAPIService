@@ -124,7 +124,6 @@ export class ItemController {
     });
 
     logger.debug("OrderBy: " + JSON.stringify(orderBy));
-
     const topCategory: any = "上衣";
     const accessoryCategory: any = "饰品";
     const dressCategory: any = "裙";
@@ -138,9 +137,9 @@ export class ItemController {
       AND items."shopId"  IN (${shopPool
         .map((shop: any) => `'${shop}'`)
         .join(",")})
-      OFFSET ${Constants.TOPSDISTRIBUTIONSIZEFORFEEDS * (pageNumber - 1)}) 
+      ) 
       AS A 
-      WHERE order_in_grp < 2
+      WHERE order_in_grp = ${pageNumber}
       LIMIT ${Constants.TOPSDISTRIBUTIONSIZEFORFEEDS}`); //根据平台卖出比例选择返回商品种类，https://ft4910ylw7.feishu.cn/docs/doccn3iZnCse5hlGs1Z8Tr5aPey#
 
     const itemIdsForAccessories = await entityManager.query(`SELECT id FROM
@@ -151,9 +150,9 @@ export class ItemController {
       AND items."shopId"  IN (${shopPool
         .map((shop: any) => `'${shop}'`)
         .join(",")})
-      OFFSET ${Constants.ACCESSORIESDISTRIBUTIONSIZEFORFEEDS * (pageNumber - 1)}) 
+      ) 
       AS A 
-      WHERE order_in_grp < 2
+      WHERE order_in_grp = ${pageNumber}
       LIMIT ${Constants.ACCESSORIESDISTRIBUTIONSIZEFORFEEDS}`);
 
     const itemIdsForDress = await entityManager.query(`SELECT id FROM
@@ -164,9 +163,9 @@ export class ItemController {
       AND items."shopId"  IN (${shopPool
         .map((shop: any) => `'${shop}'`)
         .join(",")})
-      OFFSET ${Constants.DRESSDISTRIBUTIONSIZEFORFEEDS * (pageNumber - 1)}) 
+      ) 
       AS A 
-      WHERE order_in_grp < 2
+      WHERE order_in_grp = ${pageNumber}
       LIMIT ${Constants.DRESSDISTRIBUTIONSIZEFORFEEDS}`);
 
     const itemsQueryForTop = itemRepo
