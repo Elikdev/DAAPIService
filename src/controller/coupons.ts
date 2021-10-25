@@ -209,22 +209,13 @@ export class CouponsController {
               value: value,
             };
           }
-        }
-
-        // Support Savvy, remove after the event
-        if (couponEntity.code === "savvy828") {
-          const validCouponForAccount = await isValidCouponForAccount(
-            couponEntity.id,
-            userId,
-          );
-          if (validCouponForAccount) {
-            isValid = couponEntity.isValid;
-            metaData = {
-              id: couponEntity.id,
-              type: couponEntity.couponType,
-              value: couponEntity.value,
-            };
-          }
+        } else {
+          isValid = couponEntity.isValid;
+          metaData = {
+            id: couponEntity.id,
+            type: couponEntity.couponType,
+            value: couponEntity.value,
+          };
         }
       }
     }
