@@ -26,6 +26,9 @@ export class Collections extends BaseEntity {
   @Column("character varying", { nullable: true })
   type: string | null;
 
+  @Column("character varying", { nullable: true })
+  coverImageUrl: string | null;
+
   @Column({ default: 0 })
   order: number;
 

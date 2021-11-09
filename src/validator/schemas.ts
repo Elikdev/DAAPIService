@@ -138,6 +138,7 @@ export const createShopSchema = Joi.object().keys({
 export const createCollectionSchema = Joi.object().keys({
   name: Joi.string().max(100).required(),
   endTime: Joi.string().max(100).required(),
+  coverImageUrl: Joi.string().max(200).required(),
 });
 
 export const createShopCollectionSchema = Joi.object().keys({
@@ -151,6 +152,7 @@ export const updateCollectionSchema = Joi.object().keys({
   endTime: Joi.string().max(100).optional(),
   isSuspended: Joi.boolean().optional(),
   order: Joi.number().optional(),
+  coverImageUrl: Joi.string().max(200).optional(),
 });
 
 export const updateShopCollectionSchema = Joi.object().keys({
