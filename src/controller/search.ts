@@ -26,6 +26,12 @@ export class SearchController {
   @HandleError("search")
   static async search(req: Request, res: Response): Promise<void> {
     const query = req.query.query;
+    const category = req.query.category || "";
+    const subcategory = req.query.subcategory || "";
+    const year = req.query.year || "";
+    const shippingType = req.query.shippingType || "";
+    const condition = req.query.condition || "";
+
     const [pageNumber, skipSize, pageSize] = getPaginationParams(
       req.query.page,
     );
@@ -42,6 +48,11 @@ export class SearchController {
     };
 
     const filters = [
+      `category:${category}`,
+      `subcategory:${subcategory}`,
+      `year:${year}`,
+      `condition:${condition}`,
+      `shippingType:${shippingType}`,
       "status:new",
       "shop.isSuspended: false",
       ["auditStatus:pending", "auditStatus:pass"],
