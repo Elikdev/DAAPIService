@@ -6,6 +6,7 @@ import { ItemSaves } from "../entities/ItemSaves";
 import { Users } from "../entities/Users";
 import { ResourceNotFoundError } from "../error/notfoundError";
 import { logger } from "../logging/logger";
+import { sendPush } from "./helper/umengPushHelper";
 
 export class ItemSaveController {
   @HandleError("saveItem")
@@ -17,7 +18,10 @@ export class ItemSaveController {
     const userId = req.body.userId;
     const itemId = req.params.id;
 
-    const item = await getRepository(Items).findOne({ id: itemId });
+    const item = await getRepository(Items).findOne(
+      { id: itemId },
+      { relations: ["shop", "shop.owner"] },
+    );
     if (!item) {
       throw new ResourceNotFoundError("Item not found.");
     }
@@ -42,6 +46,13 @@ export class ItemSaveController {
     newItemSave.item = item;
 
     const result = await itemSaveRepo.save(newItemSave);
+    sendPush(
+      user.username + "收藏了你的商品!",
+      item.description,
+      "",
+      item.shop.owner.deviceToken,
+    );
+
     logger.info("ItemSave created.");
     res.send({
       data: result,

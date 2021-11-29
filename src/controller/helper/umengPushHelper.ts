@@ -7,8 +7,8 @@ const umeng = new Umeng({
 
 export const sendPush = async (
   title: string,
-  content: string | "",
-  subtitle: string | "",
+  content: string | null,
+  subtitle: string | null,
   device_token: string | null,
 ): Promise<any> => {
   await umeng.pushSingle({

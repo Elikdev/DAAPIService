@@ -6,6 +6,7 @@ import { ItemLikes } from "../entities/ItemLikes";
 import { Users } from "../entities/Users";
 import { ResourceNotFoundError } from "../error/notfoundError";
 import { logger } from "../logging/logger";
+import { sendPush } from "./helper/umengPushHelper";
 
 export class ItemLikeController {
   @HandleError("likeItem")
@@ -17,7 +18,10 @@ export class ItemLikeController {
     const userId = req.body.userId;
     const itemId = req.params.id;
 
-    const item = await getRepository(Items).findOne({ id: itemId });
+    const item = await getRepository(Items).findOne(
+      { id: itemId },
+      { relations: ["shop", "shop.owner"] },
+    );
     if (!item) {
       throw new ResourceNotFoundError("Item not found.");
     }
@@ -42,6 +46,13 @@ export class ItemLikeController {
     newItemLike.item = item;
 
     const result = await itemLikeRepo.save(newItemLike);
+    sendPush(
+      user.username + "喜欢了你的商品!",
+      item.description,
+      "",
+      item.shop.owner.deviceToken,
+    );
+
     logger.info("ItemLike created.");
     res.send({
       data: result,

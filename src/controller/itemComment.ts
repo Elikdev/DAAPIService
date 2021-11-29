@@ -15,6 +15,7 @@ import {
   getPaginationLinks,
   getPaginationParams,
 } from "./helper/paginationHelper";
+import { sendPush } from "./helper/umengPushHelper";
 
 const DEFAULT_SORT_BY: OrderByCondition = { "itemComments.createdAt": "DESC" };
 
@@ -65,12 +66,24 @@ export class itemCommentController {
     validator.validate(itemCommentData);
 
     const commenter = await Users.findOne({ id: itemCommentData.commenterId });
-    const item = await Items.findOne({ id: itemCommentData.itemId });
+    const item = await Items.findOne(
+      { id: itemCommentData.itemId },
+      { relations: ["shop", "shop.owner"] },
+    );
     if (commenter && item) {
       itemCommentData.commenter = commenter;
       itemCommentData.item = item;
       const savedItemComment = await itemCommentsRepo.save(itemCommentData);
       delete savedItemComment.commenter;
+      if (commenter.id !== item.shop.owner.id) {
+        sendPush(
+          commenter.username + "评论了你的商品!",
+          item.description,
+          "",
+          item.shop.owner.deviceToken,
+        );
+      }
+
       res.send({
         data: savedItemComment,
       });
