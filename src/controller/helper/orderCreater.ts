@@ -35,8 +35,7 @@ export const createSingleOrder = async (
   if (!user) {
     throw new ResourceNotFoundError("User not found.");
   }
-  // 清空购物车，目前只支持一次购买所有物品
-  await clearUserCart(user);
+
   orderData.coupon = coupon;
   orderData.buyer = user;
   orderData.buyerAddress = address;
@@ -53,6 +52,7 @@ export const createSingleOrder = async (
 
   orderData.orderItems = items;
   const savedOrder = await getRepository(Orders).save(orderData);
+  await updateUserCart(user, items);
 
   await Promise.all(items.map((item) => changeItemStatus(item)));
   return savedOrder;
@@ -74,14 +74,23 @@ const changeItemStatus = async (item: Items): Promise<void> => {
   await getRepository(Items).save(item);
 };
 
-const clearUserCart = async (user: Users): Promise<void> => {
+const updateUserCart = async (user: Users, items: Items[]): Promise<void> => {
   const cartRepo = await getRepository(Carts);
-  const cart = await cartRepo.findOne({ owner: user });
+  const cart = await cartRepo
+    .createQueryBuilder("cart")
+    .leftJoinAndSelect("cart.items", "items")
+    .where("cart.ownerId = :userId", { userId: user.id })
+    .getOne();
 
   if (!cart) {
     console.error("Cart is not found");
     return;
   }
-  cart.items = [];
-  await cartRepo.save(cart);
+  const cartItems = cart.items;
+  if (cartItems) {
+    items.forEach((element) => {
+      cart.items = cartItems.filter((item) => item.id !== element.id);
+    });
+    await cart.save();
+  }
 };

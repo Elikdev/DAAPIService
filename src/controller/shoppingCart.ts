@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { getRepository } from "typeorm";
 import { HandleError } from "../decorator/errorDecorator";
-import { Items } from "../entities/Items";
+import { Items, ListingStatus } from "../entities/Items";
 import { Users } from "../entities/Users";
 import { ResourceNotFoundError } from "../error/notfoundError";
 import { logger } from "../logging/logger";
@@ -23,6 +23,7 @@ export class ShoppingCartController {
       .leftJoinAndSelect("cart.items", "items")
       .leftJoinAndSelect("items.shop", "shop")
       .where("cart.ownerId = :userId", { userId: user.id })
+      .andWhere("items.status = :new", { new: ListingStatus.NEW })
       .getOne();
 
     res.send({
