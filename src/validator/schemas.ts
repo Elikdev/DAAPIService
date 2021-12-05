@@ -206,6 +206,7 @@ export const updateShopSchema = Joi.object().keys({
   location: Joi.string().max(500),
   ownerId: Joi.number().optional(),
   rating: Joi.number().optional(),
+  isSuspended: Joi.boolean().optional(),
 });
 
 export const updateConversationSchema = Joi.object().keys({
