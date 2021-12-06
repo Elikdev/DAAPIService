@@ -31,6 +31,7 @@ export class SearchController {
     const year = req.query.year || "";
     const shippingType = req.query.shippingType || "";
     const condition = req.query.condition || "";
+    const size = req.query.size || "";
 
     const [pageNumber, skipSize, pageSize] = getPaginationParams(
       req.query.page,
@@ -53,6 +54,7 @@ export class SearchController {
       `year:${year}`,
       `condition:${condition}`,
       `shippingType:${shippingType}`,
+      `size:${size}`,
       "status:new",
       "shop.isSuspended: false",
       ["auditStatus:pending", "auditStatus:pass"],
