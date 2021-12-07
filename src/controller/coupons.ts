@@ -156,19 +156,21 @@ export class CouponsController {
     const couponEntity = await couponQuery.getOne();
 
     if (couponEntity) {
-      if (couponEntity.shop && couponEntity.shop.id === itemShopId) {
+      if (couponEntity.shop) {
         // Shop Exclusive Coupon
-        const validCouponForAccount = await isValidCouponForAccount(
-          couponEntity.id,
-          userId,
-        );
-        if (validCouponForAccount) {
-          isValid = couponEntity.isValid;
-          metaData = {
-            id: couponEntity.id,
-            type: couponEntity.couponType,
-            value: couponEntity.value,
-          };
+        if (couponEntity.shop.id === itemShopId) {
+          const validCouponForAccount = await isValidCouponForAccount(
+            couponEntity.id,
+            userId,
+          );
+          if (validCouponForAccount) {
+            isValid = couponEntity.isValid;
+            metaData = {
+              id: couponEntity.id,
+              type: couponEntity.couponType,
+              value: couponEntity.value,
+            };
+          }
         }
       } else if (couponEntity.collection) {
         // Collection Items Exclusive Coupon
