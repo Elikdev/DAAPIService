@@ -171,7 +171,22 @@ export class CouponsController {
               value: couponEntity.value,
             };
           }
+        } else if (couponEntity.code === "candyneed") {
+          // Candyboom 10% off
+          const validCouponForAccount = await isValidCouponForAccount(
+            couponEntity.id,
+            userId,
+          );
+          if (validCouponForAccount) {
+            isValid = couponEntity.isValid;
+            metaData = {
+              id: couponEntity.id,
+              type: couponEntity.couponType,
+              value: couponEntity.value,
+            };
+          }
         }
+
       } else if (couponEntity.collection) {
         // Collection Items Exclusive Coupon
         const validCouponForAccount = await isValidCouponForAccount(
