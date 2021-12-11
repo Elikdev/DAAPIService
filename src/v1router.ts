@@ -139,6 +139,7 @@ v1router.post("/cart/:id", ShoppingCartController.addCartItem);
 v1router.delete("/cart/:id", ShoppingCartController.removeCartItem);
 
 v1router.get("/coupons/apply", CouponsController.apply);
+v1router.post("/coupons/applyForCart", CouponsController.applyForCart);
 
 v1router.post("/recentlyViewed", RecentlyViewedController.add);
 v1router.get("/recentlyViewed", RecentlyViewedController.get);

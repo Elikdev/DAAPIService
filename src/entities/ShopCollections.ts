@@ -10,6 +10,7 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 import { Shops } from "./Shops";
+import { Coupons } from "./Coupons";
 
 @Entity("shop_collections")
 export class ShopCollections extends BaseEntity {
@@ -39,6 +40,9 @@ export class ShopCollections extends BaseEntity {
 
   @UpdateDateColumn({ type: "timestamp" })
   updatedtime: string;
+
+  @OneToMany(() => Coupons, (coupons) => coupons.collection, { cascade: true })
+  coupons: Coupons[];
 
   @ManyToMany(() => Shops, (shops) => shops.shopCollections)
   @JoinTable()

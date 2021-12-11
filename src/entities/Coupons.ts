@@ -13,6 +13,7 @@ import {
 import { Users } from "./Users";
 import { Orders } from "./Orders";
 import { Shops } from "./Shops";
+import { ShopCollections } from "./ShopCollections";
 import { Collections } from "./Collections";
 
 export enum CouponType {
@@ -63,6 +64,11 @@ export class Coupons extends BaseEntity {
     nullable: true,
   })
   collection: Collections;
+
+  @ManyToOne(() => ShopCollections, (shopCollections) => shopCollections.coupons, {
+    nullable: true,
+  })
+  shopCollection: ShopCollections;
 
   @Column({ type: "timestamp" })
   expireTime: string;
