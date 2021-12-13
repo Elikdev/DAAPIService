@@ -77,6 +77,8 @@ v1router.get(
   EventController.getShopEventItems,
 );
 
+v1router.get("/events/:eventName/items", EventController.getEventItems);
+
 v1router.get("/events/:eventName", EventController.getEvent);
 
 v1router.post("/events/:eventName/:itemId", EventController.addEventItems);

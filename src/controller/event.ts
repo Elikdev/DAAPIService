@@ -118,4 +118,24 @@ export class EventController {
       data: event,
     });
   }
+
+  @HandleError("getEventItems")
+  static async getEventItems(req: Request, res: Response): Promise<void> {
+    const eventName = req.params.eventName;
+
+    const eventRepo = await getRepository(Events);
+    const event = await eventRepo
+      .createQueryBuilder("event")
+      .leftJoinAndSelect("event.items", "items")
+      .where("event.name = :name", { name: eventName })
+      .getOne();
+
+    if (!event) {
+      throw new ResourceNotFoundError("Event is not found.");
+    }
+
+    res.send({
+      data: event,
+    });
+  }
 }
