@@ -21,6 +21,23 @@ export class EventController {
     });
   }
 
+  @HandleError("getEvents")
+  static async getEvents(req: Request, res: Response): Promise<void> {
+    const eventRepo = await getRepository(Events);
+    const event = await eventRepo
+      .createQueryBuilder("event")
+      .leftJoinAndSelect("event.shops", "shops")
+      .getMany();
+
+    if (!event) {
+      throw new ResourceNotFoundError("Event is not found.");
+    }
+
+    res.send({
+      data: event,
+    });
+  }
+
   @HandleError("addEventItems")
   static async addEventItems(req: Request, res: Response): Promise<void> {
     const itemId = req.params.itemId;
