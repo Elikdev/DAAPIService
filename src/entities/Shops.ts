@@ -11,6 +11,7 @@ import {
 } from "typeorm";
 import { Items } from "./Items";
 import { Users } from "./Users";
+import { Events } from "./Events";
 import { Orders } from "./Orders";
 import { Coupons } from "./Coupons";
 import { Reviews } from "./Reviews";
@@ -72,6 +73,9 @@ export class Shops extends BaseEntity {
 
   @ManyToOne(() => Users, (users) => users.shops)
   owner: Users;
+
+  @ManyToMany(() => Events, (events) => events.items)
+  events: Events[];
 
   @ManyToMany(() => ShopCollections, (shopCollections) => shopCollections.shops)
   shopCollections: ShopCollections[];

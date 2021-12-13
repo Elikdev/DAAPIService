@@ -19,6 +19,8 @@ import { Conversations } from "./Conversations";
 import { Collections } from "./Collections";
 import { RecentlyViewed } from "./RecentlyViewed";
 import { Carts } from "./Cart";
+import { Events } from "./Events";
+
 import { ItemComments } from "./ItemComments";
 
 export enum ListingStatus {
@@ -188,6 +190,9 @@ export class Items extends BaseEntity {
 
   @ManyToMany(() => Carts, (carts) => carts.items)
   carts: Carts[];
+
+  @ManyToMany(() => Events, (events) => events.items)
+  events: Events[];
 
   @Column({ default: 0 })
   itemSavesCount: number;

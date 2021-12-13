@@ -20,6 +20,7 @@ import { ShoppingCartController } from "./controller/shoppingCart";
 import { ConversationsController } from "./controller/conversation";
 import { ReviewsController } from "./controller/review";
 import { itemCommentController } from "./controller/itemComment";
+import { EventController } from "./controller/event";
 
 export const v1router = Router();
 
@@ -69,6 +70,18 @@ v1router.post("/coupons", CouponsController.create);
 v1router.get("/itemComments/:itemId", itemCommentController.getItemComments);
 
 v1router.get("/reviews/:shopId/count", ReviewsController.getShopReviewsCount);
+
+//events
+v1router.get(
+  "/events/:eventName/:shopId/items",
+  EventController.getShopEventItems,
+);
+
+v1router.get("/events/:eventName", EventController.getEvent);
+
+v1router.post("/events/:eventName/:itemId", EventController.addEventItems);
+
+v1router.delete("/events/:eventName/:itemId", EventController.removeEventItems);
 
 // Do auth filtering for the following apis
 v1router.use(authMiddleWare);

@@ -65,9 +65,13 @@ export class Coupons extends BaseEntity {
   })
   collection: Collections;
 
-  @ManyToOne(() => ShopCollections, (shopCollections) => shopCollections.coupons, {
-    nullable: true,
-  })
+  @ManyToOne(
+    () => ShopCollections,
+    (shopCollections) => shopCollections.coupons,
+    {
+      nullable: true,
+    },
+  )
   shopCollection: ShopCollections;
 
   @Column({ type: "timestamp" })

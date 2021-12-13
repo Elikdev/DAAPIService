@@ -186,7 +186,6 @@ export class CouponsController {
             };
           }
         }
-
       } else if (couponEntity.collection) {
         // Collection Items Exclusive Coupon
         const unusedCouponForAccount = await isUnusedCouponForAccount(
@@ -248,8 +247,8 @@ export class CouponsController {
     const couponData = req.body.data;
     const userId = req.body.userId;
     const couponCode = couponData.code;
-    const productsShopId: Array<String> = couponData.productsShopId;
-    const productsId: Array<String> = couponData.productsId;
+    const productsShopId: Array<string> = couponData.productsShopId;
+    const productsId: Array<string> = couponData.productsId;
     const totalPrice = couponData.price;
     const couponRepo = getRepository(Coupons);
     let isValid = false;
@@ -275,23 +274,26 @@ export class CouponsController {
 
     if (couponEntity) {
       const unusedCouponForAccount = await isUnusedCouponForAccount(
-            couponEntity.id,
-            userId,
-          );
+        couponEntity.id,
+        userId,
+      );
 
       if (couponEntity.owner && couponEntity.owner.id != userId) {
         // Return false if coupon doesn't belong to this user
         res.send({
           isValid: false,
-          metaData: {}
-        });    
-        return; 
+          metaData: {},
+        });
+        return;
       }
 
       if (couponEntity.shop) {
         // Shop Exclusive Coupon
         if (unusedCouponForAccount) {
-          if (productsShopId.length > 0 && productsShopId.every((shopId) => shopId === couponEntity.shop.id)) {
+          if (
+            productsShopId.length > 0 &&
+            productsShopId.every((shopId) => shopId === couponEntity.shop.id)
+          ) {
             isValid = couponEntity.isValid;
             metaData = {
               id: couponEntity.id,
@@ -300,12 +302,21 @@ export class CouponsController {
             };
           }
         }
-
       } else if (couponEntity.collection) {
         // Collection Items Exclusive Coupon
         if (unusedCouponForAccount) {
-          const booleanResultArray: Boolean[] = await Promise.all(productsId.map(productId => isValidCouponForCollectionItem(couponEntity.collection.id, productId)));
-          if (productsId.length > 0 && booleanResultArray.every(v => v === true)) {
+          const booleanResultArray: boolean[] = await Promise.all(
+            productsId.map((productId) =>
+              isValidCouponForCollectionItem(
+                couponEntity.collection.id,
+                productId,
+              ),
+            ),
+          );
+          if (
+            productsId.length > 0 &&
+            booleanResultArray.every((v) => v === true)
+          ) {
             isValid = couponEntity.isValid;
             metaData = {
               id: couponEntity.id,
@@ -316,17 +327,25 @@ export class CouponsController {
         }
       } else if (couponEntity.shopCollection) {
         // ShopColletion shops exclusive coupon
-        const booleanResultArray: Boolean[] = await Promise.all(productsShopId.map(shopId => isValidShopCollectionCouponForShop(couponEntity.shopCollection.id, shopId))); 
-        if (productsShopId.length > 0 && booleanResultArray.every(v => v === true)) {
+        const booleanResultArray: boolean[] = await Promise.all(
+          productsShopId.map((shopId) =>
+            isValidShopCollectionCouponForShop(
+              couponEntity.shopCollection.id,
+              shopId,
+            ),
+          ),
+        );
+        if (
+          productsShopId.length > 0 &&
+          booleanResultArray.every((v) => v === true)
+        ) {
           isValid = couponEntity.isValid;
           metaData = {
             id: couponEntity.id,
             type: couponEntity.couponType,
             value: couponEntity.value,
-          };         
+          };
         }
-
-
       } else {
         if (couponEntity.code === "first10") {
           const newAccount = await isNewAccount(userId);
@@ -360,7 +379,6 @@ export class CouponsController {
   }
 }
 
-
 const isValidCouponForCollectionItem = async (
   collectionId: string,
   itemId: any,
@@ -391,7 +409,9 @@ const isValidShopCollectionCouponForShop = async (
     .createQueryBuilder("shops")
     .leftJoinAndSelect("shops.shopCollections", "shopCollections")
     .where("shopCollections.id = :id", { id: shopCollectionId })
-    .andWhere("shopCollections.isSuspended = :isSuspended", { isSuspended: false })
+    .andWhere("shopCollections.isSuspended = :isSuspended", {
+      isSuspended: false,
+    })
     .andWhere("shopCollections.endTime > :current", { current: new Date() })
     .andWhere("shops.id = :shopId", { shopId: shopId })
     .getOne();
