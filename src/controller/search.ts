@@ -57,6 +57,7 @@ export class SearchController {
       `size:${size}`,
       "status:new",
       "shop.isSuspended: false",
+      "shop.id: c6a8eaaa-5892-456b-9fe2-9764e7f7823c",
       ["auditStatus:pending", "auditStatus:pass"],
     ];
 
