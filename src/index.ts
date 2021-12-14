@@ -37,6 +37,8 @@ createConnection(DBConfig)
       "http://www.admin.pbrick.cn",
       "https://www.share.pbrick.cn",
       "http://www.share.pbrick.cn",
+      "http://www.event.pbrick.cn",
+      "https://www.event.pbrick.cn",
     ];
     //options for cors midddleware
     const options: cors.CorsOptions = {
