@@ -32,6 +32,12 @@ export class ShopCollections extends BaseEntity {
   @Column("character varying", { nullable: true })
   h5Url: string | null;
 
+  @Column("character varying", { nullable: true })
+  h5Name: string | null;
+
+  @Column("character varying", { nullable: true })
+  h5CoverImageUrl: string | null;
+
   @Column({ default: 0 })
   order: number;
 
