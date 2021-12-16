@@ -11,6 +11,7 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 import { Orders } from "./Orders";
+import { EventUserStatus } from "./EventUserStatus";
 import { Shops } from "./Shops";
 import { Addresses } from "./Addresses";
 import { ItemSaves } from "./ItemSaves";
@@ -85,6 +86,12 @@ export class Users extends BaseEntity {
 
   @OneToMany(() => Orders, (orders) => orders.buyer)
   buyerOrders: Orders[];
+
+  @OneToMany(
+    () => EventUserStatus,
+    (eventUserStatus) => eventUserStatus.participant,
+  )
+  eventUserStatus: EventUserStatus[];
 
   @OneToMany(() => Shops, (shops) => shops.owner, { cascade: true })
   @JoinColumn()

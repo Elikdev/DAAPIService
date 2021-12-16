@@ -21,6 +21,7 @@ import { ConversationsController } from "./controller/conversation";
 import { ReviewsController } from "./controller/review";
 import { itemCommentController } from "./controller/itemComment";
 import { EventController } from "./controller/event";
+import { EventUserStatusController } from "./controller/eventUserStatus";
 
 export const v1router = Router();
 
@@ -70,6 +71,21 @@ v1router.post("/coupons", CouponsController.create);
 v1router.get("/itemComments/:itemId", itemCommentController.getItemComments);
 
 v1router.get("/reviews/:shopId/count", ReviewsController.getShopReviewsCount);
+
+//eventUserStatus
+v1router.get(
+  "/eventUserStatus/:eventName/:userId/inviteStatus",
+  EventUserStatusController.getEventUserStatus,
+);
+
+v1router.post(
+  "/eventUserStatus/:eventName/:userId/:inviteStatus",
+  EventUserStatusController.updateEventUserStatus,
+);
+v1router.get(
+  "/eventUserStatus/:eventName/:inviteCode",
+  EventUserStatusController.verifyInviteCode,
+);
 
 //events
 v1router.get(
