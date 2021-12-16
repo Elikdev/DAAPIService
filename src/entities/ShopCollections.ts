@@ -35,6 +35,9 @@ export class ShopCollections extends BaseEntity {
   @Column("character varying", { nullable: true })
   h5Name: string | null;
 
+  @Column("bool", { default: false })
+  h5LoginRequired: boolean;
+
   @Column("character varying", { nullable: true })
   h5CoverImageUrl: string | null;
 

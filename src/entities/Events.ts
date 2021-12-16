@@ -29,6 +29,9 @@ export class Events extends BaseEntity {
   title: string;
 
   @Column()
+  subTitle: string;
+
+  @Column()
   bannerImage: string;
 
   @Column()
