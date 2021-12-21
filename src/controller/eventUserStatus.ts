@@ -14,6 +14,7 @@ export class EventUserStatusController {
   static async getEventUserStatus(req: Request, res: Response): Promise<void> {
     const name = req.params.eventName;
     const userId = req.params.userId;
+    const user = await getRepository(Users).findOne({ id: parseInt(userId) });
 
     const eventUserStatusRepo = await getRepository(EventUserStatus);
     const eventUserStatus = await eventUserStatusRepo
@@ -23,10 +24,19 @@ export class EventUserStatusController {
       .getOne();
 
     if (!eventUserStatus) {
+      const eventUserStatusData: any = {};
+      eventUserStatusData.eventName = name;
+      eventUserStatusData.inviteStatus = InviteStatus.NOT_INVITED;
+      eventUserStatusData.participant = user;
+      eventUserStatusData.inviteCode = (Math.random() + 1)
+        .toString(36)
+        .substring(8)
+        .toUpperCase();
+      const eventUserStatusEntity = await eventUserStatusRepo.save(
+        eventUserStatusData,
+      );
       res.send({
-        data: {
-          inviteStatus: InviteStatus.NOT_INVITED,
-        },
+        data: eventUserStatusEntity,
       });
     }
 
