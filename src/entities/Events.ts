@@ -31,8 +31,8 @@ export class Events extends BaseEntity {
   @Column()
   subTitle: string;
 
-  @Column()
-  bannerImage: string;
+  @Column("character varying", { array: true, nullable: true })
+  bannerImages: string[] | null;
 
   @Column()
   backgroundColor: string;
