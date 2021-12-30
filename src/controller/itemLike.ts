@@ -7,6 +7,7 @@ import { Users } from "../entities/Users";
 import { ResourceNotFoundError } from "../error/notfoundError";
 import { logger } from "../logging/logger";
 import { sendPush } from "./helper/umengPushHelper";
+import { ListingStatus } from "../entities/Items";
 
 export class ItemLikeController {
   @HandleError("likeItem")
@@ -127,8 +128,20 @@ export class ItemLikeController {
     const itemLikes = await itemLikeRepo
       .createQueryBuilder("itemLikes")
       .leftJoinAndSelect("itemLikes.user", "user")
-      .where("itemLikes.itemId = :itemId", { itemId: itemId })
-      .select(["itemLikes", "user"])
+      .leftJoinAndSelect("user.shops", "shops")
+      .leftJoinAndSelect("shops.items", "items")
+      .where("items.status = :new", { new: ListingStatus.NEW })
+      .andWhere("itemLikes.itemId = :itemId", { itemId: itemId })
+      .select([
+        "itemLikes",
+        "user",
+        "shops.id",
+        "shops.rating",
+        "shops.name",
+        "shops.introduction",
+        "shops.logoUrl",
+        "items",
+      ])
       .getMany();
 
     res.send({
