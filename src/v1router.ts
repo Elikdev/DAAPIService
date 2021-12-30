@@ -103,6 +103,10 @@ v1router.post("/events/:eventName/:itemId", EventController.addEventItems);
 
 v1router.delete("/events/:eventName/:itemId", EventController.removeEventItems);
 
+//itemLikes
+
+v1router.get("/itemLikes/:id", ItemLikeController.getItemLikes);
+
 // Do auth filtering for the following apis
 v1router.use(authMiddleWare);
 

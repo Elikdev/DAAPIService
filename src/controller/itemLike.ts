@@ -118,4 +118,22 @@ export class ItemLikeController {
       data: userLikedItems,
     });
   }
+
+  @HandleError("getItemLikes")
+  static async getItemLikes(req: Request, res: Response): Promise<void> {
+    const itemId = req.params.id;
+    const itemLikeRepo = getRepository(ItemLikes);
+
+    const itemLikes = await itemLikeRepo
+      .createQueryBuilder("itemLikes")
+      .leftJoinAndSelect("itemLikes.user", "user")
+      .where("itemLikes.itemId = :itemId", { itemId: itemId })
+      .select(["itemLikes", "user"])
+      .getMany();
+
+    res.send({
+      data: itemLikes,
+      count: itemLikes.length,
+    });
+  }
 }
