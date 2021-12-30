@@ -36,11 +36,13 @@ export class ItemsSubscriber implements EntitySubscriberInterface<Items> {
     // to do change to afterUpdate after https://github.com/typeorm/typeorm/commits/master checks into major version.
     if (APP_ENV === "production") {
       const object: any = event.entity;
-      object.objectID = object.id;
-      const result = await index.partialUpdateObject(object).then(() => {
-        console.log("success");
-        delete object.objectID;
-      });
+      if (object.id) {
+        object.objectID = object.id;
+        const result = await index.partialUpdateObject(object).then(() => {
+          console.log("success");
+          delete object.objectID;
+        });
+      }
     }
   }
 
