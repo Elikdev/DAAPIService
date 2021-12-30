@@ -130,18 +130,8 @@ export class ItemLikeController {
       .leftJoinAndSelect("itemLikes.user", "user")
       .leftJoinAndSelect("user.shops", "shops")
       .leftJoinAndSelect("shops.items", "items")
-      .where("items.status = :new", { new: ListingStatus.NEW })
-      .andWhere("itemLikes.itemId = :itemId", { itemId: itemId })
-      .select([
-        "itemLikes",
-        "user",
-        "shops.id",
-        "shops.rating",
-        "shops.name",
-        "shops.introduction",
-        "shops.logoUrl",
-        "items",
-      ])
+      .where("itemLikes.itemId = :itemId", { itemId: itemId })
+      .select(["itemLikes", "user", "shops", "items"])
       .getMany();
 
     res.send({
