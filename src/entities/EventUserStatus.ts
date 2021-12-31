@@ -40,6 +40,9 @@ export class EventUserStatus extends BaseEntity {
   @Column()
   inviteCode: string;
 
+  @Column({ nullable: true })
+  invitedBy: number;
+
   @CreateDateColumn({ type: "timestamp" })
   createdtime: string;
 

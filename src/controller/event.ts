@@ -1,11 +1,16 @@
 import { Request, Response } from "express";
-import { getRepository } from "typeorm";
 import { HandleError } from "../decorator/errorDecorator";
 import { Items, ListingStatus } from "../entities/Items";
 import { Events } from "../entities/Events";
 import { ResourceNotFoundError } from "../error/notfoundError";
 import { logger } from "../logging/logger";
 import { Carts } from "../entities/Cart";
+import { getOrderByConditions } from "./helper/orderByHelper";
+import { getRepository, OrderByCondition } from "typeorm";
+
+const SHOPS_DEFAULT_SORT_BY: OrderByCondition = {
+  "users.followersCount": "DESC",
+};
 
 export class EventController {
   @HandleError("getEvent")
@@ -23,10 +28,14 @@ export class EventController {
 
   @HandleError("getEvents")
   static async getEvents(req: Request, res: Response): Promise<void> {
+    const sorts = req.query.sort;
+    const orderBy = getOrderByConditions(sorts, SHOPS_DEFAULT_SORT_BY);
     const eventRepo = await getRepository(Events);
     const event = await eventRepo
       .createQueryBuilder("event")
       .leftJoinAndSelect("event.shops", "shops")
+      .leftJoinAndSelect("shops.owner", "users")
+      .orderBy(orderBy)
       .getMany();
 
     if (!event) {

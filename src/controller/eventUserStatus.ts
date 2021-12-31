@@ -86,7 +86,7 @@ export class EventUserStatusController {
 
   @HandleError("verifyInviteCode")
   static async verifyInviteCode(req: Request, res: Response): Promise<void> {
-    const userId = req.params.userId;
+    const userId = req.query.userId;
     const eventName = req.params.eventName;
     const inviteCode = req.params.inviteCode;
     const eventUserStatusRepo = await getRepository(EventUserStatus);
@@ -96,6 +96,7 @@ export class EventUserStatusController {
 
     const eventUserStatus = await eventUserStatusRepo
       .createQueryBuilder("eventUserStatus")
+      .leftJoinAndSelect("eventUserStatus.participant", "users")
       .where("eventUserStatus.eventName = :name", { name: eventName })
       .andWhere("eventUserStatus.inviteCode = :inviteCode", {
         inviteCode: inviteCode,
@@ -107,8 +108,18 @@ export class EventUserStatusController {
       eventUserStatus.inviteStatus === InviteStatus.INVITED
     ) {
       response.valid = true;
-    }
 
+      const requestUserStatus = await eventUserStatusRepo
+        .createQueryBuilder("eventUserStatus")
+        .where("eventUserStatus.eventName = :name", { name: eventName })
+        .andWhere("eventUserStatus.participantId = :userId", { userId: userId })
+        .getOne();
+
+      if (requestUserStatus) {
+        requestUserStatus.invitedBy = eventUserStatus.participant.id;
+        await eventUserStatusRepo.save(requestUserStatus);
+      }
+    }
     res.send({
       data: response,
     });
