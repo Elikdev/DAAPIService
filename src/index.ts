@@ -12,7 +12,9 @@ import { messageRouter } from "./messageRouter";
 import { createScheduledJobs } from "./scheduler/scheduler";
 import cors from "cors";
 import https from "https";
+import * as http from "http";
 import { getServerOptions } from "./config/serverconfig";
+import * as socketio from "socket.io";
 
 const PORT = 4000;
 const HTTPS_PORT = 443;
@@ -62,7 +64,24 @@ createConnection(DBConfig)
       // use https on the host for test environment
       https.createServer(httpsOptions, app).listen(HTTPS_PORT);
     } else {
-      app.listen(PORT);
+      const server = http.createServer(app);
+      server.listen(PORT, () => console.log(`server running on port ${PORT}`));
+      const io = new socketio.Server(server);
+      io.on("connection", (socket) => {
+        logger.info("new ws connection");
+        // Listen for Join room
+
+        socket.on("joinRoom", (data: any) => {
+          socket.emit("message", "欢迎" + data.username + "加入聊天！");
+          //Broadcast when a user connects
+          socket.broadcast.emit("message", `${data.username}加入了聊天!`);
+        });
+
+        // Listen for chat message
+        socket.on("chat", (data: any) => {
+          io.emit("message", data);
+        });
+      });
     }
 
     router.use(cors(options));
@@ -76,6 +95,10 @@ createConnection(DBConfig)
         res.set("Content-Type", "application/json");
         res.status(200).sendFile(__dirname + "/apple-app-site-association");
       },
+    );
+
+    app.get("/chat", (req: Request, res: Response) =>
+      res.sendFile(__dirname + "/index.html"),
     );
 
     app.get("/health", (req: Request, res: Response) =>
