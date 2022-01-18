@@ -83,6 +83,7 @@ export class OrderController {
       .createQueryBuilder("orders")
       .where("orders.id = :id", { id: orderId })
       .leftJoinAndSelect("orders.buyerAddress", "buyerAddress")
+      .leftJoinAndSelect("orders.buyer", "buyer")
       .leftJoinAndSelect("orders.orderItems", "item")
       .leftJoinAndSelect("orders.shop", "shop")
       .getOne();
