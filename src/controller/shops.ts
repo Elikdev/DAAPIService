@@ -197,7 +197,7 @@ export class ShopController {
       .loadRelationCountAndMap("shops.itemsCount", "shops.items")
       .select(["shops.id", "items"])
       .orderBy(
-        "CASE WHEN items.auditStatus='fail' AND items.status='new' THEN 0 WHEN items.status='new' THEN 1 ELSE 2 END",
+        "CASE WHEN items.auditStatus='fail' AND items.status='new' THEN 0 ELSE 1 END",
       )
       .addOrderBy("items.createdtime", "DESC")
       .offset(skipSize)
