@@ -85,6 +85,9 @@ export class WxpayService {
     let tradeType = "APP";
     const data: PaymentRequestData = {};
     if (platform == Platform.MINIPROGRAM) {
+      if (!openId) {
+        throw new ResourceNotFoundError("openid for user not found");
+      }
       data.openid = openId;
       appId = PaymentConstants.MINIPROGRAM_APP_ID;
       tradeType = "JSAPI";
@@ -167,9 +170,6 @@ export class WxpayService {
       throw new ResourceNotFoundError("user in order not found");
     }
     const openId = user.openId;
-    if (!openId) {
-      throw new ResourceNotFoundError("openid for user not found");
-    }
     // TODO: 分账
     const payresult = await this.prepay(
       totalPrice,
