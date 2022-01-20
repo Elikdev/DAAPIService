@@ -10,6 +10,8 @@ import * as dotenv from "dotenv";
 import { payrouter } from "./payrouter";
 import { messageRouter } from "./messageRouter";
 import { createScheduledJobs } from "./scheduler/scheduler";
+import { userJoin, getCurrentUser } from "./controller/helper/chatRoomHelper";
+
 import cors from "cors";
 import https from "https";
 import * as http from "http";
@@ -76,14 +78,20 @@ createConnection(DBConfig)
         // Listen for Join room
 
         socket.on("joinRoom", (data: any) => {
+          data.id = socket.id;
+          const user = userJoin(data);
+          socket.join(user.room);
           socket.emit("message", "欢迎" + data.username + "加入聊天！");
           //Broadcast when a user connects
-          socket.broadcast.emit("message", `${data.username}加入了聊天!`);
+          socket.broadcast
+            .to(user.room)
+            .emit("message", `${data.username}加入了聊天!`);
         });
 
         // Listen for chat message
         socket.on("chat", (data: any) => {
-          io.emit("message", data);
+          const user = getCurrentUser(socket.id);
+          io.to(user.room).emit("message", data);
         });
       });
     }
