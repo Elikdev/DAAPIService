@@ -37,6 +37,9 @@ export class Events extends BaseEntity {
   @Column()
   backgroundColor: string;
 
+  @Column()
+  backgroundUrl: string;
+
   @ManyToMany(() => Items, (items) => items.events)
   @JoinTable()
   items: Items[];
