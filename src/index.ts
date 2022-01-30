@@ -91,9 +91,7 @@ createConnection(DBConfig)
         // Listen for chat message
         socket.on("chat", (data: any) => {
           const user = getCurrentUser(socket.id);
-          if (user) {
-            io.to(data.room).emit("message", data);
-          }
+          io.to(data.room).emit("message", data);
         });
       });
     }
