@@ -80,20 +80,18 @@ createConnection(DBConfig)
         socket.on("joinRoom", (data: any) => {
           data.id = socket.id;
           const user = userJoin(data);
-          if (data) {
-            socket.join(data.room);
-            socket.emit("message", "欢迎" + data.username + "加入聊天！");
-            //Broadcast when a user connects
-            socket.broadcast
-              .to(data.room)
-              .emit("message", `${data.username}加入了聊天!`);
-          }
+          socket.join(data.room);
+          socket.emit("message", "欢迎" + data.username + "加入聊天！");
+          //Broadcast when a user connects
+          socket.broadcast
+            .to(data.room)
+            .emit("message", `${data.username}加入了聊天!`);
         });
 
         // Listen for chat message
         socket.on("chat", (data: any) => {
           const user = getCurrentUser(socket.id);
-          if (data && data.room) {
+          if (user) {
             io.to(data.room).emit("message", data);
           }
         });
