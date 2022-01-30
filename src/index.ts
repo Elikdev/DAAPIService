@@ -80,12 +80,12 @@ createConnection(DBConfig)
         socket.on("joinRoom", (data: any) => {
           data.id = socket.id;
           const user = userJoin(data);
-          if (user) {
-            socket.join(user.room);
+          if (data) {
+            socket.join(data.room);
             socket.emit("message", "欢迎" + data.username + "加入聊天！");
             //Broadcast when a user connects
             socket.broadcast
-              .to(user.room)
+              .to(data.room)
               .emit("message", `${data.username}加入了聊天!`);
           }
         });
@@ -93,8 +93,8 @@ createConnection(DBConfig)
         // Listen for chat message
         socket.on("chat", (data: any) => {
           const user = getCurrentUser(socket.id);
-          if (user && user.room) {
-            io.to(user.room).emit("message", data);
+          if (data && data.room) {
+            io.to(data.room).emit("message", data);
           }
         });
       });
