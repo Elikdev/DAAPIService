@@ -1,8 +1,13 @@
 const Umeng = require("umengtuisong");
 
-const umeng = new Umeng({
+const umengIOS = new Umeng({
   appKey: "614579ecd884567d811b5254",
   appMasterSecret: "oj41rao8e9xpxoagtmbqekhdxhtrfl5y",
+});
+
+const umengAndroid = new Umeng({
+  appKey: "61455f15520cc86a1d480802",
+  appMasterSecret: "tkl8jkflrezpj6syo9iz7kausreopfzq",
 });
 
 export const sendPush = async (
@@ -10,7 +15,9 @@ export const sendPush = async (
   content: string | null,
   subtitle: string | null,
   device_token: string | null,
+  device_type: string | null,
 ): Promise<any> => {
+  const umeng = device_type === "ios" ? umengIOS : umengAndroid;
   await umeng.pushSingle({
     title: title,
     content: content,

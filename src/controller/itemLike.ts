@@ -34,6 +34,7 @@ export class ItemLikeController {
 
     const itemLikeRepo = getRepository(ItemLikes);
     const itemLike = await itemLikeRepo.findOne({ user: user, item: item });
+
     if (itemLike) {
       logger.info("ItemLike already exists.");
       res.send({
@@ -52,6 +53,7 @@ export class ItemLikeController {
       item.description,
       "",
       item.shop.owner.deviceToken,
+      item.shop.owner.deviceType,
     );
 
     logger.info("ItemLike created.");

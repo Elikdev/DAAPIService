@@ -81,6 +81,7 @@ export class itemCommentController {
           item.description,
           "",
           item.shop.owner.deviceToken,
+          item.shop.owner.deviceType,
         );
       }
 

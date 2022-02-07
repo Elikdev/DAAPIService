@@ -37,7 +37,13 @@ export class UserRelationController {
       throw new ResourceNotFoundError("Followee is not found.");
     }
 
-    sendPush(follower.username + "开始关注了你!", "", "", followee.deviceToken);
+    sendPush(
+      follower.username + "开始关注了你!",
+      "",
+      "",
+      followee.deviceToken,
+      followee.deviceType,
+    );
 
     const userRelationRepo = getRepository(UserRelations);
     const userRelationEntry = await userRelationRepo.findOne({

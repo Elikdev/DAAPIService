@@ -137,7 +137,7 @@ export class ConversationsController {
       deviceToken = conversation.sender.deviceToken;
     }
 
-    sendPush(pushTitle, "", "", deviceToken);
+    sendPush(pushTitle, "", "", deviceToken, conversation.sender.deviceType);
 
     const result = await conversationRepo
       .createQueryBuilder()

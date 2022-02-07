@@ -35,7 +35,13 @@ export class PaymentController {
           payment.orders.map((order) => {
             order.status = OrderStatus.CONFIRMED;
             order.save();
-            sendPush("店铺有新订单了!", "", "", order.shop.owner.deviceToken);
+            sendPush(
+              "店铺有新订单了!",
+              "",
+              "",
+              order.shop.owner.deviceToken,
+              order.shop.owner.deviceType,
+            );
           }),
         );
       }

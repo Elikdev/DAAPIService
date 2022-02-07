@@ -51,6 +51,7 @@ export class ItemSaveController {
       item.description,
       "",
       item.shop.owner.deviceToken,
+      item.shop.owner.deviceType,
     );
 
     logger.info("ItemSave created.");

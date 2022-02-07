@@ -248,7 +248,13 @@ export class OrderController {
         OrderUtility.isToShipOrder(order.status)
       ) {
         order.status = OrderStatus.SHIPPED;
-        sendPush("你的订单在路上了！", "", "", order.buyer.deviceToken);
+        sendPush(
+          "你的订单在路上了！",
+          "",
+          "",
+          order.buyer.deviceToken,
+          order.buyer.deviceType,
+        );
       }
     }
     const result = await getRepository(Orders).save(order);
