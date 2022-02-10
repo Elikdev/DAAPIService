@@ -132,12 +132,14 @@ export class ConversationsController {
 
     let pushTitle = conversation.sender.username + "给你发了一条消息!";
     let deviceToken = conversation.receiver.deviceToken;
+    let deviceType = conversation.receiver.deviceType;
     if (conversation.receiver.id === conversationData.lastMessageSenderUserId) {
       pushTitle = conversation.receiver.username + "给你发了一条消息!";
       deviceToken = conversation.sender.deviceToken;
+      deviceType = conversation.sender.deviceType;
     }
 
-    sendPush(pushTitle, "", "", deviceToken, conversation.sender.deviceType);
+    sendPush(pushTitle, "", "", deviceToken, deviceType);
 
     const result = await conversationRepo
       .createQueryBuilder()
