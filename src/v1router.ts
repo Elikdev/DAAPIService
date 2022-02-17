@@ -23,6 +23,7 @@ import { itemCommentController } from "./controller/itemComment";
 import { EventController } from "./controller/event";
 import { EventUserStatusController } from "./controller/eventUserStatus";
 import { JsApiController } from "./controller/jsApi";
+import { AliApiController } from "./controller/aliApi";
 
 export const v1router = Router();
 
@@ -193,3 +194,6 @@ v1router.post("/reviews", ReviewsController.createReviews);
 v1router.get("/reviews/:shopId", ReviewsController.getShopReviews);
 
 v1router.post("/itemComments", itemCommentController.createItemComment);
+
+v1router.post("/ali/verify", AliApiController.getVerifyParams);
+v1router.get("/ali/verify/query/:userId", AliApiController.queryVerify);
