@@ -195,5 +195,5 @@ v1router.get("/reviews/:shopId", ReviewsController.getShopReviews);
 
 v1router.post("/itemComments", itemCommentController.createItemComment);
 
-v1router.post("/ali/verify", AliApiController.getVerifyParams);
+v1router.post("/ali/verify", AliApiController.verify);
 v1router.get("/ali/verify/query/:userId", AliApiController.queryVerify);
