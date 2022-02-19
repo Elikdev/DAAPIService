@@ -59,7 +59,7 @@ export class AliApiController {
         cert_type: certType,
       },
       merchant_config: {
-        return_url: "com.retopia.vintage",
+        return_url: "com.retopia.vintage://app",
       },
     };
     const initRes = await alipaySdk.exec(
