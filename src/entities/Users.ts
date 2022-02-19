@@ -34,6 +34,18 @@ export enum Platform {
   APPLE = "apple",
 }
 
+export enum AliAuditStatus {
+  PENDING = "pending",
+  PASS = "pass",
+  FAIL = "fail",
+}
+
+export enum ManualAuditStatus {
+  PENDING = "pending",
+  PASS = "pass",
+  FAIL = "fail",
+}
+
 @Index("users_pkey", ["id"], { unique: true })
 @Entity("users")
 export class Users extends BaseEntity {
@@ -55,6 +67,23 @@ export class Users extends BaseEntity {
     default: Platform.MINIPROGRAM,
   })
   platform: string;
+
+  @Column({
+    type: "enum",
+    enum: AliAuditStatus,
+    default: AliAuditStatus.PENDING,
+  })
+  aliAuditStatus: string;
+
+  @Column("character varying", { nullable: true })
+  aliVerifyCertId: string;
+
+  @Column({
+    type: "enum",
+    enum: ManualAuditStatus,
+    default: ManualAuditStatus.PENDING,
+  })
+  manualAuditStatus: string;
 
   @Column("character varying", { nullable: true })
   unionId: string;
