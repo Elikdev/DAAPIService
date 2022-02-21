@@ -6,7 +6,7 @@ import {
   AuditReasonCode,
 } from "../entities/Items";
 import { CouponType } from "../entities/Coupons";
-
+import { AliAuditStatus } from "../entities/Users";
 import { OrderStatus } from "../entities/Orders";
 
 export const signUpSchema = Joi.object().keys({
@@ -191,6 +191,7 @@ export const updateUserSchema = Joi.object().keys({
   username: Joi.string().max(100),
   introduction: Joi.string().max(500),
   avatarUrl: Joi.string().max(500),
+  aliAuditStatus: Joi.string().valid(...Object.values(AliAuditStatus)),
 });
 
 export const updateUserDeviceInfoSchema = Joi.object().keys({
