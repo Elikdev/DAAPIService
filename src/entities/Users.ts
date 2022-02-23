@@ -100,6 +100,9 @@ export class Users extends BaseEntity {
   @Column("character varying", { nullable: true })
   mobile: string;
 
+  @Column("character varying", { nullable: true })
+  nationalId: string;
+
   @Column({
     type: "enum",
     enum: UserRole,
