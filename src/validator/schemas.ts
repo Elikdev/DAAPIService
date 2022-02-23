@@ -192,6 +192,7 @@ export const updateUserSchema = Joi.object().keys({
   introduction: Joi.string().max(500),
   avatarUrl: Joi.string().max(500),
   aliAuditStatus: Joi.string().valid(...Object.values(AliAuditStatus)),
+  mobile: Joi.string().max(20),
 });
 
 export const updateUserDeviceInfoSchema = Joi.object().keys({

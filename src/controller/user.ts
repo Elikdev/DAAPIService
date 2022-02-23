@@ -280,6 +280,10 @@ export class UserController {
         "users.followingsCount",
         "users.avatarUrl",
         "users.introduction",
+        "users.role",
+        "users.aliAuditStatus",
+        "users.aliVerifyCertId",
+        "users.manualAuditStatus",
       ])
       .getOne();
 
