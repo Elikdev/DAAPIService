@@ -45,7 +45,7 @@ export class AliApiController {
         needEncrypt: true,
       });
       if (queryRes.code === "10000" && queryRes.passed === "T")
-        res.send({ status: "PASSED" });
+        res.send({ status: "PASS" });
     }
 
     //未验证过用户
@@ -148,9 +148,9 @@ export class AliApiController {
       needEncrypt: true,
     });
     if (queryRes && queryRes.passed === "T") {
-      res.send({ passed: "T" });
+      res.send({ status: "PASS" });
     } else {
-      res.send({ passed: "F" });
+      res.send({ status: "FAIL" });
     }
   }
 }
