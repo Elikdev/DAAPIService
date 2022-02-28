@@ -44,10 +44,9 @@ export const autoCancelOrders = async (): Promise<void> => {
   let cancelCount = 0;
   const results = orders.map(async (order) => {
     const orderCreateDate = new Date(order.createdtime);
-    const orderCancelTime = moment(orderCreateDate)
-      .add(ORDER_AUTO_CANCEL_MINUTES, "m")
-      .toDate();
-    if (orderCancelTime < new Date()) {
+    const orderCancelTime = Date.parse(new Date(orderCreateDate.getTime() + 60000).toLocaleString()); // + 1min
+
+    if (orderCancelTime < Date.parse(new Date().toLocaleString('zh-CN', {timeZone: 'Asia/Shanghai'}))) {
       order.status = OrderStatus.CANCELLED;
       // Relist corresponding items
       await resetItems(order.orderItems);
