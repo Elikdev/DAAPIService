@@ -59,6 +59,10 @@ export const createSingleOrder = async (
 };
 
 const verifyItem = (shopId: string, item: Items): void => {
+  if (item.stock <= 0) {
+    throw new BadRequestError(`item ${item.id} out of stock`);
+  }
+
   if (item.status != ListingStatus.NEW) {
     throw new BadRequestError(
       `item ${item.id} with status=${item.status} is not valid`,
@@ -70,7 +74,10 @@ const verifyItem = (shopId: string, item: Items): void => {
 };
 
 const changeItemStatus = async (item: Items): Promise<void> => {
-  item.status = ListingStatus.SOLD;
+  item.stock -= 1;
+  if (item.stock === 0) {
+    item.status = ListingStatus.SOLD;
+  }
   await getRepository(Items).save(item);
 };
 

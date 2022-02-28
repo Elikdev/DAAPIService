@@ -7,6 +7,8 @@ import {
   Index,
   ManyToOne,
   OneToMany,
+  ManyToMany,
+  JoinTable,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { Items } from "./Items";
@@ -82,7 +84,8 @@ export class Orders extends BaseEntity {
   @UpdateDateColumn({ type: "timestamp" })
   updatedtime: string;
 
-  @OneToMany(() => Items, (items) => items.order, { cascade: true })
+  @ManyToMany(() => Items, (items) => items.orders, { cascade: true })
+  @JoinTable()
   orderItems: Items[];
 
   @ManyToOne(() => Coupons, (coupons) => coupons.orders)

@@ -157,8 +157,8 @@ export class Items extends BaseEntity {
   @UpdateDateColumn({ type: "timestamp" })
   updatedtime: string;
 
-  @ManyToOne(() => Orders, (orders) => orders.orderItems)
-  order: Orders;
+  @ManyToMany(() => Orders, (orders) => orders.orderItems)
+  orders: Orders[];
 
   @ManyToOne(() => Shops, (shops) => shops.items)
   shop: Shops;
