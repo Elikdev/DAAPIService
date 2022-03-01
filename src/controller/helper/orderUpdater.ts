@@ -69,6 +69,7 @@ export const resetItems = async (items: Items[]): Promise<void> => {
     if (item.status === ListingStatus.SOLD) {
       logger.debug(`Relist item: ${item.id}`);
       item.status = ListingStatus.NEW;
+      item.stock += 1;
       await item.save();
       relistCount += 1;
     }
