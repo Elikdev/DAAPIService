@@ -102,7 +102,7 @@ export class WxpayService {
     data.notify_url = this.callbackUrl;
     data.trade_type = tradeType;
     data.profit_sharing = useProfitSharing ? "Y" : "N";
-    data.body = "Retopia商品订单";
+    data.body = "NEED! 商品订单";
 
     const signature = WxpayUtility.generateSignature(data, this.apiToken);
     data.sign = signature;

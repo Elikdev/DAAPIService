@@ -62,6 +62,10 @@ export class UserController {
         newUser = true;
       }
 
+      user.platform = Platform.WX; //updates platform and openId as it changes with different platform.
+      user.openId = userInfo.openid;
+      await userRepo.save(user); // back fill union Id
+
       const payload = {
         customerId: user.id,
       };
@@ -178,6 +182,7 @@ export class UserController {
       }
       user.unionId = unionId;
       user.platform = Platform.MINIPROGRAM;
+      user.openId = openId;
       await userRepo.save(user); // back fill union Id
       const payload = {
         customerId: user.id,
