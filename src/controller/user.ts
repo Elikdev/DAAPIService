@@ -48,12 +48,12 @@ export class UserController {
       if (!user) {
         logger.info("Creating new user record.");
         delete userData.code;
-        userData.openId = userInfo.openid;
         userData.username = userInfo.nickname;
         userData.role = Constants.SHOPPER;
         userData.unionId = userInfo.unionid;
         userData.avatarUrl = userInfo.headimgurl;
         userData.sex = userInfo.sex;
+        userData.appOpenId = userInfo.openid;
         userData.platform = Platform.WX;
         user = await userRepo.save(userData);
         if (!user) {
@@ -63,7 +63,7 @@ export class UserController {
       }
 
       user.platform = Platform.WX; //updates platform and openId as it changes with different platform.
-      user.openId = userInfo.openid;
+      user.appOpenId = userInfo.openid;
       await userRepo.save(user); // back fill union Id
 
       const payload = {
@@ -181,8 +181,8 @@ export class UserController {
         }
       }
       user.unionId = unionId;
-      user.platform = Platform.MINIPROGRAM;
       user.openId = openId;
+      user.platform = Platform.MINIPROGRAM;
       await userRepo.save(user); // back fill union Id
       const payload = {
         customerId: user.id,

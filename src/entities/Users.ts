@@ -56,6 +56,9 @@ export class Users extends BaseEntity {
   openId: string;
 
   @Column("character varying", { nullable: true })
+  appOpenId: string;
+
+  @Column("character varying", { nullable: true })
   appleSub: string;
 
   @Column("character varying", { nullable: true })
