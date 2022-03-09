@@ -44,7 +44,7 @@ export class Shops extends BaseEntity {
   @OneToMany(() => Orders, (orders) => orders.shop)
   shopOrders: Orders[];
 
-  @Column("float", { default: 0.0 })
+  @Column("float", { default: 5.0 })
   rating: number;
 
   @Column("character varying", { nullable: true })
@@ -59,7 +59,7 @@ export class Shops extends BaseEntity {
   @Column("character varying", { nullable: true })
   location: string;
 
-  @Column("float", { default: 0.0 })
+  @Column("float", { default: 10.0 })
   commissionRate: number;
 
   @OneToMany(() => Items, (items) => items.shop, { cascade: true })

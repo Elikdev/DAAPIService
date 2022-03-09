@@ -13,6 +13,7 @@ import {
 import { Orders } from "./Orders";
 import { EventUserStatus } from "./EventUserStatus";
 import { Shops } from "./Shops";
+import { PendingShops } from "./PendingShops";
 import { Addresses } from "./Addresses";
 import { ItemSaves } from "./ItemSaves";
 import { Coupons } from "./Coupons";
@@ -131,6 +132,13 @@ export class Users extends BaseEntity {
   @OneToMany(() => Shops, (shops) => shops.owner, { cascade: true })
   @JoinColumn()
   shops: Shops[];
+
+  @OneToMany(() => PendingShops, (pendingShops) => pendingShops.owner, { cascade: true })
+  @JoinColumn()
+  pendingShops: PendingShops[];
+
+  @Column("bool", { default: false })
+  shopApplied: boolean;
 
   @OneToMany(() => Coupons, (coupons) => coupons.owner, { cascade: true })
   coupons: Coupons[];

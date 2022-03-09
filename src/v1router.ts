@@ -6,6 +6,7 @@ import { ItemLikeController } from "./controller/itemLike";
 import { ItemSaveController } from "./controller/itemSave";
 import { UserRelationController } from "./controller/userRelation";
 import { AddressController } from "./controller/address";
+import { PendingShopController } from "./controller/pendingShops";
 import { ShopController } from "./controller/shops";
 import { OrderController } from "./controller/order";
 import { FeedsController } from "./controller/feeds";
@@ -44,6 +45,7 @@ v1router.get("/items/:id", ItemController.getItem);
 v1router.get("/shops", ShopController.discoverShops);
 v1router.get("/shops/:id/items", ShopController.getShopItems);
 v1router.get("/shops/:id", ShopController.getShop);
+v1router.get("/pendingShops", PendingShopController.getPendingShops);
 v1router.get("/collections", CollectionsController.getCollections);
 v1router.get(
   "/collections/:id/items",
@@ -138,8 +140,10 @@ v1router.put("/addresses/:id", AddressController.updateAddress);
 v1router.delete("/addresses/:id", AddressController.deleteAddress);
 
 v1router.post("/shops", ShopController.createShop);
+v1router.post("/pendingShops", PendingShopController.createPendingShop);
 v1router.post("/shops/:id/items", ItemController.createItem);
 v1router.put("/shops/:id", ShopController.updateShop);
+v1router.put("/pendingShops/:id", PendingShopController.updatePendingShop);
 v1router.get("/shops/:id/orders", OrderController.getShopOrders);
 
 v1router.post("/orders", OrderController.createOrder);
