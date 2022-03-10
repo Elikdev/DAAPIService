@@ -105,7 +105,7 @@ export class PendingShopController {
 
       const shopData: any = {
         name: pendingShop.name,
-        introduction: pendingShop.redbookName + " | " + pendingShop.introduction,
+        introduction: "小红书： " + pendingShop.redbookName + " | " + pendingShop.introduction,
         logoUrl: user.avatarUrl,
         location: pendingShop.location,
       };
