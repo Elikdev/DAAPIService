@@ -92,7 +92,7 @@ export const updateItemSchema = Joi.object().keys({
   origin: Joi.string().allow("").allow(null).optional(),
   category: Joi.string().optional(),
   subcategory: Joi.string().optional(),
-  auditStatus: Joi.number()
+  auditStatus: Joi.string()
     .optional()
     .valid(...Object.values(AuditStatus)),
   score: Joi.number(),
@@ -222,7 +222,7 @@ export const updateShopSchema = Joi.object().keys({
 });
 
 export const updatePendingShopSchema = Joi.object().keys({
-  manualAuditStatus: Joi.number()
+  manualAuditStatus: Joi.string()
     .required()
     .valid(...Object.values(ManualAuditStatus))
 });

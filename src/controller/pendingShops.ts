@@ -2,7 +2,8 @@ import { HandleError } from "../decorator/errorDecorator";
 import { Request, Response } from "express";
 import { getRepository, OrderByCondition } from "typeorm";
 import { PendingShops, ManualAuditStatus } from "../entities/PendingShops";
-import { Users } from "../entities/Users";
+import { Shops } from "../entities/Shops";
+import { UserRole, Users } from "../entities/Users";
 import { BadRequestError } from "../error/badRequestError";
 import { RequestValidator } from "../validator/requestValidator";
 import { createPendingShopSchema, updatePendingShopSchema } from "../validator/schemas";
@@ -13,7 +14,7 @@ import {
   getPaginationParams,
 } from "./helper/paginationHelper";
 
-const DEFAULT_SORT_BY: OrderByCondition = { "PendingShops.createdtime": "DESC" };
+const DEFAULT_SORT_BY: OrderByCondition = { "pendingShops.createdtime": "DESC" };
 
 export class PendingShopController {
   @HandleError("createPendingShop")
@@ -27,13 +28,15 @@ export class PendingShopController {
     const userRepo = getRepository(Users);
     const user = await userRepo.findOne({ id: userId });
 
+    if (!user) {
+      throw new ResourceNotFoundError("User doesn't exist.");
+    }
+
     pendingShopData.owner = user;
     const createdPendingShop = await pendingShopRepo.save(pendingShopData);
 
-    if (user) {
-      user.shopApplied = true;
-      await getRepository(Users).save(user);
-    }
+    user.shopApplied = true;
+    await getRepository(Users).save(user);
 
     res.send({
       data: createdPendingShop,
@@ -49,10 +52,9 @@ export class PendingShopController {
       req.query.page,
     );
 
-    // Sort shops by followersCount
     const pendingShopsQuery = repo
-      .createQueryBuilder("PendingShops")
-      .where("PendingShops.manualAuditStatus = :manualAuditStatus", { manualAuditStatus: ManualAuditStatus.PENDING })
+      .createQueryBuilder("pendingShops")
+      .where("pendingShops.manualAuditStatus = :manualAuditStatus", { manualAuditStatus: ManualAuditStatus.PENDING })
       .orderBy(orderBy)
       .skip(skipSize)
       .take(pageSize);
@@ -67,7 +69,6 @@ export class PendingShopController {
 
   @HandleError("updatePendingShop")
   static async updatePendingShop(req: Request, res: Response): Promise<void> {
-    const userId = req.body.userId;
     const pendingShopId = req.params.id;
     const pendingShopData = req.body.data;
 
@@ -78,6 +79,31 @@ export class PendingShopController {
 
     const pendingShopRepo = await getRepository(PendingShops);
     const result = await pendingShopRepo.save(pendingShopData);
+
+    if (pendingShopData.manualAuditStatus === ManualAuditStatus.PASS) {
+      // create shop
+      const pendingShop = await pendingShopRepo
+        .createQueryBuilder("pendingShops")
+        .where("pendingShops.id = :id", { id: pendingShopId })
+        .leftJoinAndSelect("pendingShops.owner", "users")
+        .getOne();
+      if (!pendingShop) {
+        throw new ResourceNotFoundError("PendingShop doesn't exist.");
+      }
+
+      const user = pendingShop.owner;
+      user.role = UserRole.SELLER;
+      await getRepository(Users).save(user);
+
+      const shopData: any = {
+        "name": pendingShop.name,
+        "introduction": pendingShop.redbookName + " | " + pendingShop.introduction,
+        "logoUrl": user.avatarUrl,
+        "location": pendingShop.location
+      };
+      shopData.owner = user;
+      await getRepository(Shops).save(shopData);
+    }
 
     res.send({
       data: result,

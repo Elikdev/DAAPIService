@@ -17,7 +17,7 @@ export enum ManualAuditStatus {
   FAIL = "fail",
 }
 
-@Entity("PendingShops")
+@Entity("pendingShops")
 export class PendingShops extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
