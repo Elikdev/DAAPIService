@@ -11,7 +11,7 @@ import {
 } from "typeorm";
 import { Users } from "./Users";
 
-export enum ManualAuditStatus {
+export enum ShopManualAuditStatus {
   PENDING = "pending",
   PASS = "pass",
   FAIL = "fail",
@@ -48,8 +48,8 @@ export class PendingShops extends BaseEntity {
 
   @Column({
     type: "enum",
-    enum: ManualAuditStatus,
-    default: ManualAuditStatus.PENDING,
+    enum: ShopManualAuditStatus,
+    default: ShopManualAuditStatus.PENDING,
   })
   manualAuditStatus: string;
 }

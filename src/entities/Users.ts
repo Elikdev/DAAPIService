@@ -133,7 +133,9 @@ export class Users extends BaseEntity {
   @JoinColumn()
   shops: Shops[];
 
-  @OneToMany(() => PendingShops, (pendingShops) => pendingShops.owner, { cascade: true })
+  @OneToMany(() => PendingShops, (pendingShops) => pendingShops.owner, {
+    cascade: true,
+  })
   @JoinColumn()
   pendingShops: PendingShops[];
 

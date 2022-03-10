@@ -1,12 +1,15 @@
 import { HandleError } from "../decorator/errorDecorator";
 import { Request, Response } from "express";
 import { getRepository, OrderByCondition } from "typeorm";
-import { PendingShops, ManualAuditStatus } from "../entities/PendingShops";
+import { PendingShops, ShopManualAuditStatus } from "../entities/PendingShops";
 import { Shops } from "../entities/Shops";
-import { UserRole, Users } from "../entities/Users";
+import { UserRole, Users, ManualAuditStatus } from "../entities/Users";
 import { BadRequestError } from "../error/badRequestError";
 import { RequestValidator } from "../validator/requestValidator";
-import { createPendingShopSchema, updatePendingShopSchema } from "../validator/schemas";
+import {
+  createPendingShopSchema,
+  updatePendingShopSchema,
+} from "../validator/schemas";
 import { ResourceNotFoundError } from "../error/notfoundError";
 import { getOrderByConditions } from "./helper/orderByHelper";
 import {
@@ -14,7 +17,9 @@ import {
   getPaginationParams,
 } from "./helper/paginationHelper";
 
-const DEFAULT_SORT_BY: OrderByCondition = { "pendingShops.createdtime": "DESC" };
+const DEFAULT_SORT_BY: OrderByCondition = {
+  "pendingShops.createdtime": "DESC",
+};
 
 export class PendingShopController {
   @HandleError("createPendingShop")
@@ -54,7 +59,9 @@ export class PendingShopController {
 
     const pendingShopsQuery = repo
       .createQueryBuilder("pendingShops")
-      .where("pendingShops.manualAuditStatus = :manualAuditStatus", { manualAuditStatus: ManualAuditStatus.PENDING })
+      .where("pendingShops.manualAuditStatus = :manualAuditStatus", {
+        manualAuditStatus: ShopManualAuditStatus.PENDING,
+      })
       .orderBy(orderBy)
       .skip(skipSize)
       .take(pageSize);
@@ -80,7 +87,7 @@ export class PendingShopController {
     const pendingShopRepo = await getRepository(PendingShops);
     const result = await pendingShopRepo.save(pendingShopData);
 
-    if (pendingShopData.manualAuditStatus === ManualAuditStatus.PASS) {
+    if (pendingShopData.manualAuditStatus === ShopManualAuditStatus.PASS) {
       // create shop
       const pendingShop = await pendingShopRepo
         .createQueryBuilder("pendingShops")
@@ -93,13 +100,14 @@ export class PendingShopController {
 
       const user = pendingShop.owner;
       user.role = UserRole.SELLER;
+      user.manualAuditStatus = ManualAuditStatus.PASS;
       await getRepository(Users).save(user);
 
       const shopData: any = {
-        "name": pendingShop.name,
-        "introduction": pendingShop.redbookName + " | " + pendingShop.introduction,
-        "logoUrl": user.avatarUrl,
-        "location": pendingShop.location
+        name: pendingShop.name,
+        introduction: pendingShop.redbookName + " | " + pendingShop.introduction,
+        logoUrl: user.avatarUrl,
+        location: pendingShop.location,
       };
       shopData.owner = user;
       await getRepository(Shops).save(shopData);

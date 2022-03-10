@@ -7,7 +7,7 @@ import {
 } from "../entities/Items";
 import { CouponType } from "../entities/Coupons";
 import { AliAuditStatus } from "../entities/Users";
-import { ManualAuditStatus } from "../entities/PendingShops";
+import { ShopManualAuditStatus } from "../entities/PendingShops";
 import { OrderStatus } from "../entities/Orders";
 
 export const signUpSchema = Joi.object().keys({
@@ -141,7 +141,7 @@ export const createPendingShopSchema = Joi.object().keys({
   introduction: Joi.string().max(500),
   location: Joi.string().optional(),
   redbookName: Joi.string().optional(),
-  wechatId: Joi.string().max(100).required()
+  wechatId: Joi.string().max(100).required(),
 });
 
 export const createCollectionSchema = Joi.object().keys({
@@ -224,9 +224,8 @@ export const updateShopSchema = Joi.object().keys({
 export const updatePendingShopSchema = Joi.object().keys({
   manualAuditStatus: Joi.string()
     .required()
-    .valid(...Object.values(ManualAuditStatus))
+    .valid(...Object.values(ShopManualAuditStatus)),
 });
-
 
 export const updateConversationSchema = Joi.object().keys({
   buyerArchived: Joi.boolean().optional(),
